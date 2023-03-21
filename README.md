@@ -1,7 +1,7 @@
 # SGLT2-GLP1
 Collection of functions and scripts to investigate how clinical features can be used for prediction.
 
-## Final structure for analysis: (Model 11.5)
+## Final structure for analysis: (Model 05)
 
 1. Fit a BART propensity score model (function _bartMachine::bartMachine_) with all variable available.
 2. Perform BART variable selection (function _bartMachine::var_selection_by_permute_) to choose variables for the PS model.
