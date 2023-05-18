@@ -32,8 +32,8 @@ dir.create("Plots")
 
 ## Load functions required
 
-source("11.01.slade_aurum_functions.R")
-source("11.02.slade_aurum_set_data.R")
+source("01.slade_aurum_functions.R")
+source("02.slade_aurum_set_data.R")
 
 # variables chosen
 variables_mu <- readRDS(paste0(output_path, "/response_model_bcf/variables_mu.rds"))
@@ -167,8 +167,8 @@ plot_preheartfailure_strata <- hba1c.train %>%
 breaks_hba1c <- quantile(hba1c.train$prehba1c, probs = seq(0.2, 0.9, 0.2), na.rm = TRUE)
 
 plot_prehba1c_strata <- group_values(data = hba1c.train,
-                              variable = "prehba1c",
-                              breaks = breaks_hba1c) %>%
+                                     variable = "prehba1c",
+                                     breaks = breaks_hba1c) %>%
   select(intervals, effects, sex, prehba1c) %>%
   drop_na() %>%
   group_by(intervals) %>%
@@ -187,13 +187,13 @@ plot_prehba1c_strata <- group_values(data = hba1c.train,
         axis.title = element_blank(),
         plot.title = element_text(hjust = 0.5),
         strip.background = element_rect(fill="white"))
-  
+
 # eGFR at baseline
 breaks_egfr <- quantile(hba1c.train$preegfr, probs = seq(0.2, 0.9, 0.2), na.rm = TRUE)
 
 plot_preegfr_strata <- group_values(data = hba1c.train,
-                              variable = "preegfr",
-                              breaks = breaks_egfr) %>%
+                                    variable = "preegfr",
+                                    breaks = breaks_egfr) %>%
   select(intervals, effects, sex, preegfr) %>%
   drop_na() %>%
   group_by(intervals) %>%
@@ -217,8 +217,8 @@ plot_preegfr_strata <- group_values(data = hba1c.train,
 breaks_agetx <- quantile(hba1c.train$agetx, probs = seq(0.2, 0.9, 0.2), na.rm = TRUE)
 
 plot_agetx_strata <- group_values(data = hba1c.train,
-                             variable = "agetx",
-                             breaks = breaks_agetx) %>%
+                                  variable = "agetx",
+                                  breaks = breaks_agetx) %>%
   select(intervals, effects, sex, agetx) %>%
   drop_na() %>%
   group_by(intervals) %>%
@@ -242,8 +242,8 @@ plot_agetx_strata <- group_values(data = hba1c.train,
 breaks_prebmi <- quantile(hba1c.train$prebmi, probs = seq(0.2, 0.9, 0.2), na.rm = TRUE)
 
 plot_prebmi_strata <- group_values(data = hba1c.train,
-                                  variable = "prebmi",
-                                  breaks = breaks_prebmi) %>%
+                                   variable = "prebmi",
+                                   breaks = breaks_prebmi) %>%
   select(intervals, effects, sex, prebmi) %>%
   drop_na() %>%
   group_by(intervals) %>%
@@ -279,7 +279,7 @@ plot_strata <- patchwork::wrap_plots(
     plot_preneuropathy_strata,
     plot_preihd_strata,
     plot_preheartfailure_strata
-)) +
+  )) +
   patchwork::plot_annotation(
     title = "Boxplot of treatment effects for covariate strata"
   )

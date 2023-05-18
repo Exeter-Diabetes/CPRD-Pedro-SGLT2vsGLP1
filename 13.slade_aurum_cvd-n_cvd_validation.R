@@ -29,8 +29,8 @@ dir.create("Plots")
 
 ## Load functions required
 
-source("11.01.slade_aurum_functions.R")
-source("11.02.slade_aurum_set_data.R")
+source("01.slade_aurum_functions.R")
+source("02.slade_aurum_set_data.R")
 
 ###############################################################################
 ###############################################################################
@@ -54,7 +54,7 @@ hba1c.test <- set_up_data_sglt2_glp1(dataset.type = "hba1c.test") %>%
   left_join(readRDS("Samples/SGLT2-GLP1/Aurum/ps_model/patient_prop_scores.rds"), by = c("patid", "pated"))
 
 hba1c.test.with.cvd <- hba1c.test %>%
-  filter(preangina == "Yes" | preaf == "Yes" | prerevasc == "Yes" | preheartfailure == "Yes" | prehypertension == "Yes" | preihd == "Yes" | premyocardialinfarction == "Yes" | prestroke == "Yes" | pretia == "Yes") %>%
+  filter(preangina == "Yes" | preaf == "Yes" | prerevasc == "Yes" | preheartfailure == "Yes" |preihd == "Yes" | premyocardialinfarction == "Yes" | prestroke == "Yes" | pretia == "Yes") %>%
   mutate(hba1c_diff.q = ntile(effects, 10)) %>%
   rename("hba1c_diff" = "effects") %>%
   drop_na(hba1c_diff.q)
@@ -75,21 +75,21 @@ ATE_adjusted_hba1c.test.with.cvd <- calc_ATE(data = hba1c.test.with.cvd,
                                              order = "largest", breakdown = unique(c(variables_tau, variables_mu)))
 
 
-plot_ATE_psm_1_1_hba1c.test.with.cvd <- ATE_plot(ATE_psm_1_1_hba1c.test.with.cvd[["effects"]], "hba1c_diff.pred", "obs", "lci", "uci", -10, 10) +
+plot_ATE_psm_1_1_hba1c.test.with.cvd <- ATE_plot(ATE_psm_1_1_hba1c.test.with.cvd[["effects"]], "hba1c_diff.pred", "obs", "lci", "uci", -12, 12) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   labs(
     title = paste0("Cohort with CVD (n=", format(sum(ATE_psm_1_1_hba1c.test.with.cvd[["effects"]]$n_drug1)*2,big.mark=",",scientific=FALSE), ")"),
     subtitle = "Propensity score matching"
   )
 
-plot_ATE_psm_1_1_adjusted_hba1c.test.with.cvd <- ATE_plot(ATE_psm_1_1_adjusted_hba1c.test.with.cvd[["effects"]], "hba1c_diff.pred", "obs", "lci", "uci", -10, 10) +
+plot_ATE_psm_1_1_adjusted_hba1c.test.with.cvd <- ATE_plot(ATE_psm_1_1_adjusted_hba1c.test.with.cvd[["effects"]], "hba1c_diff.pred", "obs", "lci", "uci", -12, 12) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   labs(
     title = paste0("Cohort with CVD (n=", format(sum(ATE_psm_1_1_adjusted_hba1c.test.with.cvd[["effects"]]$n_drug1)*2,big.mark=",",scientific=FALSE), ")"),
     subtitle = "Propensity score matching and estimate adjustment"
   )
 
-plot_ATE_adjusted_hba1c.test.with.cvd <- ATE_plot(ATE_adjusted_hba1c.test.with.cvd[["effects"]], "hba1c_diff.pred", "obs", "lci", "uci", -10, 10) +
+plot_ATE_adjusted_hba1c.test.with.cvd <- ATE_plot(ATE_adjusted_hba1c.test.with.cvd[["effects"]], "hba1c_diff.pred", "obs", "lci", "uci", -12, 12) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   labs(
     title = paste0("Cohort with CVD (n=", format(sum(ATE_adjusted_hba1c.test.with.cvd[["effects"]]$N),big.mark=",",scientific=FALSE), ")"),
@@ -119,21 +119,21 @@ ATE_adjusted_hba1c.test.without.cvd <- calc_ATE(data = hba1c.test.without.cvd,
                                                 order = "largest", breakdown = unique(c(variables_tau, variables_mu)))
 
 
-plot_ATE_psm_1_1_hba1c.test.without.cvd <- ATE_plot(ATE_psm_1_1_hba1c.test.without.cvd[["effects"]], "hba1c_diff.pred", "obs", "lci", "uci", -10, 10) +
+plot_ATE_psm_1_1_hba1c.test.without.cvd <- ATE_plot(ATE_psm_1_1_hba1c.test.without.cvd[["effects"]], "hba1c_diff.pred", "obs", "lci", "uci", -12, 12) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   labs(
     title = paste0("Cohort without CVD (n=", format(sum(ATE_psm_1_1_hba1c.test.without.cvd[["effects"]]$n_drug1)*2,big.mark=",",scientific=FALSE), ")"),
     subtitle = "Propensity score matching"
   )
 
-plot_ATE_psm_1_1_adjusted_hba1c.test.without.cvd <- ATE_plot(ATE_psm_1_1_adjusted_hba1c.test.without.cvd[["effects"]], "hba1c_diff.pred", "obs", "lci", "uci", -10, 10) +
+plot_ATE_psm_1_1_adjusted_hba1c.test.without.cvd <- ATE_plot(ATE_psm_1_1_adjusted_hba1c.test.without.cvd[["effects"]], "hba1c_diff.pred", "obs", "lci", "uci", -12, 12) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   labs(
     title = paste0("Cohort without CVD (n=", format(sum(ATE_psm_1_1_adjusted_hba1c.test.without.cvd[["effects"]]$n_drug1)*2,big.mark=",",scientific=FALSE), ")"),
     subtitle = "Propensity score matching and estimate adjustment"
   )
 
-plot_ATE_adjusted_hba1c.test.without.cvd <- ATE_plot(ATE_adjusted_hba1c.test.without.cvd[["effects"]], "hba1c_diff.pred", "obs", "lci", "uci", -10, 10) +
+plot_ATE_adjusted_hba1c.test.without.cvd <- ATE_plot(ATE_adjusted_hba1c.test.without.cvd[["effects"]], "hba1c_diff.pred", "obs", "lci", "uci", -12, 12) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   labs(
     title = paste0("Cohort without CVD (n=", format(sum(ATE_adjusted_hba1c.test.without.cvd[["effects"]]$N),big.mark=",",scientific=FALSE), ")"),

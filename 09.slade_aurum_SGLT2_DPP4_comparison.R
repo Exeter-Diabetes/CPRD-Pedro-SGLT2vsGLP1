@@ -28,7 +28,7 @@ dir.create("Plots")
 ###############################################################################
 
 ## Load functions required
-source("11.02.slade_aurum_set_data.R")
+source("02.slade_aurum_set_data.R")
 
 ###############################################################################
 ###############################################################################
@@ -41,6 +41,7 @@ patient_predicted_outcomes <- readRDS("Samples/SGLT2-GLP1/Aurum/response_model_b
 
 # load the object for the Linear model. This model object is the object used
 #   in the SGLT2vsDPP4 model by John Dennis et al.
+# Regression parameters can be extracted from the original paper.
 load("m1_hba1cmodel_SGLT2_DPP4.Rdata")
 
 # Collect the full cohort from CPRD Aurum that can be used to fit the SGLT2vsDPP4 linear model
@@ -103,7 +104,14 @@ plot_comparison <- interim.dataset %>%
 pdf(width = 7, height = 7, "Plots/11.09.plot_1.pdf")
 plot_comparison
 dev.off()
-  
+
+## r_squared 
+
+## Calculate assessments of prediction
+rsq <- function (x, y) cor(x, y) ^ 2
+
+r_squared_value <- rsq(interim.dataset$pred.SGLT2.lm, interim.dataset$pred.SGLT2.bcf)
+
 
 ## What drug is best:
 #-----------------
@@ -173,7 +181,7 @@ plot_histogram <- interim.dataset %>%
         axis.title.y = element_blank()) +
   facet_wrap(~best_drug, nrow = 1) +
   scale_y_continuous(label=comma)
-  
+
 ## PDF with the plot for the differential treatment effects
 pdf(width = 9, height = 4, "Plots/11.09.plot_3.pdf")
 plot_histogram

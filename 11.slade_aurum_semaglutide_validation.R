@@ -30,8 +30,8 @@ dir.create(paste0(output_path, "/semaglutide"))
 
 ## Load functions required
 
-source("11.01.slade_aurum_functions.R")
-source("11.02.slade_aurum_set_data.R")
+source("01.slade_aurum_functions.R")
+source("02.slade_aurum_set_data.R")
 
 ###############################################################################
 ###############################################################################

@@ -28,8 +28,8 @@ dir.create("Plots")
 
 ## Load functions required
 
-source("11.01.slade_aurum_functions.R")
-source("11.02.slade_aurum_set_data.R")
+source("01.slade_aurum_functions.R")
+source("02.slade_aurum_set_data.R")
 
 ###############################################################################
 ###############################################################################
@@ -93,9 +93,9 @@ predicted_observed_mixed <- ethnicity.dataset %>%
 #### ---------------------- Propensity score matching
 # White
 ATE_psm_1_1_white <- calc_ATE(data = predicted_observed_white, validation_type = "PSM",
-                                variable = "posthba1cfinal", quantile_var = "hba1c_diff.q",
-                                prop_scores = predicted_observed_white%>%select(prop.score)%>%unlist(),
-                                order = "largest", breakdown = unique(c(variables_mu, variables_tau)))
+                              variable = "posthba1cfinal", quantile_var = "hba1c_diff.q",
+                              prop_scores = predicted_observed_white%>%select(prop.score)%>%unlist(),
+                              order = "largest", breakdown = unique(c(variables_mu, variables_tau)))
 
 # South Asian
 ATE_psm_1_1_asian <- calc_ATE(data = predicted_observed_asian, validation_type = "PSM",
@@ -314,23 +314,23 @@ ATE_adjust_mixed <- calc_ATE(data = predicted_observed_mixed%>%mutate(intervals=
 ### Overall analysis (1 group)
 # White
 ATE_adjust_white_overall <- calc_ATE(data = predicted_observed_white%>%mutate(intervals=as.numeric(1)), validation_type = "Adjust",
-                             variable = "posthba1cfinal", quantile_var = "intervals",
-                             order = "largest", breakdown = unique(c(variables_mu, variables_tau)))
+                                     variable = "posthba1cfinal", quantile_var = "intervals",
+                                     order = "largest", breakdown = unique(c(variables_mu, variables_tau)))
 
 # South Asian
 ATE_adjust_asian_overall <- calc_ATE(data = predicted_observed_asian%>%mutate(intervals=as.numeric(1)), validation_type = "Adjust",
-                             variable = "posthba1cfinal", quantile_var = "intervals",
-                             order = "largest", breakdown = unique(c(variables_mu, variables_tau)))
+                                     variable = "posthba1cfinal", quantile_var = "intervals",
+                                     order = "largest", breakdown = unique(c(variables_mu, variables_tau)))
 
 # Black
 ATE_adjust_black_overall <- calc_ATE(data = predicted_observed_black%>%mutate(intervals=as.numeric(1)), validation_type = "Adjust",
-                             variable = "posthba1cfinal", quantile_var = "intervals",
-                             order = "largest", breakdown = unique(c(variables_mu, variables_tau)))
+                                     variable = "posthba1cfinal", quantile_var = "intervals",
+                                     order = "largest", breakdown = unique(c(variables_mu, variables_tau)))
 
 # Mixed / Other
 ATE_adjust_mixed_overall <- calc_ATE(data = predicted_observed_mixed%>%mutate(intervals=as.numeric(1)), validation_type = "Adjust",
-                             variable = "posthba1cfinal", quantile_var = "intervals",
-                             order = "largest", breakdown = unique(c(variables_mu, variables_tau)))
+                                     variable = "posthba1cfinal", quantile_var = "intervals",
+                                     order = "largest", breakdown = unique(c(variables_mu, variables_tau)))
 
 #:-----------------------------------------------------------------------------------
 # Forest plots for calibration variable
@@ -345,7 +345,7 @@ hba1c_strata_axis_min <- plyr::round_any(floor(min(c(
   ATE_adjust_asian_overall[["effects"]] %>% select(c("obs","lci","uci")) %>% min(),
   ATE_adjust_black_overall[["effects"]] %>% select(c("obs","lci","uci")) %>% min(),
   ATE_adjust_mixed_overall[["effects"]] %>% select(c("obs","lci","uci")) %>% min()
-  ))), 2, f = floor)
+))), 2, f = floor)
 
 hba1c_strata_axis_max <- plyr::round_any(ceiling(max(c(
   ATE_adjust_white[["effects"]] %>% select(c("obs","lci","uci")) %>% max(),

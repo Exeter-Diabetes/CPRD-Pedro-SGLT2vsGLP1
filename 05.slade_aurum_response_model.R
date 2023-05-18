@@ -40,8 +40,8 @@ dir.create("Plots")
 
 ## Load functions required
 
-source("11.01.slade_aurum_functions.R")
-source("11.02.slade_aurum_set_data.R")
+source("01.slade_aurum_functions.R")
+source("02.slade_aurum_set_data.R")
 
 ## Load dataset
 hba1c.train <- set_up_data_sglt2_glp1(dataset.type = "hba1c.train")
@@ -455,6 +455,43 @@ if (class(try(
   saveRDS(predictions.hba1c.test_prop, paste0(output_path, "/response_model_bcf/predictions.hba1c.test_prop.rds"))
   
 }
+
+
+
+# plot mu predictions from model BCF (prop score) vs BCF (no prop score)
+if (class(try(
+  
+  var.selection.comparison.mu <- readRDS(paste0(output_path, "/response_model_bcf/var.selection.comparison.mu.rds"))
+  
+  , silent = TRUE)) == "try-error") {
+  
+  var.selection.comparison.mu <- NULL
+  
+  var.selection.comparison.mu[["bcf_prop"]] <- c(colMeans(bcf_model_prop$mu))
+  var.selection.comparison.mu[["sbcf_prop"]] <- c(colMeans(sparsebcf_chain_1$mu))
+  
+  saveRDS(var.selection.comparison.mu, paste0(output_path, "/response_model_bcf/var.selection.comparison.mu.rds"))
+  
+}
+
+# plot tau predictions from model BCF (prop score) vs BCF (no prop score)
+if (class(try(
+  
+  var.selection.comparison.tau <- readRDS(paste0(output_path, "/response_model_bcf/var.selection.comparison.tau.rds"))
+  
+  , silent = TRUE)) == "try-error") {
+  
+  var.selection.comparison.tau <- NULL
+  
+  var.selection.comparison.tau[["bcf_prop"]] <- c(colMeans(bcf_model_prop$tau))
+  var.selection.comparison.tau[["sbcf_prop"]] <- c(colMeans(sparsebcf_chain_1$tau))
+  
+  saveRDS(var.selection.comparison.tau, paste0(output_path, "/response_model_bcf/var.selection.comparison.tau.rds"))
+  
+}
+
+
+
 
 #:----------------------------------------------------------------------------------------------------
 # Fit BCF model without propensity score included
@@ -1295,8 +1332,56 @@ if (class(try(
 
 
 
+#:---------------------------------------------------------------------------------
+# best linear projections
+
+# load variables used in the BCF model
+variables_tau <- readRDS("Samples/SGLT2-GLP1/Aurum/response_model_bcf/variables_tau.rds")
+variables_mu <- readRDS("Samples/SGLT2-GLP1/Aurum/response_model_bcf/variables_mu.rds")
+
+# load BCF model
+bcf_model <- readRDS("Samples/SGLT2-GLP1/Aurum/response_model_bcf/bcf_model.rds")
+
+# load development dataset
+hba1c.train.cleaned_up <- set_up_data_sglt2_glp1(dataset.type = "hba1c.train") %>%
+  # drop the variables with the most missingness
+  select(-preacr, -preast, -prehaematocrit, -prehaemoglobin, -pretriglyceride) %>%
+  # only complete cases
+  drop_na() %>%
+  as.data.frame() %>%
+  select(patid, pated, posthba1cfinal, drugclass, unique(c(variables_mu, variables_tau))) %>%
+  cbind(effects = colMeans(bcf_model$tau))
 
 
+m1 <- rms::ols(effects ~ rms::rcs(agetx, 3) + sex + ncurrtx + rms::rcs(prehba1c, 3) + rms::rcs(prebmi, 3) + rms::rcs(preegfr, 3) + preheartfailure + preihd + preneuropathy + prepad + preretinopathy, data = hba1c.train.cleaned_up, x = TRUE, y = TRUE)
+
+
+# make a matrix, with samples for every iteration of the treatment effect model
+samples <- matrix(nrow = nrow(bcf_model$tau), ncol = length(m1$coef))
+
+hba1c.train.cleaned <- set_up_data_sglt2_glp1(dataset.type = "hba1c.train") %>%
+  # drop the variables with the most missingness
+  select(-preacr, -preast, -prehaematocrit, -prehaemoglobin, -pretriglyceride) %>%
+  # only complete cases
+  drop_na() %>%
+  as.data.frame() %>%
+  select(patid, pated, posthba1cfinal, drugclass, unique(c(variables_mu, variables_tau)))
+
+for (i in 1:nrow(bcf_model$tau)) {
+  
+  hba1c.train.cleaned_effect <- hba1c.train.cleaned %>%
+    cbind(effects = bcf_model$tau[i, ])
+  
+  m1 <- rms::ols(effects ~ rms::rcs(agetx, 3) + sex + ncurrtx + rms::rcs(prehba1c, 3) + rms::rcs(prebmi, 3) + rms::rcs(preegfr, 3) + preheartfailure + preihd + preneuropathy + prepad + preretinopathy, data = hba1c.train.cleaned_effect, x = TRUE, y = TRUE)
+  
+  samples[i,] <- unlist(m1$coef)
+  
+  print(i)
+  
+}
+
+
+saveRDS(samples, paste0(output_path, "/response_model_bcf/best_linear_projection.rds"))
 
 
 

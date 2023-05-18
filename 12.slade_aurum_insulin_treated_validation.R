@@ -30,8 +30,8 @@ dir.create(paste0(output_path, "/insulin_treated"))
 
 ## Load functions required
 
-source("11.01.slade_aurum_functions.R")
-source("11.02.slade_aurum_set_data.R")
+source("01.slade_aurum_functions.R")
+source("02.slade_aurum_set_data.R")
 
 ###############################################################################
 ###############################################################################
@@ -93,7 +93,7 @@ if (class(try(
   patient_effects <- interim.dataset %>%
     select(patid, pated) %>%
     cbind(effects = colMeans(predictions.interim$tau))
-    # slice(-nrow(interim.dataset))
+  # slice(-nrow(interim.dataset))
   
   
   saveRDS(patient_effects, paste0(output_path, "/insulin_treated/patient_effects.rds"))
@@ -119,9 +119,9 @@ if (class(try(
   , silent = TRUE)) == "try-error") {
   
   ATE_adjust_validation <- calc_ATE(data = predicted_observed,
-                                        validation_type = "Adjust", variable = "posthba1cfinal",
-                                        quantile_var = "hba1c_diff.q",
-                                        order = "largest", breakdown = unique(c(variables_tau, variables_mu)))
+                                    validation_type = "Adjust", variable = "posthba1cfinal",
+                                    quantile_var = "hba1c_diff.q",
+                                    order = "largest", breakdown = unique(c(variables_tau, variables_mu)))
   
   saveRDS(ATE_adjust_validation, paste0(output_path, "/response_model_bcf/assessment/ATE_adjust_validation.rds"))
 }

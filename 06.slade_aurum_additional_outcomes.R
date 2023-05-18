@@ -28,8 +28,8 @@ library(cowplot)
 
 ## functions needed
 
-source("11.01.slade_aurum_functions.R")
-source("11.02.slade_aurum_set_data.R")
+source("01.slade_aurum_functions.R")
+source("02.slade_aurum_set_data.R")
 
 marginal_distribution <- function(x,var) {
   ggplot(x, aes_string(x = var)) +
@@ -114,42 +114,78 @@ group.hba1c.dataset.female <- group.hba1c.dataset %>% filter(sex == "Female")
 
 # Propensity score matching - calibration
 ## Overall
-ATE_psm_1_1_hba1c <- calc_ATE_validation_prop_matching(group.hba1c.dataset%>%mutate(intervals = as.numeric(intervals)), "posthba1cfinal", group.hba1c.dataset$prop.score, quantile_var = "intervals", adjust = FALSE, order = "largest")
+ATE_psm_1_1_hba1c <- calc_ATE(data = group.hba1c.dataset%>%mutate(intervals = as.numeric(intervals)),
+                              validation_type = "PSM", variable = "posthba1cfinal",
+                              quantile_var = "intervals", prop_scores = group.hba1c.dataset$prop.score, 
+                              order = "largest", breakdown = unique(c(variables_tau, variables_mu)))
 
 ## Male
-ATE_psm_1_1_hba1c_male <- calc_ATE_validation_prop_matching(group.hba1c.dataset.male%>%mutate(intervals = as.numeric(intervals)), "posthba1cfinal", group.hba1c.dataset.male$prop.score, quantile_var = "intervals", adjust = FALSE, order = "largest")
+ATE_psm_1_1_hba1c_male <- calc_ATE(data = group.hba1c.dataset.male%>%mutate(intervals = as.numeric(intervals)),
+                                   validation_type = "PSM", variable = "posthba1cfinal",
+                                   quantile_var = "intervals", prop_scores = group.hba1c.dataset.male$prop.score, 
+                                   order = "largest", breakdown = unique(c(variables_tau, variables_mu)))
 
 ## Female
-ATE_psm_1_1_hba1c_female <- calc_ATE_validation_prop_matching(group.hba1c.dataset.female%>%mutate(intervals = as.numeric(intervals)), "posthba1cfinal", group.hba1c.dataset.female$prop.score, quantile_var = "intervals", adjust = FALSE, order = "largest")
+ATE_psm_1_1_hba1c_female <- calc_ATE(data = group.hba1c.dataset.female%>%mutate(intervals = as.numeric(intervals)),
+                                     validation_type = "PSM", variable = "posthba1cfinal",
+                                     quantile_var = "intervals", prop_scores = group.hba1c.dataset.female$prop.score, 
+                                     order = "largest", breakdown = unique(c(variables_tau, variables_mu)))
 
 ## Average treatment effect - whole population
-ATE_psm_1_1_hba1c_full <- calc_ATE_validation_prop_matching(group.hba1c.dataset%>%mutate(intervals = as.numeric(1)), "posthba1cfinal", group.hba1c.dataset$prop.score, quantile_var = "intervals", adjust = FALSE, order = "largest")
+ATE_psm_1_1_hba1c_full <- calc_ATE(data = group.hba1c.dataset%>%mutate(intervals = as.numeric(1)),
+                                   validation_type = "PSM", variable = "posthba1cfinal",
+                                   quantile_var = "intervals", prop_scores = group.hba1c.dataset$prop.score, 
+                                   order = "largest", breakdown = unique(c(variables_tau, variables_mu)))
 
 # Propensity score matching + adjust - calibration
 ## Overall
-ATE_psm_1_1_adjust_hba1c <- calc_ATE_validation_prop_matching(group.hba1c.dataset%>%mutate(intervals = as.numeric(intervals)), "posthba1cfinal", group.hba1c.dataset$prop.score, quantile_var = "intervals", breakdown = model_variables, adjust = TRUE, order = "largest")
+ATE_psm_1_1_adjust_hba1c <- calc_ATE(data = group.hba1c.dataset%>%mutate(intervals = as.numeric(intervals)),
+                                     validation_type = "PSM + adjust", variable = "posthba1cfinal",
+                                     quantile_var = "intervals", prop_scores = group.hba1c.dataset$prop.score, 
+                                     order = "largest", breakdown = unique(c(variables_tau, variables_mu)))
 
 ## Male
-ATE_psm_1_1_adjust_hba1c_male <- calc_ATE_validation_prop_matching(group.hba1c.dataset.male%>%mutate(intervals = as.numeric(intervals)), "posthba1cfinal", group.hba1c.dataset.male$prop.score, quantile_var = "intervals", breakdown = model_variables, adjust = TRUE, order = "largest")
+ATE_psm_1_1_adjust_hba1c_male <- calc_ATE(data = group.hba1c.dataset.male%>%mutate(intervals = as.numeric(intervals)),
+                                          validation_type = "PSM + adjust", variable = "posthba1cfinal",
+                                          quantile_var = "intervals", prop_scores = group.hba1c.dataset.male$prop.score, 
+                                          order = "largest", breakdown = unique(c(variables_tau, variables_mu)))
 
 ## Female
-ATE_psm_1_1_adjust_hba1c_female <- calc_ATE_validation_prop_matching(group.hba1c.dataset.female%>%mutate(intervals = as.numeric(intervals)), "posthba1cfinal", group.hba1c.dataset.female$prop.score, quantile_var = "intervals", breakdown = model_variables, adjust = TRUE, order = "largest")
+ATE_psm_1_1_adjust_hba1c_female <- calc_ATE(data = group.hba1c.dataset.female%>%mutate(intervals = as.numeric(intervals)),
+                                            validation_type = "PSM + adjust", variable = "posthba1cfinal",
+                                            quantile_var = "intervals", prop_scores = group.hba1c.dataset.female$prop.score, 
+                                            order = "largest", breakdown = unique(c(variables_tau, variables_mu)))
 
 ## Average treatment effect - whole population
-ATE_psm_1_1_adjust_hba1c_full <- calc_ATE_validation_prop_matching(group.hba1c.dataset%>%mutate(intervals = as.numeric(1)), "posthba1cfinal", group.hba1c.dataset$prop.score, quantile_var = "intervals", breakdown = model_variables, adjust = TRUE, order = "largest")
+ATE_psm_1_1_adjust_hba1c_full <- calc_ATE(data = group.hba1c.dataset%>%mutate(intervals = as.numeric(1)),
+                                          validation_type = "PSM + adjust", variable = "posthba1cfinal",
+                                          quantile_var = "intervals", prop_scores = group.hba1c.dataset$prop.score, 
+                                          order = "largest", breakdown = unique(c(variables_tau, variables_mu)))
 
 # Adjust - calibration
 ## Overall
-ATE_adjust_hba1c <- calc_ATE_validation_adjust(group.hba1c.dataset, "posthba1cfinal", quantile_var = "intervals", breakdown = model_variables, adjust = TRUE)
+ATE_adjust_hba1c <- calc_ATE(data = group.hba1c.dataset%>%mutate(intervals = as.numeric(intervals)),
+                             validation_type = "Adjust", variable = "posthba1cfinal",
+                             quantile_var = "intervals",
+                             order = "largest", breakdown = unique(c(variables_tau, variables_mu)))
 
 ## Male
-ATE_adjust_hba1c_male <- calc_ATE_validation_adjust(group.hba1c.dataset.male, "posthba1cfinal", quantile_var = "intervals", breakdown = model_variables, adjust = TRUE)
+ATE_adjust_hba1c_male <- calc_ATE(data = group.hba1c.dataset.male%>%mutate(intervals = as.numeric(intervals)),
+                                  validation_type = "Adjust", variable = "posthba1cfinal",
+                                  quantile_var = "intervals",
+                                  order = "largest", breakdown = unique(c(variables_tau, variables_mu)))
 
 ## Female
-ATE_adjust_hba1c_female <- calc_ATE_validation_adjust(group.hba1c.dataset.female, "posthba1cfinal", quantile_var = "intervals", breakdown = model_variables, adjust = TRUE)
+ATE_adjust_hba1c_female <- calc_ATE(data = group.hba1c.dataset.female%>%mutate(intervals = as.numeric(intervals)),
+                                    validation_type = "Adjust", variable = "posthba1cfinal",
+                                    quantile_var = "intervals",
+                                    order = "largest", breakdown = unique(c(variables_tau, variables_mu)))
 
 ## Average treatment effect - whole population
-ATE_adjust_hba1c_full <- calc_ATE_validation_adjust(group.hba1c.dataset %>% mutate(intervals = as.numeric(1)), "posthba1cfinal", quantile_var = "intervals", breakdown = model_variables, adjust = TRUE)
+ATE_adjust_hba1c_full <- calc_ATE(data = group.hba1c.dataset.female%>%mutate(intervals = as.numeric(1)),
+                                  validation_type = "Adjust", variable = "posthba1cfinal",
+                                  quantile_var = "intervals",
+                                  order = "largest", breakdown = unique(c(variables_tau, variables_mu)))
 
 
 # Set up axis for the plots
@@ -574,8 +610,8 @@ full.dataset <- set_up_data_sglt2_glp1(dataset.type = "full.cohort") %>%
 
 # still population into subgroups
 group.full.dataset <- group_values(data = full.dataset,
-                                    variable = "effects",
-                                    breaks = interval_breaks) %>%
+                                   variable = "effects",
+                                   breaks = interval_breaks) %>%
   drop_na(intervals) %>%
   rename("hba1c_diff" = "effects")
 
@@ -621,70 +657,70 @@ if (class(try(
   formula <- "hba1c.change ~ factor(drugclass) + intervals + factor(drugclass)*intervals + rcs(prehba1c, 3) + sex*factor(drugclass)"
   
   models_hba1c_psm_1_1 <- stan_glm(formula, 
-                                    data = group.full.dataset.matched,
-                                    family = gaussian(link = "identity"),
-                                    prior = normal(0, 2),
-                                    prior_intercept = normal(0, 2))
+                                   data = group.full.dataset.matched,
+                                   family = gaussian(link = "identity"),
+                                   prior = normal(0, 2),
+                                   prior_intercept = normal(0, 2))
   
   saveRDS(models_hba1c_psm_1_1, paste0(output_path, "/additional_outcomes/models_hba1c_psm_1_1.rds"))
   
   for (i in mnumber) {
     
     male_sglt2 <- posterior_epred(models_hba1c_psm_1_1, newdata = group.full.dataset.matched %>%
-                            filter(intervals == levels(group.full.dataset.matched$intervals)[i]) %>%
-                            filter(sex == "Male") %>%
-                            mutate(drugclass = factor("SGLT2", levels = levels(group.full.dataset.matched$drugclass))),
-                            type = "response") %>%
+                                    filter(intervals == levels(group.full.dataset.matched$intervals)[i]) %>%
+                                    filter(sex == "Male") %>%
+                                    mutate(drugclass = factor("SGLT2", levels = levels(group.full.dataset.matched$drugclass))),
+                                  type = "response") %>%
       rowMeans()
     
     predictions_hba1c_stan_psm_1_1 <- rbind(predictions_hba1c_stan_psm_1_1, cbind(mean = mean(male_sglt2, na.rm = TRUE),
-                                                                                    lci = quantile(male_sglt2, probs = c(0.025)),
-                                                                                    uci = quantile(male_sglt2, probs = c(0.975)),
-                                                                                    sex = "Male",
-                                                                                    drugclass = "SGLT2",
-                                                                                    intervals = levels(group.full.dataset$intervals)[i]))
+                                                                                  lci = quantile(male_sglt2, probs = c(0.025)),
+                                                                                  uci = quantile(male_sglt2, probs = c(0.975)),
+                                                                                  sex = "Male",
+                                                                                  drugclass = "SGLT2",
+                                                                                  intervals = levels(group.full.dataset$intervals)[i]))
     
     male_glp1 <- posterior_epred(models_hba1c_psm_1_1, newdata = group.full.dataset.matched %>%
-                           filter(intervals == levels(group.full.dataset.matched$intervals)[i]) %>%
-                           filter(sex == "Male") %>%
-                           mutate(drugclass = factor("GLP1", levels = levels(group.full.dataset.matched$drugclass))),
-                           type = "response") %>%
+                                   filter(intervals == levels(group.full.dataset.matched$intervals)[i]) %>%
+                                   filter(sex == "Male") %>%
+                                   mutate(drugclass = factor("GLP1", levels = levels(group.full.dataset.matched$drugclass))),
+                                 type = "response") %>%
       rowMeans()
     
     predictions_hba1c_stan_psm_1_1 <- rbind(predictions_hba1c_stan_psm_1_1, cbind(mean = mean(male_glp1, na.rm = TRUE),
-                                                                                    lci = quantile(male_glp1, probs = c(0.025)),
-                                                                                    uci = quantile(male_glp1, probs = c(0.975)),
-                                                                                    sex = "Male",
-                                                                                    drugclass = "GLP1",
-                                                                                    intervals = levels(group.full.dataset$intervals)[i]))
+                                                                                  lci = quantile(male_glp1, probs = c(0.025)),
+                                                                                  uci = quantile(male_glp1, probs = c(0.975)),
+                                                                                  sex = "Male",
+                                                                                  drugclass = "GLP1",
+                                                                                  intervals = levels(group.full.dataset$intervals)[i]))
     
     female_sglt2 <- posterior_epred(models_hba1c_psm_1_1, newdata = group.full.dataset.matched %>%
-                              filter(intervals == levels(group.full.dataset.matched$intervals)[i]) %>%
-                              filter(sex == "Female") %>%
-                              mutate(drugclass = factor("SGLT2", levels = levels(group.full.dataset.matched$drugclass))),
-                              type = "response") %>%
+                                      filter(intervals == levels(group.full.dataset.matched$intervals)[i]) %>%
+                                      filter(sex == "Female") %>%
+                                      mutate(drugclass = factor("SGLT2", levels = levels(group.full.dataset.matched$drugclass))),
+                                    type = "response") %>%
       rowMeans()
     
     predictions_hba1c_stan_psm_1_1 <- rbind(predictions_hba1c_stan_psm_1_1, cbind(mean = mean(female_sglt2, na.rm = TRUE),
-                                                                                    lci = quantile(female_sglt2, probs = c(0.025)),
-                                                                                    uci = quantile(female_sglt2, probs = c(0.975)),
-                                                                                    sex = "Female",
-                                                                                    drugclass = "SGLT2",
-                                                                                    intervals = levels(group.full.dataset$intervals)[i]))
+                                                                                  lci = quantile(female_sglt2, probs = c(0.025)),
+                                                                                  uci = quantile(female_sglt2, probs = c(0.975)),
+                                                                                  sex = "Female",
+                                                                                  drugclass = "SGLT2",
+                                                                                  intervals = levels(group.full.dataset$intervals)[i]))
     
     female_glp1 <- posterior_epred(models_hba1c_psm_1_1, newdata = group.full.dataset.matched %>%
-                             filter(intervals == levels(group.full.dataset.matched$intervals)[i]) %>%
-                             filter(sex == "Female") %>%
-                             mutate(drugclass = factor("GLP1", levels = levels(group.full.dataset.matched$drugclass))),
-                             type = "response") %>%
+                                     filter(intervals == levels(group.full.dataset.matched$intervals)[i]) %>%
+                                     filter(sex == "Female") %>%
+                                     mutate(drugclass = factor("GLP1", levels = levels(group.full.dataset.matched$drugclass))),
+                                   type = "response") %>%
       rowMeans()
     
     predictions_hba1c_stan_psm_1_1 <- rbind(predictions_hba1c_stan_psm_1_1, cbind(mean = mean(female_glp1, na.rm = TRUE),
-                                                                                    lci = quantile(female_glp1, probs = c(0.025)),
-                                                                                    uci = quantile(female_glp1, probs = c(0.975)),
-                                                                                    sex = "Female",
-                                                                                    drugclass = "GLP1",
-                                                                                    intervals = levels(group.full.dataset$intervals)[i]))
+                                                                                  lci = quantile(female_glp1, probs = c(0.025)),
+                                                                                  uci = quantile(female_glp1, probs = c(0.975)),
+                                                                                  sex = "Female",
+                                                                                  drugclass = "GLP1",
+                                                                                  intervals = levels(group.full.dataset$intervals)[i]))
     
   }
   
@@ -715,28 +751,28 @@ if (class(try(
   for (i in mnumber) {
     
     sglt2 <- posterior_epred(models_hba1c_psm_1_1, newdata = group.full.dataset.matched %>%
-                       filter(intervals == levels(group.full.dataset.matched$intervals)[i]) %>%
-                       mutate(drugclass = factor("SGLT2", levels = levels(group.full.dataset.matched$drugclass))),
-                       type = "response") %>%
+                               filter(intervals == levels(group.full.dataset.matched$intervals)[i]) %>%
+                               mutate(drugclass = factor("SGLT2", levels = levels(group.full.dataset.matched$drugclass))),
+                             type = "response") %>%
       rowMeans()
     
     predictions_hba1c_stan_psm_1_1_overall <- rbind(predictions_hba1c_stan_psm_1_1_overall, cbind(mean = mean(sglt2, na.rm = TRUE),
-                                                                                                    lci = quantile(sglt2, probs = c(0.025)),
-                                                                                                    uci = quantile(sglt2, probs = c(0.975)),
-                                                                                                    drugclass = "SGLT2",
-                                                                                                    intervals = levels(group.full.dataset.matched$intervals)[i]))
+                                                                                                  lci = quantile(sglt2, probs = c(0.025)),
+                                                                                                  uci = quantile(sglt2, probs = c(0.975)),
+                                                                                                  drugclass = "SGLT2",
+                                                                                                  intervals = levels(group.full.dataset.matched$intervals)[i]))
     
     glp1 <- posterior_epred(models_hba1c_psm_1_1, newdata = group.full.dataset.matched %>%
-                      filter(intervals == levels(group.full.dataset.matched$intervals)[i]) %>%
-                      mutate(drugclass = factor("GLP1", levels = levels(group.full.dataset.matched$drugclass))),
-                      type = "response") %>%
+                              filter(intervals == levels(group.full.dataset.matched$intervals)[i]) %>%
+                              mutate(drugclass = factor("GLP1", levels = levels(group.full.dataset.matched$drugclass))),
+                            type = "response") %>%
       rowMeans()
     
     predictions_hba1c_stan_psm_1_1_overall <- rbind(predictions_hba1c_stan_psm_1_1_overall, cbind(mean = mean(glp1, na.rm = TRUE),
-                                                                                                    lci = quantile(glp1, probs = c(0.025)),
-                                                                                                    uci = quantile(glp1, probs = c(0.975)),
-                                                                                                    drugclass = "GLP1",
-                                                                                                    intervals = levels(group.full.dataset.matched$intervals)[i]))
+                                                                                                  lci = quantile(glp1, probs = c(0.025)),
+                                                                                                  uci = quantile(glp1, probs = c(0.975)),
+                                                                                                  drugclass = "GLP1",
+                                                                                                  intervals = levels(group.full.dataset.matched$intervals)[i]))
     
   }
   
@@ -761,24 +797,24 @@ if (class(try(
   models_hba1c_psm_1_1 <- readRDS(paste0(output_path, "/additional_outcomes/models_hba1c_psm_1_1.rds"))
   
   sglt2 <- posterior_epred(models_hba1c_psm_1_1, newdata = group.full.dataset.matched %>%
-                     mutate(drugclass = factor("SGLT2", levels = levels(group.full.dataset.matched$drugclass))),
-                     type = "response") %>%
+                             mutate(drugclass = factor("SGLT2", levels = levels(group.full.dataset.matched$drugclass))),
+                           type = "response") %>%
     rowMeans()
   
   predictions_hba1c_stan_psm_1_1_full <- rbind(predictions_hba1c_stan_psm_1_1_full, cbind(mean = mean(sglt2, na.rm = TRUE),
-                                                                                            lci = quantile(sglt2, probs = c(0.025)),
-                                                                                            uci = quantile(sglt2, probs = c(0.975)),
-                                                                                            drugclass = "SGLT2"))
+                                                                                          lci = quantile(sglt2, probs = c(0.025)),
+                                                                                          uci = quantile(sglt2, probs = c(0.975)),
+                                                                                          drugclass = "SGLT2"))
   
   glp1 <- posterior_epred(models_hba1c_psm_1_1, newdata = group.full.dataset.matched %>%
-                    mutate(drugclass = factor("GLP1", levels = levels(group.full.dataset.matched$drugclass))),
-                    type = "response") %>%
+                            mutate(drugclass = factor("GLP1", levels = levels(group.full.dataset.matched$drugclass))),
+                          type = "response") %>%
     rowMeans()
   
   predictions_hba1c_stan_psm_1_1_full <- rbind(predictions_hba1c_stan_psm_1_1_full, cbind(mean = mean(glp1, na.rm = TRUE),
-                                                                                            lci = quantile(glp1, probs = c(0.025)),
-                                                                                            uci = quantile(glp1, probs = c(0.975)),
-                                                                                            drugclass = "GLP1"))
+                                                                                          lci = quantile(glp1, probs = c(0.025)),
+                                                                                          uci = quantile(glp1, probs = c(0.975)),
+                                                                                          drugclass = "GLP1"))
   
   predictions_hba1c_stan_psm_1_1_full <- predictions_hba1c_stan_psm_1_1_full %>%
     as.data.frame()
@@ -811,70 +847,70 @@ if (class(try(
   formula <- paste0("hba1c.change ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + rcs(agetx, 3) + rcs(prebmi, 3) + rcs(t2dmduration, 3) + rcs(prehba1c, 3) + rcs(preegfr, 3) + rcs(prealt, 3) +", paste(breakdown_adjust[factors], collapse = " + "))
   
   models_hba1c_psm_1_1_adjusted <- stan_glm(formula, 
-                                             data = group.full.dataset.matched,
-                                             family = gaussian(link = "identity"),
-                                             prior = normal(0, 2),
-                                             prior_intercept = normal(0, 2))
+                                            data = group.full.dataset.matched,
+                                            family = gaussian(link = "identity"),
+                                            prior = normal(0, 2),
+                                            prior_intercept = normal(0, 2))
   
   saveRDS(models_hba1c_psm_1_1_adjusted, paste0(output_path, "/additional_outcomes/models_hba1c_psm_1_1_adjusted.rds"))
   
   for (i in mnumber) {
     
     male_sglt2 <- posterior_epred(models_hba1c_psm_1_1_adjusted, newdata = group.full.dataset.matched %>%
-                            filter(intervals == levels(group.full.dataset.matched$intervals)[i]) %>%
-                            filter(sex == "Male") %>%
-                            mutate(drugclass = factor("SGLT2", levels = levels(group.full.dataset.matched$drugclass))),
-                            type = "response") %>%
+                                    filter(intervals == levels(group.full.dataset.matched$intervals)[i]) %>%
+                                    filter(sex == "Male") %>%
+                                    mutate(drugclass = factor("SGLT2", levels = levels(group.full.dataset.matched$drugclass))),
+                                  type = "response") %>%
       rowMeans()
     
     predictions_hba1c_stan_psm_1_1_adjusted <- rbind(predictions_hba1c_stan_psm_1_1_adjusted, cbind(mean = mean(male_sglt2, na.rm = TRUE),
-                                                                                                      lci = quantile(male_sglt2, probs = c(0.025)),
-                                                                                                      uci = quantile(male_sglt2, probs = c(0.975)),
-                                                                                                      sex = "Male",
-                                                                                                      drugclass = "SGLT2",
-                                                                                                      intervals = levels(group.full.dataset$intervals)[i]))
+                                                                                                    lci = quantile(male_sglt2, probs = c(0.025)),
+                                                                                                    uci = quantile(male_sglt2, probs = c(0.975)),
+                                                                                                    sex = "Male",
+                                                                                                    drugclass = "SGLT2",
+                                                                                                    intervals = levels(group.full.dataset$intervals)[i]))
     
     male_glp1 <- posterior_epred(models_hba1c_psm_1_1_adjusted, newdata = group.full.dataset.matched %>%
-                           filter(intervals == levels(group.full.dataset.matched$intervals)[i]) %>%
-                           filter(sex == "Male") %>%
-                           mutate(drugclass = factor("GLP1", levels = levels(group.full.dataset.matched$drugclass))),
-                           type = "response") %>%
+                                   filter(intervals == levels(group.full.dataset.matched$intervals)[i]) %>%
+                                   filter(sex == "Male") %>%
+                                   mutate(drugclass = factor("GLP1", levels = levels(group.full.dataset.matched$drugclass))),
+                                 type = "response") %>%
       rowMeans()
     
     predictions_hba1c_stan_psm_1_1_adjusted <- rbind(predictions_hba1c_stan_psm_1_1_adjusted, cbind(mean = mean(male_glp1, na.rm = TRUE),
-                                                                                                      lci = quantile(male_glp1, probs = c(0.025)),
-                                                                                                      uci = quantile(male_glp1, probs = c(0.975)),
-                                                                                                      sex = "Male",
-                                                                                                      drugclass = "GLP1",
-                                                                                                      intervals = levels(group.full.dataset$intervals)[i]))
+                                                                                                    lci = quantile(male_glp1, probs = c(0.025)),
+                                                                                                    uci = quantile(male_glp1, probs = c(0.975)),
+                                                                                                    sex = "Male",
+                                                                                                    drugclass = "GLP1",
+                                                                                                    intervals = levels(group.full.dataset$intervals)[i]))
     
     female_sglt2 <- posterior_epred(models_hba1c_psm_1_1_adjusted, newdata = group.full.dataset.matched %>%
-                              filter(intervals == levels(group.full.dataset.matched$intervals)[i]) %>%
-                              filter(sex == "Female") %>%
-                              mutate(drugclass = factor("SGLT2", levels = levels(group.full.dataset.matched$drugclass))),
-                              type = "response") %>%
+                                      filter(intervals == levels(group.full.dataset.matched$intervals)[i]) %>%
+                                      filter(sex == "Female") %>%
+                                      mutate(drugclass = factor("SGLT2", levels = levels(group.full.dataset.matched$drugclass))),
+                                    type = "response") %>%
       rowMeans()
     
     predictions_hba1c_stan_psm_1_1_adjusted <- rbind(predictions_hba1c_stan_psm_1_1_adjusted, cbind(mean = mean(female_sglt2, na.rm = TRUE),
-                                                                                                      lci = quantile(female_sglt2, probs = c(0.025)),
-                                                                                                      uci = quantile(female_sglt2, probs = c(0.975)),
-                                                                                                      sex = "Female",
-                                                                                                      drugclass = "SGLT2",
-                                                                                                      intervals = levels(group.full.dataset$intervals)[i]))
+                                                                                                    lci = quantile(female_sglt2, probs = c(0.025)),
+                                                                                                    uci = quantile(female_sglt2, probs = c(0.975)),
+                                                                                                    sex = "Female",
+                                                                                                    drugclass = "SGLT2",
+                                                                                                    intervals = levels(group.full.dataset$intervals)[i]))
     
     female_glp1 <- posterior_epred(models_hba1c_psm_1_1_adjusted, newdata = group.full.dataset.matched %>%
-                             filter(intervals == levels(group.full.dataset.matched$intervals)[i]) %>%
-                             filter(sex == "Female") %>%
-                             mutate(drugclass = factor("GLP1", levels = levels(group.full.dataset.matched$drugclass))),
-                             type = "response") %>%
+                                     filter(intervals == levels(group.full.dataset.matched$intervals)[i]) %>%
+                                     filter(sex == "Female") %>%
+                                     mutate(drugclass = factor("GLP1", levels = levels(group.full.dataset.matched$drugclass))),
+                                   type = "response") %>%
       rowMeans()
     
     predictions_hba1c_stan_psm_1_1_adjusted <- rbind(predictions_hba1c_stan_psm_1_1_adjusted, cbind(mean = mean(female_glp1, na.rm = TRUE),
-                                                                                                      lci = quantile(female_glp1, probs = c(0.025)),
-                                                                                                      uci = quantile(female_glp1, probs = c(0.975)),
-                                                                                                      sex = "Female",
-                                                                                                      drugclass = "GLP1",
-                                                                                                      intervals = levels(group.full.dataset$intervals)[i]))
+                                                                                                    lci = quantile(female_glp1, probs = c(0.025)),
+                                                                                                    uci = quantile(female_glp1, probs = c(0.975)),
+                                                                                                    sex = "Female",
+                                                                                                    drugclass = "GLP1",
+                                                                                                    intervals = levels(group.full.dataset$intervals)[i]))
     
   }
   
@@ -906,28 +942,28 @@ if (class(try(
   for (i in mnumber) {
     
     sglt2 <- posterior_epred(models_hba1c_psm_1_1_adjusted, newdata = group.full.dataset.matched %>%
-                       filter(intervals == levels(group.full.dataset.matched$intervals)[i]) %>%
-                       mutate(drugclass = factor("SGLT2", levels = levels(group.full.dataset.matched$drugclass))),
-                       type = "response") %>%
+                               filter(intervals == levels(group.full.dataset.matched$intervals)[i]) %>%
+                               mutate(drugclass = factor("SGLT2", levels = levels(group.full.dataset.matched$drugclass))),
+                             type = "response") %>%
       rowMeans()
     
     predictions_hba1c_stan_psm_1_1_adjusted_overall <- rbind(predictions_hba1c_stan_psm_1_1_adjusted_overall, cbind(mean = mean(sglt2, na.rm = TRUE),
-                                                                                                                      lci = quantile(sglt2, probs = c(0.025)),
-                                                                                                                      uci = quantile(sglt2, probs = c(0.975)),
-                                                                                                                      drugclass = "SGLT2",
-                                                                                                                      intervals = levels(group.full.dataset.matched$intervals)[i]))
+                                                                                                                    lci = quantile(sglt2, probs = c(0.025)),
+                                                                                                                    uci = quantile(sglt2, probs = c(0.975)),
+                                                                                                                    drugclass = "SGLT2",
+                                                                                                                    intervals = levels(group.full.dataset.matched$intervals)[i]))
     
     glp1 <- posterior_epred(models_hba1c_psm_1_1_adjusted, newdata = group.full.dataset.matched %>%
-                      filter(intervals == levels(group.full.dataset.matched$intervals)[i]) %>%
-                      mutate(drugclass = factor("GLP1", levels = levels(group.full.dataset.matched$drugclass))),
-                      type = "response") %>%
+                              filter(intervals == levels(group.full.dataset.matched$intervals)[i]) %>%
+                              mutate(drugclass = factor("GLP1", levels = levels(group.full.dataset.matched$drugclass))),
+                            type = "response") %>%
       rowMeans()
     
     predictions_hba1c_stan_psm_1_1_adjusted_overall <- rbind(predictions_hba1c_stan_psm_1_1_adjusted_overall, cbind(mean = mean(glp1, na.rm = TRUE),
-                                                                                                                      lci = quantile(glp1, probs = c(0.025)),
-                                                                                                                      uci = quantile(glp1, probs = c(0.975)),
-                                                                                                                      drugclass = "GLP1",
-                                                                                                                      intervals = levels(group.full.dataset.matched$intervals)[i]))
+                                                                                                                    lci = quantile(glp1, probs = c(0.025)),
+                                                                                                                    uci = quantile(glp1, probs = c(0.975)),
+                                                                                                                    drugclass = "GLP1",
+                                                                                                                    intervals = levels(group.full.dataset.matched$intervals)[i]))
     
   }
   
@@ -951,24 +987,24 @@ if (class(try(
   models_hba1c_psm_1_1_adjusted <- readRDS(paste0(output_path, "/additional_outcomes/models_hba1c_psm_1_1_adjusted.rds"))
   
   sglt2 <- posterior_epred(models_hba1c_psm_1_1_adjusted, newdata = group.full.dataset.matched %>%
-                     mutate(drugclass = factor("SGLT2", levels = levels(group.full.dataset.matched$drugclass))),
-                     type = "response") %>%
+                             mutate(drugclass = factor("SGLT2", levels = levels(group.full.dataset.matched$drugclass))),
+                           type = "response") %>%
     rowMeans()
   
   predictions_hba1c_stan_psm_1_1_adjusted_full <- rbind(predictions_hba1c_stan_psm_1_1_adjusted_full, cbind(mean = mean(sglt2, na.rm = TRUE),
-                                                                                                              lci = quantile(sglt2, probs = c(0.025)),
-                                                                                                              uci = quantile(sglt2, probs = c(0.975)),
-                                                                                                              drugclass = "SGLT2"))
+                                                                                                            lci = quantile(sglt2, probs = c(0.025)),
+                                                                                                            uci = quantile(sglt2, probs = c(0.975)),
+                                                                                                            drugclass = "SGLT2"))
   
   glp1 <- posterior_epred(models_hba1c_psm_1_1_adjusted, newdata = group.full.dataset.matched %>%
-                    mutate(drugclass = factor("GLP1", levels = levels(group.full.dataset.matched$drugclass))),
-                    type = "response") %>%
+                            mutate(drugclass = factor("GLP1", levels = levels(group.full.dataset.matched$drugclass))),
+                          type = "response") %>%
     rowMeans()
   
   predictions_hba1c_stan_psm_1_1_adjusted_full <- rbind(predictions_hba1c_stan_psm_1_1_adjusted_full, cbind(mean = mean(glp1, na.rm = TRUE),
-                                                                                                              lci = quantile(glp1, probs = c(0.025)),
-                                                                                                              uci = quantile(glp1, probs = c(0.975)),
-                                                                                                              drugclass = "GLP1"))
+                                                                                                            lci = quantile(glp1, probs = c(0.025)),
+                                                                                                            uci = quantile(glp1, probs = c(0.975)),
+                                                                                                            drugclass = "GLP1"))
   
   predictions_hba1c_stan_psm_1_1_adjusted_full <- predictions_hba1c_stan_psm_1_1_adjusted_full %>%
     as.data.frame()
@@ -1001,70 +1037,70 @@ if (class(try(
   formula <- paste0("hba1c.change ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + rcs(agetx, 3) + rcs(t2dmduration, 3) + rcs(prebmi, 3) + rcs(prehba1c, 3) + rcs(preegfr, 3) + rcs(prealt, 3) +", paste(breakdown_adjust[factors], collapse = " + "))
   
   models_hba1c_adjusted <- stan_glm(formula, 
-                                     data = group.full.dataset,
-                                     family = gaussian(link = "identity"),
-                                     prior = normal(0, 2),
-                                     prior_intercept = normal(0, 2))
+                                    data = group.full.dataset,
+                                    family = gaussian(link = "identity"),
+                                    prior = normal(0, 2),
+                                    prior_intercept = normal(0, 2))
   
   saveRDS(models_hba1c_adjusted, paste0(output_path, "/additional_outcomes/models_hba1c_adjusted.rds"))
   
   for (i in mnumber) {
     
     male_sglt2 <- posterior_epred(models_hba1c_adjusted, newdata = group.full.dataset %>%
-                            filter(intervals == levels(group.full.dataset$intervals)[i]) %>%
-                            filter(sex == "Male") %>%
-                            mutate(drugclass = factor("SGLT2", levels = levels(group.full.dataset.matched$drugclass))),
-                            type = "response") %>%
+                                    filter(intervals == levels(group.full.dataset$intervals)[i]) %>%
+                                    filter(sex == "Male") %>%
+                                    mutate(drugclass = factor("SGLT2", levels = levels(group.full.dataset.matched$drugclass))),
+                                  type = "response") %>%
       rowMeans()
     
     predictions_hba1c_stan_adjusted <- rbind(predictions_hba1c_stan_adjusted, cbind(mean = mean(male_sglt2, na.rm = TRUE),
-                                                                                      lci = quantile(male_sglt2, probs = c(0.025)),
-                                                                                      uci = quantile(male_sglt2, probs = c(0.975)),
-                                                                                      sex = "Male",
-                                                                                      drugclass = "SGLT2",
-                                                                                      intervals = levels(group.full.dataset$intervals)[i]))
+                                                                                    lci = quantile(male_sglt2, probs = c(0.025)),
+                                                                                    uci = quantile(male_sglt2, probs = c(0.975)),
+                                                                                    sex = "Male",
+                                                                                    drugclass = "SGLT2",
+                                                                                    intervals = levels(group.full.dataset$intervals)[i]))
     
     male_glp1 <- posterior_epred(models_hba1c_adjusted, newdata = group.full.dataset %>%
-                           filter(intervals == levels(group.full.dataset$intervals)[i]) %>%
-                           filter(sex == "Male") %>%
-                           mutate(drugclass = factor("GLP1", levels = levels(group.full.dataset.matched$drugclass))),
-                           type = "response") %>%
+                                   filter(intervals == levels(group.full.dataset$intervals)[i]) %>%
+                                   filter(sex == "Male") %>%
+                                   mutate(drugclass = factor("GLP1", levels = levels(group.full.dataset.matched$drugclass))),
+                                 type = "response") %>%
       rowMeans()
     
     predictions_hba1c_stan_adjusted <- rbind(predictions_hba1c_stan_adjusted, cbind(mean = mean(male_glp1, na.rm = TRUE),
-                                                                                      lci = quantile(male_glp1, probs = c(0.025)),
-                                                                                      uci = quantile(male_glp1, probs = c(0.975)),
-                                                                                      sex = "Male",
-                                                                                      drugclass = "GLP1",
-                                                                                      intervals = levels(group.full.dataset$intervals)[i]))
+                                                                                    lci = quantile(male_glp1, probs = c(0.025)),
+                                                                                    uci = quantile(male_glp1, probs = c(0.975)),
+                                                                                    sex = "Male",
+                                                                                    drugclass = "GLP1",
+                                                                                    intervals = levels(group.full.dataset$intervals)[i]))
     
     female_sglt2 <- posterior_epred(models_hba1c_adjusted, newdata = group.full.dataset %>%
-                              filter(intervals == levels(group.full.dataset$intervals)[i]) %>%
-                              filter(sex == "Female") %>%
-                              mutate(drugclass = factor("SGLT2", levels = levels(group.full.dataset.matched$drugclass))),
-                              type = "response") %>%
+                                      filter(intervals == levels(group.full.dataset$intervals)[i]) %>%
+                                      filter(sex == "Female") %>%
+                                      mutate(drugclass = factor("SGLT2", levels = levels(group.full.dataset.matched$drugclass))),
+                                    type = "response") %>%
       rowMeans()
     
     predictions_hba1c_stan_adjusted <- rbind(predictions_hba1c_stan_adjusted, cbind(mean = mean(female_sglt2, na.rm = TRUE),
-                                                                                      lci = quantile(female_sglt2, probs = c(0.025)),
-                                                                                      uci = quantile(female_sglt2, probs = c(0.975)),
-                                                                                      sex = "Female",
-                                                                                      drugclass = "SGLT2",
-                                                                                      intervals = levels(group.full.dataset$intervals)[i]))
+                                                                                    lci = quantile(female_sglt2, probs = c(0.025)),
+                                                                                    uci = quantile(female_sglt2, probs = c(0.975)),
+                                                                                    sex = "Female",
+                                                                                    drugclass = "SGLT2",
+                                                                                    intervals = levels(group.full.dataset$intervals)[i]))
     
     female_glp1 <- posterior_epred(models_hba1c_adjusted, newdata = group.full.dataset %>%
-                             filter(intervals == levels(group.full.dataset$intervals)[i]) %>%
-                             filter(sex == "Female") %>%
-                             mutate(drugclass = factor("GLP1", levels = levels(group.full.dataset.matched$drugclass))),
-                             type = "response") %>%
+                                     filter(intervals == levels(group.full.dataset$intervals)[i]) %>%
+                                     filter(sex == "Female") %>%
+                                     mutate(drugclass = factor("GLP1", levels = levels(group.full.dataset.matched$drugclass))),
+                                   type = "response") %>%
       rowMeans()
     
     predictions_hba1c_stan_adjusted <- rbind(predictions_hba1c_stan_adjusted, cbind(mean = mean(female_glp1, na.rm = TRUE),
-                                                                                      lci = quantile(female_glp1, probs = c(0.025)),
-                                                                                      uci = quantile(female_glp1, probs = c(0.975)),
-                                                                                      sex = "Female",
-                                                                                      drugclass = "GLP1",
-                                                                                      intervals = levels(group.full.dataset$intervals)[i]))
+                                                                                    lci = quantile(female_glp1, probs = c(0.025)),
+                                                                                    uci = quantile(female_glp1, probs = c(0.975)),
+                                                                                    sex = "Female",
+                                                                                    drugclass = "GLP1",
+                                                                                    intervals = levels(group.full.dataset$intervals)[i]))
     
   }
   
@@ -1095,28 +1131,28 @@ if (class(try(
   for (i in mnumber) {
     
     sglt2 <- posterior_epred(models_hba1c_adjusted, newdata = group.full.dataset %>%
-                       filter(intervals == levels(group.full.dataset$intervals)[i]) %>%
-                       mutate(drugclass = factor("SGLT2", levels = levels(group.full.dataset.matched$drugclass))),
-                       type = "response") %>%
+                               filter(intervals == levels(group.full.dataset$intervals)[i]) %>%
+                               mutate(drugclass = factor("SGLT2", levels = levels(group.full.dataset.matched$drugclass))),
+                             type = "response") %>%
       rowMeans()
     
     predictions_hba1c_stan_adjusted_overall <- rbind(predictions_hba1c_stan_adjusted_overall, cbind(mean = mean(sglt2, na.rm = TRUE),
-                                                                                                      lci = quantile(sglt2, probs = c(0.025)),
-                                                                                                      uci = quantile(sglt2, probs = c(0.975)),
-                                                                                                      drugclass = "SGLT2",
-                                                                                                      intervals = levels(group.full.dataset$intervals)[i]))
+                                                                                                    lci = quantile(sglt2, probs = c(0.025)),
+                                                                                                    uci = quantile(sglt2, probs = c(0.975)),
+                                                                                                    drugclass = "SGLT2",
+                                                                                                    intervals = levels(group.full.dataset$intervals)[i]))
     
     glp1 <- posterior_epred(models_hba1c_adjusted, newdata = group.full.dataset %>%
-                      filter(intervals == levels(group.full.dataset$intervals)[i]) %>%
-                      mutate(drugclass = factor("GLP1", levels = levels(group.full.dataset.matched$drugclass))),
-                      type = "response") %>%
+                              filter(intervals == levels(group.full.dataset$intervals)[i]) %>%
+                              mutate(drugclass = factor("GLP1", levels = levels(group.full.dataset.matched$drugclass))),
+                            type = "response") %>%
       rowMeans()
     
     predictions_hba1c_stan_adjusted_overall <- rbind(predictions_hba1c_stan_adjusted_overall, cbind(mean = mean(glp1, na.rm = TRUE),
-                                                                                                      lci = quantile(glp1, probs = c(0.025)),
-                                                                                                      uci = quantile(glp1, probs = c(0.975)),
-                                                                                                      drugclass = "GLP1",
-                                                                                                      intervals = levels(group.full.dataset$intervals)[i]))
+                                                                                                    lci = quantile(glp1, probs = c(0.025)),
+                                                                                                    uci = quantile(glp1, probs = c(0.975)),
+                                                                                                    drugclass = "GLP1",
+                                                                                                    intervals = levels(group.full.dataset$intervals)[i]))
     
   }
   
@@ -1140,24 +1176,24 @@ if (class(try(
   models_hba1c_adjusted <- readRDS(paste0(output_path, "/additional_outcomes/models_hba1c_adjusted.rds"))
   
   sglt2 <- posterior_epred(models_hba1c_adjusted, newdata = group.full.dataset %>%
-                     mutate(drugclass = factor("SGLT2", levels = levels(group.full.dataset$drugclass))),
-                     type = "response") %>%
+                             mutate(drugclass = factor("SGLT2", levels = levels(group.full.dataset$drugclass))),
+                           type = "response") %>%
     rowMeans()
   
   predictions_hba1c_stan_adjusted_full <- rbind(predictions_hba1c_stan_adjusted_full, cbind(mean = mean(sglt2, na.rm = TRUE),
-                                                                                              lci = quantile(sglt2, probs = c(0.025)),
-                                                                                              uci = quantile(sglt2, probs = c(0.975)),
-                                                                                              drugclass = "SGLT2"))
+                                                                                            lci = quantile(sglt2, probs = c(0.025)),
+                                                                                            uci = quantile(sglt2, probs = c(0.975)),
+                                                                                            drugclass = "SGLT2"))
   
   glp1 <- posterior_epred(models_hba1c_adjusted, newdata = group.full.dataset %>%
-                    mutate(drugclass = factor("GLP1", levels = levels(group.full.dataset$drugclass))),
-                    type = "response") %>%
+                            mutate(drugclass = factor("GLP1", levels = levels(group.full.dataset$drugclass))),
+                          type = "response") %>%
     rowMeans()
   
   predictions_hba1c_stan_adjusted_full <- rbind(predictions_hba1c_stan_adjusted_full, cbind(mean = mean(glp1, na.rm = TRUE),
-                                                                                              lci = quantile(glp1, probs = c(0.025)),
-                                                                                              uci = quantile(glp1, probs = c(0.975)),
-                                                                                              drugclass = "GLP1"))
+                                                                                            lci = quantile(glp1, probs = c(0.025)),
+                                                                                            uci = quantile(glp1, probs = c(0.975)),
+                                                                                            drugclass = "GLP1"))
   
   predictions_hba1c_stan_adjusted_full <- predictions_hba1c_stan_adjusted_full %>%
     as.data.frame()
@@ -1175,33 +1211,33 @@ if (class(try(
 ## calculate limits
 
 hba1c_overall_axis_min <- plyr::round_any(floor(min(c(predictions_hba1c_stan_psm_1_1_full %>% select(c("mean","lci","uci")) %>% as.data.frame() %>% gather() %>% select(value) %>% unlist() %>% as.numeric() %>% min(), 
-                                                       predictions_hba1c_stan_psm_1_1_adjusted_full %>% select(c("mean","lci","uci")) %>% as.data.frame() %>% gather() %>% select(value) %>% unlist() %>% as.numeric() %>% min(), 
-                                                       predictions_hba1c_stan_adjusted_full %>% select(c("mean","lci","uci")) %>% as.data.frame() %>% gather() %>% select(value) %>% unlist() %>% as.numeric() %>% min(), 
-                                                       predictions_hba1c_stan_psm_1_1_overall %>% select(c("mean","lci","uci")) %>% as.data.frame() %>% gather() %>% select(value) %>% unlist() %>% as.numeric() %>% min(), 
-                                                       predictions_hba1c_stan_psm_1_1_adjusted_overall %>% select(c("mean","lci","uci")) %>% as.data.frame() %>% gather() %>% select(value) %>% unlist() %>% as.numeric() %>% min(),
-                                                       predictions_hba1c_stan_adjusted_overall %>% select(c("mean","lci","uci")) %>% as.data.frame() %>% gather() %>% select(value) %>% unlist() %>% as.numeric() %>% min()))), 2, f = floor)
+                                                      predictions_hba1c_stan_psm_1_1_adjusted_full %>% select(c("mean","lci","uci")) %>% as.data.frame() %>% gather() %>% select(value) %>% unlist() %>% as.numeric() %>% min(), 
+                                                      predictions_hba1c_stan_adjusted_full %>% select(c("mean","lci","uci")) %>% as.data.frame() %>% gather() %>% select(value) %>% unlist() %>% as.numeric() %>% min(), 
+                                                      predictions_hba1c_stan_psm_1_1_overall %>% select(c("mean","lci","uci")) %>% as.data.frame() %>% gather() %>% select(value) %>% unlist() %>% as.numeric() %>% min(), 
+                                                      predictions_hba1c_stan_psm_1_1_adjusted_overall %>% select(c("mean","lci","uci")) %>% as.data.frame() %>% gather() %>% select(value) %>% unlist() %>% as.numeric() %>% min(),
+                                                      predictions_hba1c_stan_adjusted_overall %>% select(c("mean","lci","uci")) %>% as.data.frame() %>% gather() %>% select(value) %>% unlist() %>% as.numeric() %>% min()))), 2, f = floor)
 
 hba1c_overall_axis_max <- plyr::round_any(ceiling(max(c(predictions_hba1c_stan_psm_1_1_full %>% select(c("mean","lci","uci")) %>% as.data.frame() %>% gather() %>% select(value) %>% unlist() %>% as.numeric() %>% min(), 
-                                                         predictions_hba1c_stan_psm_1_1_adjusted_full %>% select(c("mean","lci","uci")) %>% as.data.frame() %>% gather() %>% select(value) %>% unlist() %>% as.numeric() %>% min(), 
-                                                         predictions_hba1c_stan_adjusted_full %>% select(c("mean","lci","uci")) %>% as.data.frame() %>% gather() %>% select(value) %>% unlist() %>% as.numeric() %>% min(), 
-                                                         predictions_hba1c_stan_psm_1_1_overall %>% select(c("mean","lci","uci")) %>% as.data.frame() %>% gather() %>% select(value) %>% unlist() %>% as.numeric() %>% max(), 
-                                                         predictions_hba1c_stan_psm_1_1_adjusted_overall %>% select(c("mean","lci","uci")) %>% as.data.frame() %>% gather() %>% select(value) %>% unlist() %>% as.numeric() %>% max(),
-                                                         predictions_hba1c_stan_adjusted_overall %>% select(c("mean","lci","uci")) %>% as.data.frame() %>% gather() %>% select(value) %>% unlist() %>% as.numeric() %>% max()))), 2, f = ceiling)
+                                                        predictions_hba1c_stan_psm_1_1_adjusted_full %>% select(c("mean","lci","uci")) %>% as.data.frame() %>% gather() %>% select(value) %>% unlist() %>% as.numeric() %>% min(), 
+                                                        predictions_hba1c_stan_adjusted_full %>% select(c("mean","lci","uci")) %>% as.data.frame() %>% gather() %>% select(value) %>% unlist() %>% as.numeric() %>% min(), 
+                                                        predictions_hba1c_stan_psm_1_1_overall %>% select(c("mean","lci","uci")) %>% as.data.frame() %>% gather() %>% select(value) %>% unlist() %>% as.numeric() %>% max(), 
+                                                        predictions_hba1c_stan_psm_1_1_adjusted_overall %>% select(c("mean","lci","uci")) %>% as.data.frame() %>% gather() %>% select(value) %>% unlist() %>% as.numeric() %>% max(),
+                                                        predictions_hba1c_stan_adjusted_overall %>% select(c("mean","lci","uci")) %>% as.data.frame() %>% gather() %>% select(value) %>% unlist() %>% as.numeric() %>% max()))), 2, f = ceiling)
 
 
 hba1c_strata_axis_min <- plyr::round_any(floor(min(c(predictions_hba1c_stan_psm_1_1_full %>% select(c("mean","lci","uci")) %>% as.data.frame() %>% gather() %>% select(value) %>% unlist() %>% as.numeric() %>% min(), 
-                                                      predictions_hba1c_stan_psm_1_1_adjusted_full %>% select(c("mean","lci","uci")) %>% as.data.frame() %>% gather() %>% select(value) %>% unlist() %>% as.numeric() %>% min(), 
-                                                      predictions_hba1c_stan_adjusted_full %>% select(c("mean","lci","uci")) %>% as.data.frame() %>% gather() %>% select(value) %>% unlist() %>% as.numeric() %>% min(), 
-                                                      predictions_hba1c_stan_psm_1_1 %>% select(c("mean","lci","uci")) %>% as.data.frame() %>% gather() %>% select(value) %>% unlist() %>% as.numeric() %>% min(), 
-                                                      predictions_hba1c_stan_psm_1_1_adjusted %>% select(c("mean","lci","uci")) %>% as.data.frame() %>% gather() %>% select(value) %>% unlist() %>% as.numeric() %>% min(),
-                                                      predictions_hba1c_stan_adjusted %>% select(c("mean","lci","uci")) %>% as.data.frame() %>% gather() %>% select(value) %>% unlist() %>% as.numeric() %>% min()))), 2, f = floor)
+                                                     predictions_hba1c_stan_psm_1_1_adjusted_full %>% select(c("mean","lci","uci")) %>% as.data.frame() %>% gather() %>% select(value) %>% unlist() %>% as.numeric() %>% min(), 
+                                                     predictions_hba1c_stan_adjusted_full %>% select(c("mean","lci","uci")) %>% as.data.frame() %>% gather() %>% select(value) %>% unlist() %>% as.numeric() %>% min(), 
+                                                     predictions_hba1c_stan_psm_1_1 %>% select(c("mean","lci","uci")) %>% as.data.frame() %>% gather() %>% select(value) %>% unlist() %>% as.numeric() %>% min(), 
+                                                     predictions_hba1c_stan_psm_1_1_adjusted %>% select(c("mean","lci","uci")) %>% as.data.frame() %>% gather() %>% select(value) %>% unlist() %>% as.numeric() %>% min(),
+                                                     predictions_hba1c_stan_adjusted %>% select(c("mean","lci","uci")) %>% as.data.frame() %>% gather() %>% select(value) %>% unlist() %>% as.numeric() %>% min()))), 2, f = floor)
 
 hba1c_strata_axis_max <- plyr::round_any(ceiling(max(c(predictions_hba1c_stan_psm_1_1_full %>% select(c("mean","lci","uci")) %>% as.data.frame() %>% gather() %>% select(value) %>% unlist() %>% as.numeric() %>% min(), 
-                                                        predictions_hba1c_stan_psm_1_1_adjusted_full %>% select(c("mean","lci","uci")) %>% as.data.frame() %>% gather() %>% select(value) %>% unlist() %>% as.numeric() %>% min(), 
-                                                        predictions_hba1c_stan_adjusted_full %>% select(c("mean","lci","uci")) %>% as.data.frame() %>% gather() %>% select(value) %>% unlist() %>% as.numeric() %>% min(), 
-                                                        predictions_hba1c_stan_psm_1_1 %>% select(c("mean","lci","uci")) %>% as.data.frame() %>% gather() %>% select(value) %>% unlist() %>% as.numeric() %>% max(), 
-                                                        predictions_hba1c_stan_psm_1_1_adjusted %>% select(c("mean","lci","uci")) %>% as.data.frame() %>% gather() %>% select(value) %>% unlist() %>% as.numeric() %>% max(),
-                                                        predictions_hba1c_stan_adjusted %>% select(c("mean","lci","uci")) %>% as.data.frame() %>% gather() %>% select(value) %>% unlist() %>% as.numeric() %>% max()))), 2, f = ceiling)
+                                                       predictions_hba1c_stan_psm_1_1_adjusted_full %>% select(c("mean","lci","uci")) %>% as.data.frame() %>% gather() %>% select(value) %>% unlist() %>% as.numeric() %>% min(), 
+                                                       predictions_hba1c_stan_adjusted_full %>% select(c("mean","lci","uci")) %>% as.data.frame() %>% gather() %>% select(value) %>% unlist() %>% as.numeric() %>% min(), 
+                                                       predictions_hba1c_stan_psm_1_1 %>% select(c("mean","lci","uci")) %>% as.data.frame() %>% gather() %>% select(value) %>% unlist() %>% as.numeric() %>% max(), 
+                                                       predictions_hba1c_stan_psm_1_1_adjusted %>% select(c("mean","lci","uci")) %>% as.data.frame() %>% gather() %>% select(value) %>% unlist() %>% as.numeric() %>% max(),
+                                                       predictions_hba1c_stan_adjusted %>% select(c("mean","lci","uci")) %>% as.data.frame() %>% gather() %>% select(value) %>% unlist() %>% as.numeric() %>% max()))), 2, f = ceiling)
 
 
 #:---- PSM 1:1
@@ -4896,11 +4932,11 @@ ps.model.train <- set_up_data_sglt2_glp1(dataset.type = "ps.model.train") %>%
               select(patid, pated, qrisk2_10yr_score), by = c("patid", "pated"))
 ## Fit initial model using all the available variables to estimate HbA1c outcome
 if (class(try(
-
+  
   bart_qrisk_ps_model <- readRDS(paste0(output_path, "/additional_outcomes/bart_qrisk_ps_model.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   bart_qrisk_ps_model <- bartMachine::bartMachine(X = ps.model.train %>%
                                                     select(
                                                       all_of(c(variables_chosen, "qrisk2_10yr_score"))
@@ -4912,9 +4948,9 @@ if (class(try(
                                                   num_burn_in = 5000,
                                                   num_iterations_after_burn_in = 5000,
                                                   serialize = TRUE)
-
+  
   saveRDS(bart_qrisk_ps_model, paste0(output_path, "/additional_outcomes/bart_qrisk_ps_model.rds"))
-
+  
 }
 
 
@@ -4926,33 +4962,33 @@ ps.model.test <- set_up_data_sglt2_glp1(dataset.type = "ps.model.test") %>%
 
 # calculate prop score
 if (class(try(
-
+  
   prop_score_qrisk_testing_data <- readRDS(paste0(output_path, "/additional_outcomes/prop_score_qrisk_testing_data.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   prop_score_qrisk_testing_data <- predict(bart_qrisk_ps_model, ps.model.test %>%
-                                       select(
-                                         colnames(bart_qrisk_ps_model$X)
-                                       ))
-
+                                             select(
+                                               colnames(bart_qrisk_ps_model$X)
+                                             ))
+  
   saveRDS(prop_score_qrisk_testing_data, paste0(output_path, "/additional_outcomes/prop_score_qrisk_testing_data.rds"))
-
+  
 }
 
 
 if (class(try(
-
+  
   patient_prop_scores_qrisk <- readRDS(paste0(output_path, "/additional_outcomes/patient_prop_scores_qrisk.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   # Prop scores for train dataset
   patient_prop_scores_qrisk <- ps.model.train %>%
     select(patid, pated) %>%
     cbind(prop.score = bart_qrisk_ps_model$p_hat_train)
-
-
+  
+  
   patient_prop_scores_qrisk <- patient_prop_scores_qrisk %>%
     rbind(
       ps.model.test %>%
@@ -4960,9 +4996,9 @@ if (class(try(
         cbind(prop.score = prop_score_qrisk_testing_data)
     ) %>%
     as.data.frame()
-
+  
   saveRDS(patient_prop_scores_qrisk, paste0(output_path, "/additional_outcomes/patient_prop_scores_qrisk.rds"))
-
+  
 }
 
 
@@ -5011,26 +5047,26 @@ group.no_co.dataset.matched <- group.no_co.dataset %>%
 ## Propensity score matching
 
 if (class(try(
-
+  
   # predictions for the CVD outcomes in population with no CVD/HF/CKD strata sex and intervals
   predictions_no_co_cvd_stan_psm_1_1_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_no_co_cvd_stan_psm_1_1_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.no_co.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_no_co_cvd_stan_psm_1_1_baye <- vector()
-
-  formula_baye <- "time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2"
-
+  
+  formula_baye <- "time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2"
+  
   models_no_co_cvd_psm_1_1_male_baye <- vector("list", quantiles)
-
+  
   models_no_co_cvd_psm_1_1_female_baye <- vector("list", quantiles)
-
+  
   for(i in mnumber) {
-
+    
     models_no_co_cvd_psm_1_1_male_baye[[i]] <- brms::brm(formula = formula(formula_baye),
                                                          data = group.no_co.dataset.matched %>%
                                                            select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
@@ -5044,13 +5080,13 @@ if (class(try(
                                                                   intervals = relevel(intervals, ref = levels(group.no_co.dataset.matched$intervals)[i])),
                                                          family = "cox",
                                                          chains = 2)
-
+    
     predictions_no_co_cvd_stan_psm_1_1_baye <- rbind(predictions_no_co_cvd_stan_psm_1_1_baye, cbind(mean = fixef(models_no_co_cvd_psm_1_1_male_baye[[i]])[2,1],
                                                                                                     lci = fixef(models_no_co_cvd_psm_1_1_male_baye[[i]])[2,3],
                                                                                                     uci = fixef(models_no_co_cvd_psm_1_1_male_baye[[i]])[2,4],
                                                                                                     sex = "Male",
                                                                                                     intervals = levels(group.no_co.dataset.matched$intervals)[i]))
-
+    
     models_no_co_cvd_psm_1_1_female_baye[[i]] <- brms::brm(formula = formula(formula_baye),
                                                            data = group.no_co.dataset.matched %>%
                                                              select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
@@ -5064,46 +5100,46 @@ if (class(try(
                                                                     intervals = relevel(intervals, ref = levels(group.no_co.dataset.matched$intervals)[i])),
                                                            family = "cox",
                                                            chains = 2)
-
+    
     predictions_no_co_cvd_stan_psm_1_1_baye <- rbind(predictions_no_co_cvd_stan_psm_1_1_baye, cbind(mean = fixef(models_no_co_cvd_psm_1_1_female_baye[[i]])[2,1],
                                                                                                     lci = fixef(models_no_co_cvd_psm_1_1_female_baye[[i]])[2,3],
                                                                                                     uci = fixef(models_no_co_cvd_psm_1_1_female_baye[[i]])[2,4],
                                                                                                     sex = "Female",
                                                                                                     intervals = levels(group.no_co.dataset.matched$intervals)[i]))
-
+    
   }
-
+  
   saveRDS(models_no_co_cvd_psm_1_1_male_baye, paste0(output_path, "/additional_outcomes/models_no_co_cvd_psm_1_1_male_baye.rds"))
-
+  
   saveRDS(models_no_co_cvd_psm_1_1_female_baye, paste0(output_path, "/additional_outcomes/models_no_co_cvd_psm_1_1_female_baye.rds"))
-
+  
   predictions_no_co_cvd_stan_psm_1_1_baye <- predictions_no_co_cvd_stan_psm_1_1_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_no_co_cvd_stan_psm_1_1_baye, paste0(output_path, "/additional_outcomes/predictions_no_co_cvd_stan_psm_1_1_baye.rds"))
-
+  
 }
 
 # No sex strata
 if (class(try(
-
+  
   # predictions for the CVD outcomes in the population with no CVD/HF/CKD
   predictions_no_co_cvd_stan_psm_1_1_overall_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_no_co_cvd_stan_psm_1_1_overall_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
-  formula_baye <- "time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2"
-
+  
+  formula_baye <- "time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2"
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.no_co.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_no_co_cvd_stan_psm_1_1_overall_baye <- vector()
-
+  
   models_no_co_cvd_psm_1_1_overall_baye <- vector("list", quantiles)
-
+  
   for (i in mnumber) {
-
+    
     models_no_co_cvd_psm_1_1_overall_baye[[i]] <- brms::brm(formula = formula(formula_baye),
                                                             data = group.no_co.dataset.matched %>%
                                                               select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
@@ -5116,39 +5152,39 @@ if (class(try(
                                                               mutate(intervals = relevel(intervals, ref = levels(group.no_co.dataset.matched$intervals)[i])),
                                                             family = "cox",
                                                             chains = 2)
-
+    
     predictions_no_co_cvd_stan_psm_1_1_overall_baye <- rbind(predictions_no_co_cvd_stan_psm_1_1_overall_baye, cbind(mean = fixef(models_no_co_cvd_psm_1_1_overall_baye[[i]])[2,1],
-                                                                                                          lci = fixef(models_no_co_cvd_psm_1_1_overall_baye[[i]])[2,3],
-                                                                                                          uci = fixef(models_no_co_cvd_psm_1_1_overall_baye[[i]])[2,4],
-                                                                                                          intervals = levels(group.no_co.dataset.matched$intervals)[i]))
-
+                                                                                                                    lci = fixef(models_no_co_cvd_psm_1_1_overall_baye[[i]])[2,3],
+                                                                                                                    uci = fixef(models_no_co_cvd_psm_1_1_overall_baye[[i]])[2,4],
+                                                                                                                    intervals = levels(group.no_co.dataset.matched$intervals)[i]))
+    
   }
-
+  
   saveRDS(models_no_co_cvd_psm_1_1_overall_baye, paste0(output_path, "/additional_outcomes/models_no_co_cvd_psm_1_1_overall_baye.rds"))
-
+  
   predictions_no_co_cvd_stan_psm_1_1_overall_baye <- predictions_no_co_cvd_stan_psm_1_1_overall_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_no_co_cvd_stan_psm_1_1_overall_baye, paste0(output_path, "/additional_outcomes/predictions_no_co_cvd_stan_psm_1_1_overall_baye.rds"))
-
-
+  
+  
 }
 # Full population (interval as a continuous, without subgrouping individuals)
 if (class(try(
-
+  
   # predictions for the CVD outcomes in the population with no CVD/HF/CKD
   predictions_no_co_cvd_stan_psm_1_1_full_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_no_co_cvd_stan_psm_1_1_full_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
-  formula_baye <- "time | cens(censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2"
-
+  
+  formula_baye <- "time | cens(1 - censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2"
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.no_co.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_no_co_cvd_stan_psm_1_1_full_baye <- vector()
-
+  
   models_no_co_cvd_psm_1_1_full_baye <- brms::brm(formula = formula(formula_baye),
                                                   data = group.no_co.dataset.matched %>%
                                                     select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
@@ -5160,47 +5196,47 @@ if (class(try(
                                                     drop_na(),
                                                   family = "cox",
                                                   chains = 2)
-
+  
   predictions_no_co_cvd_stan_psm_1_1_full_baye <- rbind(predictions_no_co_cvd_stan_psm_1_1_full_baye, cbind(mean = fixef(models_no_co_cvd_psm_1_1_full_baye)[2,1],
                                                                                                             lci = fixef(models_no_co_cvd_psm_1_1_full_baye)[2,3],
                                                                                                             uci = fixef(models_no_co_cvd_psm_1_1_full_baye)[2,4]))
-
+  
   saveRDS(models_no_co_cvd_psm_1_1_full_baye, paste0(output_path, "/additional_outcomes/models_no_co_cvd_psm_1_1_full_baye.rds"))
-
+  
   predictions_no_co_cvd_stan_psm_1_1_full_baye <- predictions_no_co_cvd_stan_psm_1_1_full_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_no_co_cvd_stan_psm_1_1_full_baye, paste0(output_path, "/additional_outcomes/predictions_no_co_cvd_stan_psm_1_1_full_baye.rds"))
-
+  
 }
 
 
 ## Propensity score matching + adjusted
 
 if (class(try(
-
+  
   # predictions for the CVD outcomes in population with no CVD/HF/CKD strata sex and intervals
   predictions_no_co_cvd_stan_psm_1_1_adjusted_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_no_co_cvd_stan_psm_1_1_adjusted_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.no_co.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_no_co_cvd_stan_psm_1_1_adjusted_baye <- vector()
-
-
+  
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.no_co.dataset.matched[,breakdown_adjust], is.factor)
-
+  
   models_no_co_cvd_psm_1_1_adjusted_male_baye <- vector("list", quantiles)
-
+  
   models_no_co_cvd_psm_1_1_adjusted_female_baye <- vector("list", quantiles)
-
+  
   for (i in mnumber) {
-
+    
     dataset.now <- group.no_co.dataset.matched %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.no_co.dataset.matched$postdrug_mace_censtime_yrs,
@@ -5221,23 +5257,23 @@ if (class(try(
       drop_na() %>%
       mutate(sex = relevel(sex, ref = "Male"),
              intervals = relevel(intervals, ref = levels(group.no_co.dataset.matched$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_no_co_cvd_psm_1_1_adjusted_male_baye[[i]] <- brms::brm(formula = formula(formula_baye),
                                                                   data = dataset.now,
                                                                   family = "cox",
                                                                   chains = 2,
                                                                   iter = 10000)
-
+    
     predictions_no_co_cvd_stan_psm_1_1_adjusted_baye <- rbind(predictions_no_co_cvd_stan_psm_1_1_adjusted_baye, cbind(mean = fixef(models_no_co_cvd_psm_1_1_adjusted_male_baye[[i]])[2,1],
                                                                                                                       lci = fixef(models_no_co_cvd_psm_1_1_adjusted_male_baye[[i]])[2,3],
                                                                                                                       uci = fixef(models_no_co_cvd_psm_1_1_adjusted_male_baye[[i]])[2,4],
                                                                                                                       sex = "Male",
                                                                                                                       intervals = levels(group.no_co.dataset.matched$intervals)[i]))
-
+    
     dataset.now <- group.no_co.dataset.matched %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.no_co.dataset.matched$postdrug_mace_censtime_yrs,
@@ -5258,57 +5294,57 @@ if (class(try(
       drop_na() %>%
       mutate(sex = relevel(sex, ref = "Female"),
              intervals = relevel(intervals, ref = levels(group.no_co.dataset.matched$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_no_co_cvd_psm_1_1_adjusted_female_baye[[i]] <-  brms::brm(formula = formula(formula_baye),
                                                                      data = dataset.now,
                                                                      family = "cox",
                                                                      chains = 2,
                                                                      iter = 10000)
-
+    
     predictions_no_co_cvd_stan_psm_1_1_adjusted_baye <- rbind(predictions_no_co_cvd_stan_psm_1_1_adjusted_baye, cbind(mean = fixef(models_no_co_cvd_psm_1_1_adjusted_female_baye[[i]])[2,1],
                                                                                                                       lci = fixef(models_no_co_cvd_psm_1_1_adjusted_female_baye[[i]])[2,3],
                                                                                                                       uci = fixef(models_no_co_cvd_psm_1_1_adjusted_female_baye[[i]])[2,4],
                                                                                                                       sex = "Female",
                                                                                                                       intervals = levels(group.no_co.dataset.matched$intervals)[i]))
-
+    
   }
-
+  
   saveRDS(models_no_co_cvd_psm_1_1_adjusted_male_baye, paste0(output_path, "/additional_outcomes/models_no_co_cvd_psm_1_1_adjusted_male_baye.rds"))
-
+  
   saveRDS(models_no_co_cvd_psm_1_1_adjusted_female_baye, paste0(output_path, "/additional_outcomes/models_no_co_cvd_psm_1_1_adjusted_female_baye.rds"))
-
+  
   predictions_no_co_cvd_stan_psm_1_1_adjusted_baye <- predictions_no_co_cvd_stan_psm_1_1_adjusted_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_no_co_cvd_stan_psm_1_1_adjusted_baye, paste0(output_path, "/additional_outcomes/predictions_no_co_cvd_stan_psm_1_1_adjusted_baye.rds"))
-
+  
 }
 
 if (class(try(
-
+  
   # predictions for the CVD outcomes in the population with no CVD/HF/CKD
   predictions_no_co_cvd_stan_psm_1_1_adjusted_overall_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_no_co_cvd_stan_psm_1_1_adjusted_overall_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.no_co.dataset.matched[,breakdown_adjust], is.factor)
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.no_co.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_no_co_cvd_stan_psm_1_1_adjusted_overall_baye <- vector()
-
+  
   models_no_co_cvd_psm_1_1_adjusted_overall_baye <- vector("list", quantiles)
-
+  
   for (i in mnumber) {
-
+    
     dataset.now <- group.no_co.dataset.matched %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.no_co.dataset.matched$postdrug_mace_censtime_yrs,
@@ -5328,50 +5364,50 @@ if (class(try(
       as.data.frame() %>%
       drop_na() %>%
       mutate(intervals = relevel(intervals, ref = levels(group.no_co.dataset.matched$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_no_co_cvd_psm_1_1_adjusted_overall_baye[[i]] <- brms::brm(formula = formula(formula_baye),
                                                                      data = dataset.now,
                                                                      family = "cox",
                                                                      chains = 2,
                                                                      iter = 10000)
-
+    
     predictions_no_co_cvd_stan_psm_1_1_adjusted_overall_baye <- rbind(predictions_no_co_cvd_stan_psm_1_1_adjusted_overall_baye, cbind(mean = fixef(models_no_co_cvd_psm_1_1_adjusted_overall_baye[[i]])[2,1],
                                                                                                                                       lci = fixef(models_no_co_cvd_psm_1_1_adjusted_overall_baye[[i]])[2,3],
                                                                                                                                       uci = fixef(models_no_co_cvd_psm_1_1_adjusted_overall_baye[[i]])[2,4],
                                                                                                                                       intervals = levels(group.no_co.dataset.matched$intervals)[i]))
-
+    
   }
-
+  
   saveRDS(models_no_co_cvd_psm_1_1_adjusted_overall_baye, paste0(output_path, "/additional_outcomes/models_no_co_cvd_psm_1_1_adjusted_overall_baye.rds"))
-
+  
   predictions_no_co_cvd_stan_psm_1_1_adjusted_overall_baye <- predictions_no_co_cvd_stan_psm_1_1_adjusted_overall_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_no_co_cvd_stan_psm_1_1_adjusted_overall_baye, paste0(output_path, "/additional_outcomes/predictions_no_co_cvd_stan_psm_1_1_adjusted_overall_baye.rds"))
-
+  
 }
 # Full population (interval as a continuous, without subgrouping individuals)
 if (class(try(
-
+  
   # predictions for the CVD outcomes in the population with no CVD/HF/CKD
   predictions_no_co_cvd_stan_psm_1_1_adjusted_full_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_no_co_cvd_stan_psm_1_1_adjusted_full_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.no_co.dataset.matched[,breakdown_adjust], is.factor)
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.no_co.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_no_co_cvd_stan_psm_1_1_adjusted_full_baye <- vector()
-
+  
   dataset.now <- group.no_co.dataset.matched %>%
     select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
     cbind(time = group.no_co.dataset.matched$postdrug_mace_censtime_yrs,
@@ -5390,28 +5426,28 @@ if (class(try(
           prealt_2 = rcs(group.no_co.dataset.matched$prealt, 3)[,2]) %>%
     as.data.frame() %>%
     drop_na()
-
+  
   checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-  formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+  
+  formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+  
   models_no_co_cvd_psm_1_1_adjusted_full_baye <- brms::brm(formula = formula(formula_baye),
                                                            data = dataset.now,
                                                            family = "cox",
                                                            chains = 2,
                                                            iter = 10000)
-
+  
   predictions_no_co_cvd_stan_psm_1_1_adjusted_full_baye <- rbind(predictions_no_co_cvd_stan_psm_1_1_adjusted_full_baye, cbind(mean = fixef(models_no_co_cvd_psm_1_1_adjusted_full_baye)[2,1],
                                                                                                                               lci = fixef(models_no_co_cvd_psm_1_1_adjusted_full_baye)[2,3],
                                                                                                                               uci = fixef(models_no_co_cvd_psm_1_1_adjusted_full_baye)[2,4]))
-
+  
   saveRDS(models_no_co_cvd_psm_1_1_adjusted_full_baye, paste0(output_path, "additional_outcomes/models_no_co_cvd_psm_1_1_adjusted_full_baye.rds"))
-
+  
   predictions_no_co_cvd_stan_psm_1_1_adjusted_full_baye <- predictions_no_co_cvd_stan_psm_1_1_adjusted_full_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_no_co_cvd_stan_psm_1_1_adjusted_full_baye, paste0(output_path, "/additional_outcomes/predictions_no_co_cvd_stan_psm_1_1_adjusted_full_baye.rds"))
-
+  
 }
 
 
@@ -5419,29 +5455,29 @@ if (class(try(
 
 #--- Cox
 if (class(try(
-
+  
   # predictions for the CVD outcomes in population with no CVD/HF/CKD strata sex and intervals
   predictions_no_co_cvd_stan_adjusted_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_no_co_cvd_stan_adjusted_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.no_co.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_no_co_cvd_stan_adjusted_baye <- vector()
-
-
+  
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.no_co.dataset[,breakdown_adjust], is.factor)
-
+  
   models_no_co_cvd_adjusted_male_baye <- vector("list", quantiles)
-
+  
   models_no_co_cvd_adjusted_female_baye <- vector("list", quantiles)
-
+  
   for (i in mnumber) {
-
+    
     dataset.now <- group.no_co.dataset %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.no_co.dataset$postdrug_mace_censtime_yrs,
@@ -5462,23 +5498,23 @@ if (class(try(
       drop_na() %>%
       mutate(sex = relevel(sex, ref = "Male"),
              intervals = relevel(intervals, ref = levels(group.no_co.dataset$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_no_co_cvd_adjusted_male_baye[[i]] <- brms::brm(formula = formula(formula_baye),
                                                           data = dataset.now,
                                                           family = "cox",
                                                           chains = 2,
                                                           iter = 10000)
-
+    
     predictions_no_co_cvd_stan_adjusted_baye <- rbind(predictions_no_co_cvd_stan_adjusted_baye, cbind(mean = fixef(models_no_co_cvd_adjusted_male_baye[[i]])[2,1],
                                                                                                       lci = fixef(models_no_co_cvd_adjusted_male_baye[[i]])[2,3],
                                                                                                       uci = fixef(models_no_co_cvd_adjusted_male_baye[[i]])[2,4],
                                                                                                       sex = "Male",
                                                                                                       intervals = levels(group.no_co.dataset$intervals)[i]))
-
+    
     dataset.now <- group.no_co.dataset %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.no_co.dataset$postdrug_mace_censtime_yrs,
@@ -5499,57 +5535,57 @@ if (class(try(
       drop_na() %>%
       mutate(sex = relevel(sex, ref = "Female"),
              intervals = relevel(intervals, ref = levels(group.no_co.dataset$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_no_co_cvd_adjusted_female_baye[[i]] <- brms::brm(formula = formula(formula_baye),
                                                             data = dataset.now,
                                                             family = "cox",
                                                             chains = 2,
                                                             iter = 10000)
-
+    
     predictions_no_co_cvd_stan_adjusted_baye <- rbind(predictions_no_co_cvd_stan_adjusted_baye, cbind(mean = fixef(models_no_co_cvd_adjusted_female_baye[[i]])[2,1],
                                                                                                       lci = fixef(models_no_co_cvd_adjusted_female_baye[[i]])[2,3],
                                                                                                       uci = fixef(models_no_co_cvd_adjusted_female_baye[[i]])[2,4],
                                                                                                       sex = "Female",
                                                                                                       intervals = levels(group.no_co.dataset$intervals)[i]))
-
+    
   }
-
+  
   saveRDS(models_no_co_cvd_adjusted_male_baye, paste0(output_path, "/additional_outcomes/models_no_co_cvd_adjusted_male_baye.rds"))
-
+  
   saveRDS(models_no_co_cvd_adjusted_female_baye, paste0(output_path, "/additional_outcomes/models_no_co_cvd_adjusted_female_baye.rds"))
-
+  
   predictions_no_co_cvd_stan_adjusted_baye <- predictions_no_co_cvd_stan_adjusted_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_no_co_cvd_stan_adjusted_baye, paste0(output_path, "/additional_outcomes/predictions_no_co_cvd_stan_adjusted_baye.rds"))
-
+  
 }
 
 if (class(try(
-
+  
   # predictions for the CVD outcomes in the population with no CVD/HF/CKD
   predictions_no_co_cvd_stan_adjusted_overall_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_no_co_cvd_stan_adjusted_overall_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.no_co.dataset[,breakdown_adjust], is.factor)
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.no_co.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_no_co_cvd_stan_adjusted_overall_baye <- vector()
-
+  
   models_no_co_cvd_adjusted_overall_baye <- vector("list", quantiles)
-
+  
   for (i in mnumber) {
-
+    
     dataset.now <- group.no_co.dataset %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.no_co.dataset$postdrug_mace_censtime_yrs,
@@ -5569,50 +5605,50 @@ if (class(try(
       as.data.frame() %>%
       drop_na() %>%
       mutate(intervals = relevel(intervals, ref = levels(group.no_co.dataset$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_no_co_cvd_adjusted_overall_baye[[i]] <- brms::brm(formula = formula(formula_baye),
                                                              data = dataset.now,
                                                              family = "cox",
                                                              chains = 2,
                                                              iter = 10000)
-
+    
     predictions_no_co_cvd_stan_adjusted_overall_baye <- rbind(predictions_no_co_cvd_stan_adjusted_overall_baye, cbind(mean = fixef(models_no_co_cvd_adjusted_overall_baye[[i]])[2,1],
                                                                                                                       lci = fixef(models_no_co_cvd_adjusted_overall_baye[[i]])[2,3],
                                                                                                                       uci = fixef(models_no_co_cvd_adjusted_overall_baye[[i]])[2,4],
                                                                                                                       intervals = levels(group.no_co.dataset$intervals)[i]))
-
+    
   }
-
+  
   saveRDS(models_no_co_cvd_adjusted_overall_baye, paste0(output_path, "/additional_outcomes/models_no_co_cvd_adjusted_overall_baye.rds"))
-
+  
   predictions_no_co_cvd_stan_adjusted_overall_baye <- predictions_no_co_cvd_stan_adjusted_overall_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_no_co_cvd_stan_adjusted_overall_baye, paste0(output_path, "/additional_outcomes/predictions_no_co_cvd_stan_adjusted_overall_baye.rds"))
-
+  
 }
 # Full population (interval as a continuous, without subgrouping individuals)
 if (class(try(
-
+  
   # predictions for the CVD outcomes in the population with no CVD/HF/CKD
   predictions_no_co_cvd_stan_adjusted_full_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_no_co_cvd_stan_adjusted_full_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.no_co.dataset[,breakdown_adjust], is.factor)
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.no_co.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_no_co_cvd_stan_adjusted_full_baye <- vector()
-
+  
   dataset.now <- group.no_co.dataset %>%
     select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
     cbind(time = group.no_co.dataset$postdrug_mace_censtime_yrs,
@@ -5631,28 +5667,28 @@ if (class(try(
           prealt_2 = rcs(group.no_co.dataset$prealt, 3)[,2]) %>%
     as.data.frame() %>%
     drop_na()
-
+  
   checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-  formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+  
+  formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+  
   models_no_co_cvd_adjusted_full_baye <- brms::brm(formula = formula(formula_baye),
                                                    data = dataset.now,
                                                    family = "cox",
                                                    chains = 2,
                                                    iter = 10000)
-
+  
   predictions_no_co_cvd_stan_adjusted_full_baye <- rbind(predictions_no_co_cvd_stan_adjusted_full_baye, cbind(mean = fixef(models_no_co_cvd_adjusted_full_baye)[2,1],
                                                                                                               lci = fixef(models_no_co_cvd_adjusted_full_baye)[2,3],
                                                                                                               uci = fixef(models_no_co_cvd_adjusted_full_baye)[2,4]))
-
+  
   saveRDS(models_no_co_cvd_adjusted_full_baye, paste0(output_path, "/additional_outcomes/models_no_co_cvd_adjusted_full_baye.rds"))
-
+  
   predictions_no_co_cvd_stan_adjusted_full_baye <- predictions_no_co_cvd_stan_adjusted_full_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_no_co_cvd_stan_adjusted_full_baye, paste0(output_path, "/additional_outcomes/predictions_no_co_cvd_stan_adjusted_full_baye.rds"))
-
+  
 }
 
 #:--------------------
@@ -6062,47 +6098,100 @@ dev.off()
 ## Propensity score matching
 
 if (class(try(
-
+  
   # predictions for the CVD outcomes in population with no CVD/HF/CKD strata sex and intervals
   predictions_no_co_hf_stan_psm_1_1_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_no_co_hf_stan_psm_1_1_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.no_co.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_no_co_hf_stan_psm_1_1_baye <- vector()
-
-  formula_baye <- "time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2"
-
+  
+  formula_baye <- "time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2"
+  
   models_no_co_hf_psm_1_1_male_baye <- vector("list", quantiles)
-
+  
   models_no_co_hf_psm_1_1_female_baye <- vector("list", quantiles)
-
+  
   for(i in mnumber) {
-
+    
     models_no_co_hf_psm_1_1_male_baye[[i]] <- brms::brm(formula = formula(formula_baye),
-                                                         data = group.no_co.dataset.matched %>%
-                                                           select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
-                                                           cbind(time = group.no_co.dataset.matched$postdrug_hf_censtime_yrs,
-                                                                 censored = group.no_co.dataset.matched$postdrug_hf_censvar,
-                                                                 qrisk2_10yr_score_1 = rcs(group.no_co.dataset.matched$qrisk2_10yr_score, 3)[,1],
-                                                                 qrisk2_10yr_score_2 = rcs(group.no_co.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
-                                                           as.data.frame() %>%
-                                                           drop_na() %>%
-                                                           mutate(sex = relevel(sex, ref = "Male"),
-                                                                  intervals = relevel(intervals, ref = levels(group.no_co.dataset.matched$intervals)[i])),
-                                                         family = "cox",
-                                                         chains = 2)
-
+                                                        data = group.no_co.dataset.matched %>%
+                                                          select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
+                                                          cbind(time = group.no_co.dataset.matched$postdrug_hf_censtime_yrs,
+                                                                censored = group.no_co.dataset.matched$postdrug_hf_censvar,
+                                                                qrisk2_10yr_score_1 = rcs(group.no_co.dataset.matched$qrisk2_10yr_score, 3)[,1],
+                                                                qrisk2_10yr_score_2 = rcs(group.no_co.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
+                                                          as.data.frame() %>%
+                                                          drop_na() %>%
+                                                          mutate(sex = relevel(sex, ref = "Male"),
+                                                                 intervals = relevel(intervals, ref = levels(group.no_co.dataset.matched$intervals)[i])),
+                                                        family = "cox",
+                                                        chains = 2)
+    
     predictions_no_co_hf_stan_psm_1_1_baye <- rbind(predictions_no_co_hf_stan_psm_1_1_baye, cbind(mean = fixef(models_no_co_hf_psm_1_1_male_baye[[i]])[2,1],
-                                                                                                    lci = fixef(models_no_co_hf_psm_1_1_male_baye[[i]])[2,3],
-                                                                                                    uci = fixef(models_no_co_hf_psm_1_1_male_baye[[i]])[2,4],
-                                                                                                    sex = "Male",
-                                                                                                    intervals = levels(group.no_co.dataset.matched$intervals)[i]))
-
+                                                                                                  lci = fixef(models_no_co_hf_psm_1_1_male_baye[[i]])[2,3],
+                                                                                                  uci = fixef(models_no_co_hf_psm_1_1_male_baye[[i]])[2,4],
+                                                                                                  sex = "Male",
+                                                                                                  intervals = levels(group.no_co.dataset.matched$intervals)[i]))
+    
     models_no_co_hf_psm_1_1_female_baye[[i]] <- brms::brm(formula = formula(formula_baye),
+                                                          data = group.no_co.dataset.matched %>%
+                                                            select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
+                                                            cbind(time = group.no_co.dataset.matched$postdrug_hf_censtime_yrs,
+                                                                  censored = group.no_co.dataset.matched$postdrug_hf_censvar,
+                                                                  qrisk2_10yr_score_1 = rcs(group.no_co.dataset.matched$qrisk2_10yr_score, 3)[,1],
+                                                                  qrisk2_10yr_score_2 = rcs(group.no_co.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
+                                                            as.data.frame() %>%
+                                                            drop_na() %>%
+                                                            mutate(sex = relevel(sex, ref = "Female"),
+                                                                   intervals = relevel(intervals, ref = levels(group.no_co.dataset.matched$intervals)[i])),
+                                                          family = "cox",
+                                                          chains = 2)
+    
+    predictions_no_co_hf_stan_psm_1_1_baye <- rbind(predictions_no_co_hf_stan_psm_1_1_baye, cbind(mean = fixef(models_no_co_hf_psm_1_1_female_baye[[i]])[2,1],
+                                                                                                  lci = fixef(models_no_co_hf_psm_1_1_female_baye[[i]])[2,3],
+                                                                                                  uci = fixef(models_no_co_hf_psm_1_1_female_baye[[i]])[2,4],
+                                                                                                  sex = "Female",
+                                                                                                  intervals = levels(group.no_co.dataset.matched$intervals)[i]))
+    
+  }
+  
+  saveRDS(models_no_co_hf_psm_1_1_male_baye, paste0(output_path, "/additional_outcomes/models_no_co_hf_psm_1_1_male_baye.rds"))
+  
+  saveRDS(models_no_co_hf_psm_1_1_female_baye, paste0(output_path, "/additional_outcomes/models_no_co_hf_psm_1_1_female_baye.rds"))
+  
+  predictions_no_co_hf_stan_psm_1_1_baye <- predictions_no_co_hf_stan_psm_1_1_baye %>%
+    as.data.frame()
+  
+  saveRDS(predictions_no_co_hf_stan_psm_1_1_baye, paste0(output_path, "/additional_outcomes/predictions_no_co_hf_stan_psm_1_1_baye.rds"))
+  
+}
+
+# No sex strata
+if (class(try(
+  
+  # predictions for the CVD outcomes in the population with no CVD/HF/CKD
+  predictions_no_co_hf_stan_psm_1_1_overall_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_no_co_hf_stan_psm_1_1_overall_baye.rds"))
+  
+  , silent = TRUE)) == "try-error") {
+  
+  formula_baye <- "time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2"
+  
+  # maximum number of deciles being tested
+  quantiles <- length(levels(group.no_co.dataset[,"intervals"]))
+  # create lists with results
+  mnumber = c(1:quantiles)
+  predictions_no_co_hf_stan_psm_1_1_overall_baye <- vector()
+  
+  models_no_co_hf_psm_1_1_overall_baye <- vector("list", quantiles)
+  
+  for (i in mnumber) {
+    
+    models_no_co_hf_psm_1_1_overall_baye[[i]] <- brms::brm(formula = formula(formula_baye),
                                                            data = group.no_co.dataset.matched %>%
                                                              select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
                                                              cbind(time = group.no_co.dataset.matched$postdrug_hf_censtime_yrs,
@@ -6111,147 +6200,94 @@ if (class(try(
                                                                    qrisk2_10yr_score_2 = rcs(group.no_co.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
                                                              as.data.frame() %>%
                                                              drop_na() %>%
-                                                             mutate(sex = relevel(sex, ref = "Female"),
-                                                                    intervals = relevel(intervals, ref = levels(group.no_co.dataset.matched$intervals)[i])),
+                                                             mutate(intervals = relevel(intervals, ref = levels(group.no_co.dataset.matched$intervals)[i])),
                                                            family = "cox",
                                                            chains = 2)
-
-    predictions_no_co_hf_stan_psm_1_1_baye <- rbind(predictions_no_co_hf_stan_psm_1_1_baye, cbind(mean = fixef(models_no_co_hf_psm_1_1_female_baye[[i]])[2,1],
-                                                                                                    lci = fixef(models_no_co_hf_psm_1_1_female_baye[[i]])[2,3],
-                                                                                                    uci = fixef(models_no_co_hf_psm_1_1_female_baye[[i]])[2,4],
-                                                                                                    sex = "Female",
-                                                                                                    intervals = levels(group.no_co.dataset.matched$intervals)[i]))
-
-  }
-
-  saveRDS(models_no_co_hf_psm_1_1_male_baye, paste0(output_path, "/additional_outcomes/models_no_co_hf_psm_1_1_male_baye.rds"))
-
-  saveRDS(models_no_co_hf_psm_1_1_female_baye, paste0(output_path, "/additional_outcomes/models_no_co_hf_psm_1_1_female_baye.rds"))
-
-  predictions_no_co_hf_stan_psm_1_1_baye <- predictions_no_co_hf_stan_psm_1_1_baye %>%
-    as.data.frame()
-
-  saveRDS(predictions_no_co_hf_stan_psm_1_1_baye, paste0(output_path, "/additional_outcomes/predictions_no_co_hf_stan_psm_1_1_baye.rds"))
-
-}
-
-# No sex strata
-if (class(try(
-
-  # predictions for the CVD outcomes in the population with no CVD/HF/CKD
-  predictions_no_co_hf_stan_psm_1_1_overall_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_no_co_hf_stan_psm_1_1_overall_baye.rds"))
-
-  , silent = TRUE)) == "try-error") {
-
-  formula_baye <- "time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2"
-
-  # maximum number of deciles being tested
-  quantiles <- length(levels(group.no_co.dataset[,"intervals"]))
-  # create lists with results
-  mnumber = c(1:quantiles)
-  predictions_no_co_hf_stan_psm_1_1_overall_baye <- vector()
-
-  models_no_co_hf_psm_1_1_overall_baye <- vector("list", quantiles)
-
-  for (i in mnumber) {
-
-    models_no_co_hf_psm_1_1_overall_baye[[i]] <- brms::brm(formula = formula(formula_baye),
-                                                            data = group.no_co.dataset.matched %>%
-                                                              select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
-                                                              cbind(time = group.no_co.dataset.matched$postdrug_hf_censtime_yrs,
-                                                                    censored = group.no_co.dataset.matched$postdrug_hf_censvar,
-                                                                    qrisk2_10yr_score_1 = rcs(group.no_co.dataset.matched$qrisk2_10yr_score, 3)[,1],
-                                                                    qrisk2_10yr_score_2 = rcs(group.no_co.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
-                                                              as.data.frame() %>%
-                                                              drop_na() %>%
-                                                              mutate(intervals = relevel(intervals, ref = levels(group.no_co.dataset.matched$intervals)[i])),
-                                                            family = "cox",
-                                                            chains = 2)
-
+    
     predictions_no_co_hf_stan_psm_1_1_overall_baye <- rbind(predictions_no_co_hf_stan_psm_1_1_overall_baye, cbind(mean = fixef(models_no_co_hf_psm_1_1_overall_baye[[i]])[2,1],
-                                                                                                                    lci = fixef(models_no_co_hf_psm_1_1_overall_baye[[i]])[2,3],
-                                                                                                                    uci = fixef(models_no_co_hf_psm_1_1_overall_baye[[i]])[2,4],
-                                                                                                                    intervals = levels(group.no_co.dataset.matched$intervals)[i]))
-
+                                                                                                                  lci = fixef(models_no_co_hf_psm_1_1_overall_baye[[i]])[2,3],
+                                                                                                                  uci = fixef(models_no_co_hf_psm_1_1_overall_baye[[i]])[2,4],
+                                                                                                                  intervals = levels(group.no_co.dataset.matched$intervals)[i]))
+    
   }
-
+  
   saveRDS(models_no_co_hf_psm_1_1_overall_baye, paste0(output_path, "/additional_outcomes/models_no_co_hf_psm_1_1_overall_baye.rds"))
-
+  
   predictions_no_co_hf_stan_psm_1_1_overall_baye <- predictions_no_co_hf_stan_psm_1_1_overall_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_no_co_hf_stan_psm_1_1_overall_baye, paste0(output_path, "/additional_outcomes/predictions_no_co_hf_stan_psm_1_1_overall_baye.rds"))
-
-
+  
+  
 }
 # Full population (interval as a continuous, without subgrouping individuals)
 if (class(try(
-
+  
   # predictions for the CVD outcomes in the population with no CVD/HF/CKD
   predictions_no_co_hf_stan_psm_1_1_full_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_no_co_hf_stan_psm_1_1_full_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
-  formula_baye <- "time | cens(censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2"
-
+  
+  formula_baye <- "time | cens(1 - censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2"
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.no_co.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_no_co_hf_stan_psm_1_1_full_baye <- vector()
-
+  
   models_no_co_hf_psm_1_1_full_baye <- brms::brm(formula = formula(formula_baye),
-                                                  data = group.no_co.dataset.matched %>%
-                                                    select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
-                                                    cbind(time = group.no_co.dataset.matched$postdrug_hf_censtime_yrs,
-                                                          censored = group.no_co.dataset.matched$postdrug_hf_censvar,
-                                                          qrisk2_10yr_score_1 = rcs(group.no_co.dataset.matched$qrisk2_10yr_score, 3)[,1],
-                                                          qrisk2_10yr_score_2 = rcs(group.no_co.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
-                                                    as.data.frame() %>%
-                                                    drop_na(),
-                                                  family = "cox",
-                                                  chains = 2)
-
+                                                 data = group.no_co.dataset.matched %>%
+                                                   select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
+                                                   cbind(time = group.no_co.dataset.matched$postdrug_hf_censtime_yrs,
+                                                         censored = group.no_co.dataset.matched$postdrug_hf_censvar,
+                                                         qrisk2_10yr_score_1 = rcs(group.no_co.dataset.matched$qrisk2_10yr_score, 3)[,1],
+                                                         qrisk2_10yr_score_2 = rcs(group.no_co.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
+                                                   as.data.frame() %>%
+                                                   drop_na(),
+                                                 family = "cox",
+                                                 chains = 2)
+  
   predictions_no_co_hf_stan_psm_1_1_full_baye <- rbind(predictions_no_co_hf_stan_psm_1_1_full_baye, cbind(mean = fixef(models_no_co_hf_psm_1_1_full_baye)[2,1],
-                                                                                                            lci = fixef(models_no_co_hf_psm_1_1_full_baye)[2,3],
-                                                                                                            uci = fixef(models_no_co_hf_psm_1_1_full_baye)[2,4]))
-
+                                                                                                          lci = fixef(models_no_co_hf_psm_1_1_full_baye)[2,3],
+                                                                                                          uci = fixef(models_no_co_hf_psm_1_1_full_baye)[2,4]))
+  
   saveRDS(models_no_co_hf_psm_1_1_full_baye, paste0(output_path, "/additional_outcomes/models_no_co_hf_psm_1_1_full_baye.rds"))
-
+  
   predictions_no_co_hf_stan_psm_1_1_full_baye <- predictions_no_co_hf_stan_psm_1_1_full_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_no_co_hf_stan_psm_1_1_full_baye, paste0(output_path, "/additional_outcomes/predictions_no_co_hf_stan_psm_1_1_full_baye.rds"))
-
+  
 }
 
 
 ## Propensity score matching + adjusted
 
 if (class(try(
-
+  
   # predictions for the CVD outcomes in population with no CVD/HF/CKD strata sex and intervals
   predictions_no_co_hf_stan_psm_1_1_adjusted_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_no_co_hf_stan_psm_1_1_adjusted_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.no_co.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_no_co_hf_stan_psm_1_1_adjusted_baye <- vector()
-
-
+  
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.no_co.dataset.matched[,breakdown_adjust], is.factor)
-
+  
   models_no_co_hf_psm_1_1_adjusted_male_baye <- vector("list", quantiles)
-
+  
   models_no_co_hf_psm_1_1_adjusted_female_baye <- vector("list", quantiles)
-
+  
   for (i in mnumber) {
-
+    
     dataset.now <- group.no_co.dataset.matched %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.no_co.dataset.matched$postdrug_hf_censtime_yrs,
@@ -6272,23 +6308,23 @@ if (class(try(
       drop_na() %>%
       mutate(sex = relevel(sex, ref = "Male"),
              intervals = relevel(intervals, ref = levels(group.no_co.dataset.matched$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_no_co_hf_psm_1_1_adjusted_male_baye[[i]] <- brms::brm(formula = formula(formula_baye),
                                                                  data = dataset.now,
                                                                  family = "cox",
                                                                  chains = 2,
                                                                  iter = 10000)
-
+    
     predictions_no_co_hf_stan_psm_1_1_adjusted_baye <- rbind(predictions_no_co_hf_stan_psm_1_1_adjusted_baye, cbind(mean = fixef(models_no_co_hf_psm_1_1_adjusted_male_baye[[i]])[2,1],
                                                                                                                     lci = fixef(models_no_co_hf_psm_1_1_adjusted_male_baye[[i]])[2,3],
                                                                                                                     uci = fixef(models_no_co_hf_psm_1_1_adjusted_male_baye[[i]])[2,4],
                                                                                                                     sex = "Male",
                                                                                                                     intervals = levels(group.no_co.dataset.matched$intervals)[i]))
-
+    
     dataset.now <- group.no_co.dataset.matched %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.no_co.dataset.matched$postdrug_hf_censtime_yrs,
@@ -6309,57 +6345,57 @@ if (class(try(
       drop_na() %>%
       mutate(sex = relevel(sex, ref = "Female"),
              intervals = relevel(intervals, ref = levels(group.no_co.dataset.matched$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_no_co_hf_psm_1_1_adjusted_female_baye[[i]] <-  brms::brm(formula = formula(formula_baye),
                                                                     data = dataset.now,
                                                                     family = "cox",
                                                                     chains = 2,
                                                                     iter = 10000)
-
+    
     predictions_no_co_hf_stan_psm_1_1_adjusted_baye <- rbind(predictions_no_co_hf_stan_psm_1_1_adjusted_baye, cbind(mean = fixef(models_no_co_hf_psm_1_1_adjusted_female_baye[[i]])[2,1],
                                                                                                                     lci = fixef(models_no_co_hf_psm_1_1_adjusted_female_baye[[i]])[2,3],
                                                                                                                     uci = fixef(models_no_co_hf_psm_1_1_adjusted_female_baye[[i]])[2,4],
                                                                                                                     sex = "Female",
                                                                                                                     intervals = levels(group.no_co.dataset.matched$intervals)[i]))
-
+    
   }
-
+  
   saveRDS(models_no_co_hf_psm_1_1_adjusted_male_baye, paste0(output_path, "/additional_outcomes/models_no_co_hf_psm_1_1_adjusted_male_baye.rds"))
-
+  
   saveRDS(models_no_co_hf_psm_1_1_adjusted_female_baye, paste0(output_path, "/additional_outcomes/models_no_co_hf_psm_1_1_adjusted_female_baye.rds"))
-
+  
   predictions_no_co_hf_stan_psm_1_1_adjusted_baye <- predictions_no_co_hf_stan_psm_1_1_adjusted_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_no_co_hf_stan_psm_1_1_adjusted_baye, paste0(output_path, "/additional_outcomes/predictions_no_co_hf_stan_psm_1_1_adjusted_baye.rds"))
-
+  
 }
 
 if (class(try(
-
+  
   # predictions for the CVD outcomes in the population with no CVD/HF/CKD
   predictions_no_co_hf_stan_psm_1_1_adjusted_overall_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_no_co_hf_stan_psm_1_1_adjusted_overall_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.no_co.dataset.matched[,breakdown_adjust], is.factor)
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.no_co.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_no_co_hf_stan_psm_1_1_adjusted_overall_baye <- vector()
-
+  
   models_no_co_hf_psm_1_1_adjusted_overall_baye <- vector("list", quantiles)
-
+  
   for (i in mnumber) {
-
+    
     dataset.now <- group.no_co.dataset.matched %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.no_co.dataset.matched$postdrug_hf_censtime_yrs,
@@ -6379,50 +6415,50 @@ if (class(try(
       as.data.frame() %>%
       drop_na() %>%
       mutate(intervals = relevel(intervals, ref = levels(group.no_co.dataset.matched$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_no_co_hf_psm_1_1_adjusted_overall_baye[[i]] <- brms::brm(formula = formula(formula_baye),
                                                                     data = dataset.now,
                                                                     family = "cox",
                                                                     chains = 2,
                                                                     iter = 10000)
-
+    
     predictions_no_co_hf_stan_psm_1_1_adjusted_overall_baye <- rbind(predictions_no_co_hf_stan_psm_1_1_adjusted_overall_baye, cbind(mean = fixef(models_no_co_hf_psm_1_1_adjusted_overall_baye[[i]])[2,1],
                                                                                                                                     lci = fixef(models_no_co_hf_psm_1_1_adjusted_overall_baye[[i]])[2,3],
                                                                                                                                     uci = fixef(models_no_co_hf_psm_1_1_adjusted_overall_baye[[i]])[2,4],
                                                                                                                                     intervals = levels(group.no_co.dataset.matched$intervals)[i]))
-
+    
   }
-
+  
   saveRDS(models_no_co_hf_psm_1_1_adjusted_overall_baye, paste0(output_path, "/additional_outcomes/models_no_co_hf_psm_1_1_adjusted_overall_baye.rds"))
-
+  
   predictions_no_co_hf_stan_psm_1_1_adjusted_overall_baye <- predictions_no_co_hf_stan_psm_1_1_adjusted_overall_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_no_co_hf_stan_psm_1_1_adjusted_overall_baye, paste0(output_path, "/additional_outcomes/predictions_no_co_hf_stan_psm_1_1_adjusted_overall_baye.rds"))
-
+  
 }
 # Full population (interval as a continuous, without subgrouping individuals)
 if (class(try(
-
+  
   # predictions for the CVD outcomes in the population with no CVD/HF/CKD
   predictions_no_co_hf_stan_psm_1_1_adjusted_full_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_no_co_hf_stan_psm_1_1_adjusted_full_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.no_co.dataset.matched[,breakdown_adjust], is.factor)
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.no_co.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_no_co_hf_stan_psm_1_1_adjusted_full_baye <- vector()
-
+  
   dataset.now <- group.no_co.dataset.matched %>%
     select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
     cbind(time = group.no_co.dataset.matched$postdrug_hf_censtime_yrs,
@@ -6441,28 +6477,28 @@ if (class(try(
           prealt_2 = rcs(group.no_co.dataset.matched$prealt, 3)[,2]) %>%
     as.data.frame() %>%
     drop_na()
-
+  
   checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-  formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+  
+  formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+  
   models_no_co_hf_psm_1_1_adjusted_full_baye <- brms::brm(formula = formula(formula_baye),
                                                           data = dataset.now,
                                                           family = "cox",
                                                           chains = 2,
                                                           iter = 10000)
-
+  
   predictions_no_co_hf_stan_psm_1_1_adjusted_full_baye <- rbind(predictions_no_co_hf_stan_psm_1_1_adjusted_full_baye, cbind(mean = fixef(models_no_co_hf_psm_1_1_adjusted_full_baye)[2,1],
                                                                                                                             lci = fixef(models_no_co_hf_psm_1_1_adjusted_full_baye)[2,3],
                                                                                                                             uci = fixef(models_no_co_hf_psm_1_1_adjusted_full_baye)[2,4]))
-
+  
   saveRDS(models_no_co_hf_psm_1_1_adjusted_full_baye, paste0(output_path, "additional_outcomes/models_no_co_hf_psm_1_1_adjusted_full_baye.rds"))
-
+  
   predictions_no_co_hf_stan_psm_1_1_adjusted_full_baye <- predictions_no_co_hf_stan_psm_1_1_adjusted_full_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_no_co_hf_stan_psm_1_1_adjusted_full_baye, paste0(output_path, "/additional_outcomes/predictions_no_co_hf_stan_psm_1_1_adjusted_full_baye.rds"))
-
+  
 }
 
 
@@ -6470,29 +6506,29 @@ if (class(try(
 
 #--- Cox
 if (class(try(
-
+  
   # predictions for the CVD outcomes in population with no CVD/HF/CKD strata sex and intervals
   predictions_no_co_hf_stan_adjusted_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_no_co_hf_stan_adjusted_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.no_co.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_no_co_hf_stan_adjusted_baye <- vector()
-
-
+  
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.no_co.dataset[,breakdown_adjust], is.factor)
-
+  
   models_no_co_hf_adjusted_male_baye <- vector("list", quantiles)
-
+  
   models_no_co_hf_adjusted_female_baye <- vector("list", quantiles)
-
+  
   for (i in mnumber) {
-
+    
     dataset.now <- group.no_co.dataset %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.no_co.dataset$postdrug_hf_censtime_yrs,
@@ -6513,23 +6549,23 @@ if (class(try(
       drop_na() %>%
       mutate(sex = relevel(sex, ref = "Male"),
              intervals = relevel(intervals, ref = levels(group.no_co.dataset$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_no_co_hf_adjusted_male_baye[[i]] <- brms::brm(formula = formula(formula_baye),
                                                          data = dataset.now,
                                                          family = "cox",
                                                          chains = 2,
                                                          iter = 10000)
-
+    
     predictions_no_co_hf_stan_adjusted_baye <- rbind(predictions_no_co_hf_stan_adjusted_baye, cbind(mean = fixef(models_no_co_hf_adjusted_male_baye[[i]])[2,1],
                                                                                                     lci = fixef(models_no_co_hf_adjusted_male_baye[[i]])[2,3],
                                                                                                     uci = fixef(models_no_co_hf_adjusted_male_baye[[i]])[2,4],
                                                                                                     sex = "Male",
                                                                                                     intervals = levels(group.no_co.dataset$intervals)[i]))
-
+    
     dataset.now <- group.no_co.dataset %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.no_co.dataset$postdrug_hf_censtime_yrs,
@@ -6550,57 +6586,57 @@ if (class(try(
       drop_na() %>%
       mutate(sex = relevel(sex, ref = "Female"),
              intervals = relevel(intervals, ref = levels(group.no_co.dataset$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_no_co_hf_adjusted_female_baye[[i]] <- brms::brm(formula = formula(formula_baye),
                                                            data = dataset.now,
                                                            family = "cox",
                                                            chains = 2,
                                                            iter = 10000)
-
+    
     predictions_no_co_hf_stan_adjusted_baye <- rbind(predictions_no_co_hf_stan_adjusted_baye, cbind(mean = fixef(models_no_co_hf_adjusted_female_baye[[i]])[2,1],
                                                                                                     lci = fixef(models_no_co_hf_adjusted_female_baye[[i]])[2,3],
                                                                                                     uci = fixef(models_no_co_hf_adjusted_female_baye[[i]])[2,4],
                                                                                                     sex = "Female",
                                                                                                     intervals = levels(group.no_co.dataset$intervals)[i]))
-
+    
   }
-
+  
   saveRDS(models_no_co_hf_adjusted_male_baye, paste0(output_path, "/additional_outcomes/models_no_co_hf_adjusted_male_baye.rds"))
-
+  
   saveRDS(models_no_co_hf_adjusted_female_baye, paste0(output_path, "/additional_outcomes/models_no_co_hf_adjusted_female_baye.rds"))
-
+  
   predictions_no_co_hf_stan_adjusted_baye <- predictions_no_co_hf_stan_adjusted_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_no_co_hf_stan_adjusted_baye, paste0(output_path, "/additional_outcomes/predictions_no_co_hf_stan_adjusted_baye.rds"))
-
+  
 }
 
 if (class(try(
-
+  
   # predictions for the CVD outcomes in the population with no CVD/HF/CKD
   predictions_no_co_hf_stan_adjusted_overall_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_no_co_hf_stan_adjusted_overall_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.no_co.dataset[,breakdown_adjust], is.factor)
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.no_co.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_no_co_hf_stan_adjusted_overall_baye <- vector()
-
+  
   models_no_co_hf_adjusted_overall_baye <- vector("list", quantiles)
-
+  
   for (i in mnumber) {
-
+    
     dataset.now <- group.no_co.dataset %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.no_co.dataset$postdrug_hf_censtime_yrs,
@@ -6620,50 +6656,50 @@ if (class(try(
       as.data.frame() %>%
       drop_na() %>%
       mutate(intervals = relevel(intervals, ref = levels(group.no_co.dataset$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_no_co_hf_adjusted_overall_baye[[i]] <- brms::brm(formula = formula(formula_baye),
                                                             data = dataset.now,
                                                             family = "cox",
                                                             chains = 2,
                                                             iter = 10000)
-
+    
     predictions_no_co_hf_stan_adjusted_overall_baye <- rbind(predictions_no_co_hf_stan_adjusted_overall_baye, cbind(mean = fixef(models_no_co_hf_adjusted_overall_baye[[i]])[2,1],
                                                                                                                     lci = fixef(models_no_co_hf_adjusted_overall_baye[[i]])[2,3],
                                                                                                                     uci = fixef(models_no_co_hf_adjusted_overall_baye[[i]])[2,4],
                                                                                                                     intervals = levels(group.no_co.dataset$intervals)[i]))
-
+    
   }
-
+  
   saveRDS(models_no_co_hf_adjusted_overall_baye, paste0(output_path, "/additional_outcomes/models_no_co_hf_adjusted_overall_baye.rds"))
-
+  
   predictions_no_co_hf_stan_adjusted_overall_baye <- predictions_no_co_hf_stan_adjusted_overall_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_no_co_hf_stan_adjusted_overall_baye, paste0(output_path, "/additional_outcomes/predictions_no_co_hf_stan_adjusted_overall_baye.rds"))
-
+  
 }
 # Full population (interval as a continuous, without subgrouping individuals)
 if (class(try(
-
+  
   # predictions for the CVD outcomes in the population with no CVD/HF/CKD
   predictions_no_co_hf_stan_adjusted_full_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_no_co_hf_stan_adjusted_full_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.no_co.dataset[,breakdown_adjust], is.factor)
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.no_co.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_no_co_hf_stan_adjusted_full_baye <- vector()
-
+  
   dataset.now <- group.no_co.dataset %>%
     select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
     cbind(time = group.no_co.dataset$postdrug_hf_censtime_yrs,
@@ -6682,28 +6718,28 @@ if (class(try(
           prealt_2 = rcs(group.no_co.dataset$prealt, 3)[,2]) %>%
     as.data.frame() %>%
     drop_na()
-
+  
   checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-  formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+  
+  formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+  
   models_no_co_hf_adjusted_full_baye <- brms::brm(formula = formula(formula_baye),
                                                   data = dataset.now,
                                                   family = "cox",
                                                   chains = 2,
                                                   iter = 10000)
-
+  
   predictions_no_co_hf_stan_adjusted_full_baye <- rbind(predictions_no_co_hf_stan_adjusted_full_baye, cbind(mean = fixef(models_no_co_hf_adjusted_full_baye)[2,1],
                                                                                                             lci = fixef(models_no_co_hf_adjusted_full_baye)[2,3],
                                                                                                             uci = fixef(models_no_co_hf_adjusted_full_baye)[2,4]))
-
+  
   saveRDS(models_no_co_hf_adjusted_full_baye, paste0(output_path, "/additional_outcomes/models_no_co_hf_adjusted_full_baye.rds"))
-
+  
   predictions_no_co_hf_stan_adjusted_full_baye <- predictions_no_co_hf_stan_adjusted_full_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_no_co_hf_stan_adjusted_full_baye, paste0(output_path, "/additional_outcomes/predictions_no_co_hf_stan_adjusted_full_baye.rds"))
-
+  
 }
 
 
@@ -7117,196 +7153,196 @@ dev.off()
 ## Propensity score matching
 
 if (class(try(
-
+  
   # predictions for the CKD stage 3/4/5 outcomes in population with no CVD/HF/CKD strata sex and intervals
   predictions_no_co_stage345_stan_psm_1_1_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_no_co_stage345_stan_psm_1_1_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.no_co.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_no_co_stage345_stan_psm_1_1_baye <- vector()
-
-  formula_baye <- "time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2"
-
+  
+  formula_baye <- "time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2"
+  
   models_no_co_stage345_psm_1_1_male_baye <- vector("list", quantiles)
-
+  
   models_no_co_stage345_psm_1_1_female_baye <- vector("list", quantiles)
-
+  
   for(i in mnumber) {
-
+    
     models_no_co_stage345_psm_1_1_male_baye[[i]] <- brms::brm(formula = formula(formula_baye),
-                                                         data = group.no_co.dataset.matched %>%
-                                                           select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
-                                                           cbind(time = group.no_co.dataset.matched$postdrug_stage345_censtime_yrs,
-                                                                 censored = group.no_co.dataset.matched$postdrug_stage345_censvar,
-                                                                 qrisk2_10yr_score_1 = rcs(group.no_co.dataset.matched$qrisk2_10yr_score, 3)[,1],
-                                                                 qrisk2_10yr_score_2 = rcs(group.no_co.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
-                                                           as.data.frame() %>%
-                                                           drop_na() %>%
-                                                           mutate(sex = relevel(sex, ref = "Male"),
-                                                                  intervals = relevel(intervals, ref = levels(group.no_co.dataset.matched$intervals)[i])),
-                                                         family = "cox",
-                                                         chains = 2)
-
+                                                              data = group.no_co.dataset.matched %>%
+                                                                select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
+                                                                cbind(time = group.no_co.dataset.matched$postdrug_stage345_censtime_yrs,
+                                                                      censored = group.no_co.dataset.matched$postdrug_stage345_censvar,
+                                                                      qrisk2_10yr_score_1 = rcs(group.no_co.dataset.matched$qrisk2_10yr_score, 3)[,1],
+                                                                      qrisk2_10yr_score_2 = rcs(group.no_co.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
+                                                                as.data.frame() %>%
+                                                                drop_na() %>%
+                                                                mutate(sex = relevel(sex, ref = "Male"),
+                                                                       intervals = relevel(intervals, ref = levels(group.no_co.dataset.matched$intervals)[i])),
+                                                              family = "cox",
+                                                              chains = 2)
+    
     predictions_no_co_stage345_stan_psm_1_1_baye <- rbind(predictions_no_co_stage345_stan_psm_1_1_baye, cbind(mean = fixef(models_no_co_stage345_psm_1_1_male_baye[[i]])[2,1],
-                                                                                                    lci = fixef(models_no_co_stage345_psm_1_1_male_baye[[i]])[2,3],
-                                                                                                    uci = fixef(models_no_co_stage345_psm_1_1_male_baye[[i]])[2,4],
-                                                                                                    sex = "Male",
-                                                                                                    intervals = levels(group.no_co.dataset.matched$intervals)[i]))
-
+                                                                                                              lci = fixef(models_no_co_stage345_psm_1_1_male_baye[[i]])[2,3],
+                                                                                                              uci = fixef(models_no_co_stage345_psm_1_1_male_baye[[i]])[2,4],
+                                                                                                              sex = "Male",
+                                                                                                              intervals = levels(group.no_co.dataset.matched$intervals)[i]))
+    
     models_no_co_stage345_psm_1_1_female_baye[[i]] <- brms::brm(formula = formula(formula_baye),
-                                                           data = group.no_co.dataset.matched %>%
-                                                             select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
-                                                             cbind(time = group.no_co.dataset.matched$postdrug_stage345_censtime_yrs,
-                                                                   censored = group.no_co.dataset.matched$postdrug_stage345_censvar,
-                                                                   qrisk2_10yr_score_1 = rcs(group.no_co.dataset.matched$qrisk2_10yr_score, 3)[,1],
-                                                                   qrisk2_10yr_score_2 = rcs(group.no_co.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
-                                                             as.data.frame() %>%
-                                                             drop_na() %>%
-                                                             mutate(sex = relevel(sex, ref = "Female"),
-                                                                    intervals = relevel(intervals, ref = levels(group.no_co.dataset.matched$intervals)[i])),
-                                                           family = "cox",
-                                                           chains = 2)
-
+                                                                data = group.no_co.dataset.matched %>%
+                                                                  select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
+                                                                  cbind(time = group.no_co.dataset.matched$postdrug_stage345_censtime_yrs,
+                                                                        censored = group.no_co.dataset.matched$postdrug_stage345_censvar,
+                                                                        qrisk2_10yr_score_1 = rcs(group.no_co.dataset.matched$qrisk2_10yr_score, 3)[,1],
+                                                                        qrisk2_10yr_score_2 = rcs(group.no_co.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
+                                                                  as.data.frame() %>%
+                                                                  drop_na() %>%
+                                                                  mutate(sex = relevel(sex, ref = "Female"),
+                                                                         intervals = relevel(intervals, ref = levels(group.no_co.dataset.matched$intervals)[i])),
+                                                                family = "cox",
+                                                                chains = 2)
+    
     predictions_no_co_stage345_stan_psm_1_1_baye <- rbind(predictions_no_co_stage345_stan_psm_1_1_baye, cbind(mean = fixef(models_no_co_stage345_psm_1_1_female_baye[[i]])[2,1],
-                                                                                                    lci = fixef(models_no_co_stage345_psm_1_1_female_baye[[i]])[2,3],
-                                                                                                    uci = fixef(models_no_co_stage345_psm_1_1_female_baye[[i]])[2,4],
-                                                                                                    sex = "Female",
-                                                                                                    intervals = levels(group.no_co.dataset.matched$intervals)[i]))
-
+                                                                                                              lci = fixef(models_no_co_stage345_psm_1_1_female_baye[[i]])[2,3],
+                                                                                                              uci = fixef(models_no_co_stage345_psm_1_1_female_baye[[i]])[2,4],
+                                                                                                              sex = "Female",
+                                                                                                              intervals = levels(group.no_co.dataset.matched$intervals)[i]))
+    
   }
-
+  
   saveRDS(models_no_co_stage345_psm_1_1_male_baye, paste0(output_path, "/additional_outcomes/models_no_co_stage345_psm_1_1_male_baye.rds"))
-
+  
   saveRDS(models_no_co_stage345_psm_1_1_female_baye, paste0(output_path, "/additional_outcomes/models_no_co_stage345_psm_1_1_female_baye.rds"))
-
+  
   predictions_no_co_stage345_stan_psm_1_1_baye <- predictions_no_co_stage345_stan_psm_1_1_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_no_co_stage345_stan_psm_1_1_baye, paste0(output_path, "/additional_outcomes/predictions_no_co_stage345_stan_psm_1_1_baye.rds"))
-
+  
 }
 
 # No sex strata
 if (class(try(
-
+  
   # predictions for the CKD stage 3/4/5 outcomes in the population with no CVD/HF/CKD
   predictions_no_co_stage345_stan_psm_1_1_overall_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_no_co_stage345_stan_psm_1_1_overall_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
-  formula_baye <- "time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2"
-
+  
+  formula_baye <- "time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2"
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.no_co.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_no_co_stage345_stan_psm_1_1_overall_baye <- vector()
-
+  
   models_no_co_stage345_psm_1_1_overall_baye <- vector("list", quantiles)
-
+  
   for (i in mnumber) {
-
+    
     models_no_co_stage345_psm_1_1_overall_baye[[i]] <- brms::brm(formula = formula(formula_baye),
-                                                            data = group.no_co.dataset.matched %>%
-                                                              select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
-                                                              cbind(time = group.no_co.dataset.matched$postdrug_stage345_censtime_yrs,
-                                                                    censored = group.no_co.dataset.matched$postdrug_stage345_censvar,
-                                                                    qrisk2_10yr_score_1 = rcs(group.no_co.dataset.matched$qrisk2_10yr_score, 3)[,1],
-                                                                    qrisk2_10yr_score_2 = rcs(group.no_co.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
-                                                              as.data.frame() %>%
-                                                              drop_na() %>%
-                                                              mutate(intervals = relevel(intervals, ref = levels(group.no_co.dataset.matched$intervals)[i])),
-                                                            family = "cox",
-                                                            chains = 2)
-
+                                                                 data = group.no_co.dataset.matched %>%
+                                                                   select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
+                                                                   cbind(time = group.no_co.dataset.matched$postdrug_stage345_censtime_yrs,
+                                                                         censored = group.no_co.dataset.matched$postdrug_stage345_censvar,
+                                                                         qrisk2_10yr_score_1 = rcs(group.no_co.dataset.matched$qrisk2_10yr_score, 3)[,1],
+                                                                         qrisk2_10yr_score_2 = rcs(group.no_co.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
+                                                                   as.data.frame() %>%
+                                                                   drop_na() %>%
+                                                                   mutate(intervals = relevel(intervals, ref = levels(group.no_co.dataset.matched$intervals)[i])),
+                                                                 family = "cox",
+                                                                 chains = 2)
+    
     predictions_no_co_stage345_stan_psm_1_1_overall_baye <- rbind(predictions_no_co_stage345_stan_psm_1_1_overall_baye, cbind(mean = fixef(models_no_co_stage345_psm_1_1_overall_baye[[i]])[2,1],
-                                                                                                                    lci = fixef(models_no_co_stage345_psm_1_1_overall_baye[[i]])[2,3],
-                                                                                                                    uci = fixef(models_no_co_stage345_psm_1_1_overall_baye[[i]])[2,4],
-                                                                                                                    intervals = levels(group.no_co.dataset.matched$intervals)[i]))
-
+                                                                                                                              lci = fixef(models_no_co_stage345_psm_1_1_overall_baye[[i]])[2,3],
+                                                                                                                              uci = fixef(models_no_co_stage345_psm_1_1_overall_baye[[i]])[2,4],
+                                                                                                                              intervals = levels(group.no_co.dataset.matched$intervals)[i]))
+    
   }
-
+  
   saveRDS(models_no_co_stage345_psm_1_1_overall_baye, paste0(output_path, "/additional_outcomes/models_no_co_stage345_psm_1_1_overall_baye.rds"))
-
+  
   predictions_no_co_stage345_stan_psm_1_1_overall_baye <- predictions_no_co_stage345_stan_psm_1_1_overall_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_no_co_stage345_stan_psm_1_1_overall_baye, paste0(output_path, "/additional_outcomes/predictions_no_co_stage345_stan_psm_1_1_overall_baye.rds"))
-
-
+  
+  
 }
 # Full population (interval as a continuous, without subgrouping individuals)
 if (class(try(
-
+  
   # predictions for the CKD stage 3/4/5 outcomes in the population with no CVD/HF/CKD
   predictions_no_co_stage345_stan_psm_1_1_full_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_no_co_stage345_stan_psm_1_1_full_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
-  formula_baye <- "time | cens(censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2"
-
+  
+  formula_baye <- "time | cens(1 - censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2"
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.no_co.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_no_co_stage345_stan_psm_1_1_full_baye <- vector()
-
+  
   models_no_co_stage345_psm_1_1_full_baye <- brms::brm(formula = formula(formula_baye),
-                                                  data = group.no_co.dataset.matched %>%
-                                                    select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
-                                                    cbind(time = group.no_co.dataset.matched$postdrug_stage345_censtime_yrs,
-                                                          censored = group.no_co.dataset.matched$postdrug_stage345_censvar,
-                                                          qrisk2_10yr_score_1 = rcs(group.no_co.dataset.matched$qrisk2_10yr_score, 3)[,1],
-                                                          qrisk2_10yr_score_2 = rcs(group.no_co.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
-                                                    as.data.frame() %>%
-                                                    drop_na(),
-                                                  family = "cox",
-                                                  chains = 2)
-
+                                                       data = group.no_co.dataset.matched %>%
+                                                         select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
+                                                         cbind(time = group.no_co.dataset.matched$postdrug_stage345_censtime_yrs,
+                                                               censored = group.no_co.dataset.matched$postdrug_stage345_censvar,
+                                                               qrisk2_10yr_score_1 = rcs(group.no_co.dataset.matched$qrisk2_10yr_score, 3)[,1],
+                                                               qrisk2_10yr_score_2 = rcs(group.no_co.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
+                                                         as.data.frame() %>%
+                                                         drop_na(),
+                                                       family = "cox",
+                                                       chains = 2)
+  
   predictions_no_co_stage345_stan_psm_1_1_full_baye <- rbind(predictions_no_co_stage345_stan_psm_1_1_full_baye, cbind(mean = fixef(models_no_co_stage345_psm_1_1_full_baye)[2,1],
-                                                                                                            lci = fixef(models_no_co_stage345_psm_1_1_full_baye)[2,3],
-                                                                                                            uci = fixef(models_no_co_stage345_psm_1_1_full_baye)[2,4]))
-
+                                                                                                                      lci = fixef(models_no_co_stage345_psm_1_1_full_baye)[2,3],
+                                                                                                                      uci = fixef(models_no_co_stage345_psm_1_1_full_baye)[2,4]))
+  
   saveRDS(models_no_co_stage345_psm_1_1_full_baye, paste0(output_path, "/additional_outcomes/models_no_co_stage345_psm_1_1_full_baye.rds"))
-
+  
   predictions_no_co_stage345_stan_psm_1_1_full_baye <- predictions_no_co_stage345_stan_psm_1_1_full_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_no_co_stage345_stan_psm_1_1_full_baye, paste0(output_path, "/additional_outcomes/predictions_no_co_stage345_stan_psm_1_1_full_baye.rds"))
-
+  
 }
 
 
 ## Propensity score matching + adjusted
 
 if (class(try(
-
+  
   # predictions for the CKD stage 3/4/5 outcomes in population with no CVD/HF/CKD strata sex and intervals
   predictions_no_co_stage345_stan_psm_1_1_adjusted_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_no_co_stage345_stan_psm_1_1_adjusted_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.no_co.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_no_co_stage345_stan_psm_1_1_adjusted_baye <- vector()
-
-
+  
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.no_co.dataset.matched[,breakdown_adjust], is.factor)
-
+  
   models_no_co_stage345_psm_1_1_adjusted_male_baye <- vector("list", quantiles)
-
+  
   models_no_co_stage345_psm_1_1_adjusted_female_baye <- vector("list", quantiles)
-
+  
   for (i in mnumber) {
-
+    
     dataset.now <- group.no_co.dataset.matched %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.no_co.dataset.matched$postdrug_stage345_censtime_yrs,
@@ -7327,23 +7363,23 @@ if (class(try(
       drop_na() %>%
       mutate(sex = relevel(sex, ref = "Male"),
              intervals = relevel(intervals, ref = levels(group.no_co.dataset.matched$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_no_co_stage345_psm_1_1_adjusted_male_baye[[i]] <- brms::brm(formula = formula(formula_baye),
-                                                                 data = dataset.now,
-                                                                 family = "cox",
-                                                                 chains = 2,
-                                                                 iter = 10000)
-
+                                                                       data = dataset.now,
+                                                                       family = "cox",
+                                                                       chains = 2,
+                                                                       iter = 10000)
+    
     predictions_no_co_stage345_stan_psm_1_1_adjusted_baye <- rbind(predictions_no_co_stage345_stan_psm_1_1_adjusted_baye, cbind(mean = fixef(models_no_co_stage345_psm_1_1_adjusted_male_baye[[i]])[2,1],
-                                                                                                                    lci = fixef(models_no_co_stage345_psm_1_1_adjusted_male_baye[[i]])[2,3],
-                                                                                                                    uci = fixef(models_no_co_stage345_psm_1_1_adjusted_male_baye[[i]])[2,4],
-                                                                                                                    sex = "Male",
-                                                                                                                    intervals = levels(group.no_co.dataset.matched$intervals)[i]))
-
+                                                                                                                                lci = fixef(models_no_co_stage345_psm_1_1_adjusted_male_baye[[i]])[2,3],
+                                                                                                                                uci = fixef(models_no_co_stage345_psm_1_1_adjusted_male_baye[[i]])[2,4],
+                                                                                                                                sex = "Male",
+                                                                                                                                intervals = levels(group.no_co.dataset.matched$intervals)[i]))
+    
     dataset.now <- group.no_co.dataset.matched %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.no_co.dataset.matched$postdrug_stage345_censtime_yrs,
@@ -7364,57 +7400,57 @@ if (class(try(
       drop_na() %>%
       mutate(sex = relevel(sex, ref = "Female"),
              intervals = relevel(intervals, ref = levels(group.no_co.dataset.matched$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_no_co_stage345_psm_1_1_adjusted_female_baye[[i]] <-  brms::brm(formula = formula(formula_baye),
-                                                                    data = dataset.now,
-                                                                    family = "cox",
-                                                                    chains = 2,
-                                                                    iter = 10000)
-
+                                                                          data = dataset.now,
+                                                                          family = "cox",
+                                                                          chains = 2,
+                                                                          iter = 10000)
+    
     predictions_no_co_stage345_stan_psm_1_1_adjusted_baye <- rbind(predictions_no_co_stage345_stan_psm_1_1_adjusted_baye, cbind(mean = fixef(models_no_co_stage345_psm_1_1_adjusted_female_baye[[i]])[2,1],
-                                                                                                                    lci = fixef(models_no_co_stage345_psm_1_1_adjusted_female_baye[[i]])[2,3],
-                                                                                                                    uci = fixef(models_no_co_stage345_psm_1_1_adjusted_female_baye[[i]])[2,4],
-                                                                                                                    sex = "Female",
-                                                                                                                    intervals = levels(group.no_co.dataset.matched$intervals)[i]))
-
+                                                                                                                                lci = fixef(models_no_co_stage345_psm_1_1_adjusted_female_baye[[i]])[2,3],
+                                                                                                                                uci = fixef(models_no_co_stage345_psm_1_1_adjusted_female_baye[[i]])[2,4],
+                                                                                                                                sex = "Female",
+                                                                                                                                intervals = levels(group.no_co.dataset.matched$intervals)[i]))
+    
   }
-
+  
   saveRDS(models_no_co_stage345_psm_1_1_adjusted_male_baye, paste0(output_path, "/additional_outcomes/models_no_co_stage345_psm_1_1_adjusted_male_baye.rds"))
-
+  
   saveRDS(models_no_co_stage345_psm_1_1_adjusted_female_baye, paste0(output_path, "/additional_outcomes/models_no_co_stage345_psm_1_1_adjusted_female_baye.rds"))
-
+  
   predictions_no_co_stage345_stan_psm_1_1_adjusted_baye <- predictions_no_co_stage345_stan_psm_1_1_adjusted_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_no_co_stage345_stan_psm_1_1_adjusted_baye, paste0(output_path, "/additional_outcomes/predictions_no_co_stage345_stan_psm_1_1_adjusted_baye.rds"))
-
+  
 }
 
 if (class(try(
-
+  
   # predictions for the CKD stage 3/4/5 outcomes in the population with no CVD/HF/CKD
   predictions_no_co_stage345_stan_psm_1_1_adjusted_overall_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_no_co_stage345_stan_psm_1_1_adjusted_overall_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.no_co.dataset.matched[,breakdown_adjust], is.factor)
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.no_co.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_no_co_stage345_stan_psm_1_1_adjusted_overall_baye <- vector()
-
+  
   models_no_co_stage345_psm_1_1_adjusted_overall_baye <- vector("list", quantiles)
-
+  
   for (i in mnumber) {
-
+    
     dataset.now <- group.no_co.dataset.matched %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.no_co.dataset.matched$postdrug_stage345_censtime_yrs,
@@ -7434,50 +7470,50 @@ if (class(try(
       as.data.frame() %>%
       drop_na() %>%
       mutate(intervals = relevel(intervals, ref = levels(group.no_co.dataset.matched$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_no_co_stage345_psm_1_1_adjusted_overall_baye[[i]] <- brms::brm(formula = formula(formula_baye),
-                                                                    data = dataset.now,
-                                                                    family = "cox",
-                                                                    chains = 2,
-                                                                    iter = 10000)
-
+                                                                          data = dataset.now,
+                                                                          family = "cox",
+                                                                          chains = 2,
+                                                                          iter = 10000)
+    
     predictions_no_co_stage345_stan_psm_1_1_adjusted_overall_baye <- rbind(predictions_no_co_stage345_stan_psm_1_1_adjusted_overall_baye, cbind(mean = fixef(models_no_co_stage345_psm_1_1_adjusted_overall_baye[[i]])[2,1],
-                                                                                                                                    lci = fixef(models_no_co_stage345_psm_1_1_adjusted_overall_baye[[i]])[2,3],
-                                                                                                                                    uci = fixef(models_no_co_stage345_psm_1_1_adjusted_overall_baye[[i]])[2,4],
-                                                                                                                                    intervals = levels(group.no_co.dataset.matched$intervals)[i]))
-
+                                                                                                                                                lci = fixef(models_no_co_stage345_psm_1_1_adjusted_overall_baye[[i]])[2,3],
+                                                                                                                                                uci = fixef(models_no_co_stage345_psm_1_1_adjusted_overall_baye[[i]])[2,4],
+                                                                                                                                                intervals = levels(group.no_co.dataset.matched$intervals)[i]))
+    
   }
-
+  
   saveRDS(models_no_co_stage345_psm_1_1_adjusted_overall_baye, paste0(output_path, "/additional_outcomes/models_no_co_stage345_psm_1_1_adjusted_overall_baye.rds"))
-
+  
   predictions_no_co_stage345_stan_psm_1_1_adjusted_overall_baye <- predictions_no_co_stage345_stan_psm_1_1_adjusted_overall_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_no_co_stage345_stan_psm_1_1_adjusted_overall_baye, paste0(output_path, "/additional_outcomes/predictions_no_co_stage345_stan_psm_1_1_adjusted_overall_baye.rds"))
-
+  
 }
 # Full population (interval as a continuous, without subgrouping individuals)
 if (class(try(
-
+  
   # predictions for the CKD stage 3/4/5 outcomes in the population with no CVD/HF/CKD
   predictions_no_co_stage345_stan_psm_1_1_adjusted_full_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_no_co_stage345_stan_psm_1_1_adjusted_full_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.no_co.dataset.matched[,breakdown_adjust], is.factor)
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.no_co.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_no_co_stage345_stan_psm_1_1_adjusted_full_baye <- vector()
-
+  
   dataset.now <- group.no_co.dataset.matched %>%
     select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
     cbind(time = group.no_co.dataset.matched$postdrug_stage345_censtime_yrs,
@@ -7496,28 +7532,28 @@ if (class(try(
           prealt_2 = rcs(group.no_co.dataset.matched$prealt, 3)[,2]) %>%
     as.data.frame() %>%
     drop_na()
-
+  
   checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-  formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+  
+  formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+  
   models_no_co_stage345_psm_1_1_adjusted_full_baye <- brms::brm(formula = formula(formula_baye),
-                                                          data = dataset.now,
-                                                          family = "cox",
-                                                          chains = 2,
-                                                          iter = 10000)
-
+                                                                data = dataset.now,
+                                                                family = "cox",
+                                                                chains = 2,
+                                                                iter = 10000)
+  
   predictions_no_co_stage345_stan_psm_1_1_adjusted_full_baye <- rbind(predictions_no_co_stage345_stan_psm_1_1_adjusted_full_baye, cbind(mean = fixef(models_no_co_stage345_psm_1_1_adjusted_full_baye)[2,1],
-                                                                                                                            lci = fixef(models_no_co_stage345_psm_1_1_adjusted_full_baye)[2,3],
-                                                                                                                            uci = fixef(models_no_co_stage345_psm_1_1_adjusted_full_baye)[2,4]))
-
+                                                                                                                                        lci = fixef(models_no_co_stage345_psm_1_1_adjusted_full_baye)[2,3],
+                                                                                                                                        uci = fixef(models_no_co_stage345_psm_1_1_adjusted_full_baye)[2,4]))
+  
   saveRDS(models_no_co_stage345_psm_1_1_adjusted_full_baye, paste0(output_path, "additional_outcomes/models_no_co_stage345_psm_1_1_adjusted_full_baye.rds"))
-
+  
   predictions_no_co_stage345_stan_psm_1_1_adjusted_full_baye <- predictions_no_co_stage345_stan_psm_1_1_adjusted_full_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_no_co_stage345_stan_psm_1_1_adjusted_full_baye, paste0(output_path, "/additional_outcomes/predictions_no_co_stage345_stan_psm_1_1_adjusted_full_baye.rds"))
-
+  
 }
 
 
@@ -7525,29 +7561,29 @@ if (class(try(
 
 #--- Cox
 if (class(try(
-
+  
   # predictions for the CKD stage 3/4/5 outcomes in population with no CVD/HF/CKD strata sex and intervals
   predictions_no_co_stage345_stan_adjusted_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_no_co_stage345_stan_adjusted_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.no_co.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_no_co_stage345_stan_adjusted_baye <- vector()
-
-
+  
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.no_co.dataset[,breakdown_adjust], is.factor)
-
+  
   models_no_co_stage345_adjusted_male_baye <- vector("list", quantiles)
-
+  
   models_no_co_stage345_adjusted_female_baye <- vector("list", quantiles)
-
+  
   for (i in mnumber) {
-
+    
     dataset.now <- group.no_co.dataset %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.no_co.dataset$postdrug_stage345_censtime_yrs,
@@ -7568,23 +7604,23 @@ if (class(try(
       drop_na() %>%
       mutate(sex = relevel(sex, ref = "Male"),
              intervals = relevel(intervals, ref = levels(group.no_co.dataset$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_no_co_stage345_adjusted_male_baye[[i]] <- brms::brm(formula = formula(formula_baye),
-                                                         data = dataset.now,
-                                                         family = "cox",
-                                                         chains = 2,
-                                                         iter = 10000)
-
+                                                               data = dataset.now,
+                                                               family = "cox",
+                                                               chains = 2,
+                                                               iter = 10000)
+    
     predictions_no_co_stage345_stan_adjusted_baye <- rbind(predictions_no_co_stage345_stan_adjusted_baye, cbind(mean = fixef(models_no_co_stage345_adjusted_male_baye[[i]])[2,1],
-                                                                                                    lci = fixef(models_no_co_stage345_adjusted_male_baye[[i]])[2,3],
-                                                                                                    uci = fixef(models_no_co_stage345_adjusted_male_baye[[i]])[2,4],
-                                                                                                    sex = "Male",
-                                                                                                    intervals = levels(group.no_co.dataset$intervals)[i]))
-
+                                                                                                                lci = fixef(models_no_co_stage345_adjusted_male_baye[[i]])[2,3],
+                                                                                                                uci = fixef(models_no_co_stage345_adjusted_male_baye[[i]])[2,4],
+                                                                                                                sex = "Male",
+                                                                                                                intervals = levels(group.no_co.dataset$intervals)[i]))
+    
     dataset.now <- group.no_co.dataset %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.no_co.dataset$postdrug_stage345_censtime_yrs,
@@ -7605,57 +7641,57 @@ if (class(try(
       drop_na() %>%
       mutate(sex = relevel(sex, ref = "Female"),
              intervals = relevel(intervals, ref = levels(group.no_co.dataset$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_no_co_stage345_adjusted_female_baye[[i]] <- brms::brm(formula = formula(formula_baye),
-                                                           data = dataset.now,
-                                                           family = "cox",
-                                                           chains = 2,
-                                                           iter = 10000)
-
+                                                                 data = dataset.now,
+                                                                 family = "cox",
+                                                                 chains = 2,
+                                                                 iter = 10000)
+    
     predictions_no_co_stage345_stan_adjusted_baye <- rbind(predictions_no_co_stage345_stan_adjusted_baye, cbind(mean = fixef(models_no_co_stage345_adjusted_female_baye[[i]])[2,1],
-                                                                                                    lci = fixef(models_no_co_stage345_adjusted_female_baye[[i]])[2,3],
-                                                                                                    uci = fixef(models_no_co_stage345_adjusted_female_baye[[i]])[2,4],
-                                                                                                    sex = "Female",
-                                                                                                    intervals = levels(group.no_co.dataset$intervals)[i]))
-
+                                                                                                                lci = fixef(models_no_co_stage345_adjusted_female_baye[[i]])[2,3],
+                                                                                                                uci = fixef(models_no_co_stage345_adjusted_female_baye[[i]])[2,4],
+                                                                                                                sex = "Female",
+                                                                                                                intervals = levels(group.no_co.dataset$intervals)[i]))
+    
   }
-
+  
   saveRDS(models_no_co_stage345_adjusted_male_baye, paste0(output_path, "/additional_outcomes/models_no_co_stage345_adjusted_male_baye.rds"))
-
+  
   saveRDS(models_no_co_stage345_adjusted_female_baye, paste0(output_path, "/additional_outcomes/models_no_co_stage345_adjusted_female_baye.rds"))
-
+  
   predictions_no_co_stage345_stan_adjusted_baye <- predictions_no_co_stage345_stan_adjusted_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_no_co_stage345_stan_adjusted_baye, paste0(output_path, "/additional_outcomes/predictions_no_co_stage345_stan_adjusted_baye.rds"))
-
+  
 }
 
 if (class(try(
-
+  
   # predictions for the CKD stage 3/4/5 outcomes in the population with no CVD/HF/CKD
   predictions_no_co_stage345_stan_adjusted_overall_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_no_co_stage345_stan_adjusted_overall_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.no_co.dataset[,breakdown_adjust], is.factor)
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.no_co.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_no_co_stage345_stan_adjusted_overall_baye <- vector()
-
+  
   models_no_co_stage345_adjusted_overall_baye <- vector("list", quantiles)
-
+  
   for (i in mnumber) {
-
+    
     dataset.now <- group.no_co.dataset %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.no_co.dataset$postdrug_stage345_censtime_yrs,
@@ -7675,50 +7711,50 @@ if (class(try(
       as.data.frame() %>%
       drop_na() %>%
       mutate(intervals = relevel(intervals, ref = levels(group.no_co.dataset$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_no_co_stage345_adjusted_overall_baye[[i]] <- brms::brm(formula = formula(formula_baye),
-                                                            data = dataset.now,
-                                                            family = "cox",
-                                                            chains = 2,
-                                                            iter = 10000)
-
+                                                                  data = dataset.now,
+                                                                  family = "cox",
+                                                                  chains = 2,
+                                                                  iter = 10000)
+    
     predictions_no_co_stage345_stan_adjusted_overall_baye <- rbind(predictions_no_co_stage345_stan_adjusted_overall_baye, cbind(mean = fixef(models_no_co_stage345_adjusted_overall_baye[[i]])[2,1],
-                                                                                                                    lci = fixef(models_no_co_stage345_adjusted_overall_baye[[i]])[2,3],
-                                                                                                                    uci = fixef(models_no_co_stage345_adjusted_overall_baye[[i]])[2,4],
-                                                                                                                    intervals = levels(group.no_co.dataset$intervals)[i]))
-
+                                                                                                                                lci = fixef(models_no_co_stage345_adjusted_overall_baye[[i]])[2,3],
+                                                                                                                                uci = fixef(models_no_co_stage345_adjusted_overall_baye[[i]])[2,4],
+                                                                                                                                intervals = levels(group.no_co.dataset$intervals)[i]))
+    
   }
-
+  
   saveRDS(models_no_co_stage345_adjusted_overall_baye, paste0(output_path, "/additional_outcomes/models_no_co_stage345_adjusted_overall_baye.rds"))
-
+  
   predictions_no_co_stage345_stan_adjusted_overall_baye <- predictions_no_co_stage345_stan_adjusted_overall_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_no_co_stage345_stan_adjusted_overall_baye, paste0(output_path, "/additional_outcomes/predictions_no_co_stage345_stan_adjusted_overall_baye.rds"))
-
+  
 }
 # Full population (interval as a continuous, without subgrouping individuals)
 if (class(try(
-
+  
   # predictions for the CKD stage 3/4/5 outcomes in the population with no CVD/HF/CKD
   predictions_no_co_stage345_stan_adjusted_full_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_no_co_stage345_stan_adjusted_full_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.no_co.dataset[,breakdown_adjust], is.factor)
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.no_co.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_no_co_stage345_stan_adjusted_full_baye <- vector()
-
+  
   dataset.now <- group.no_co.dataset %>%
     select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
     cbind(time = group.no_co.dataset$postdrug_stage345_censtime_yrs,
@@ -7737,28 +7773,28 @@ if (class(try(
           prealt_2 = rcs(group.no_co.dataset$prealt, 3)[,2]) %>%
     as.data.frame() %>%
     drop_na()
-
+  
   checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-  formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+  
+  formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+  
   models_no_co_stage345_adjusted_full_baye <- brms::brm(formula = formula(formula_baye),
-                                                  data = dataset.now,
-                                                  family = "cox",
-                                                  chains = 2,
-                                                  iter = 10000)
-
+                                                        data = dataset.now,
+                                                        family = "cox",
+                                                        chains = 2,
+                                                        iter = 10000)
+  
   predictions_no_co_stage345_stan_adjusted_full_baye <- rbind(predictions_no_co_stage345_stan_adjusted_full_baye, cbind(mean = fixef(models_no_co_stage345_adjusted_full_baye)[2,1],
-                                                                                                            lci = fixef(models_no_co_stage345_adjusted_full_baye)[2,3],
-                                                                                                            uci = fixef(models_no_co_stage345_adjusted_full_baye)[2,4]))
-
+                                                                                                                        lci = fixef(models_no_co_stage345_adjusted_full_baye)[2,3],
+                                                                                                                        uci = fixef(models_no_co_stage345_adjusted_full_baye)[2,4]))
+  
   saveRDS(models_no_co_stage345_adjusted_full_baye, paste0(output_path, "/additional_outcomes/models_no_co_stage345_adjusted_full_baye.rds"))
-
+  
   predictions_no_co_stage345_stan_adjusted_full_baye <- predictions_no_co_stage345_stan_adjusted_full_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_no_co_stage345_stan_adjusted_full_baye, paste0(output_path, "/additional_outcomes/predictions_no_co_stage345_stan_adjusted_full_baye.rds"))
-
+  
 }
 
 
@@ -8171,196 +8207,196 @@ dev.off()
 ## Propensity score matching
 
 if (class(try(
-
+  
   # predictions for the CKD egfr drop 40 and ckd 5 outcomes in population with no CVD/HF/CKD strata sex and intervals
   predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.no_co.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_baye <- vector()
-
-  formula_baye <- "time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2"
-
+  
+  formula_baye <- "time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2"
+  
   models_no_co_egfr40_or_ckd5_psm_1_1_male_baye <- vector("list", quantiles)
-
+  
   models_no_co_egfr40_or_ckd5_psm_1_1_female_baye <- vector("list", quantiles)
-
+  
   for(i in mnumber) {
-
+    
     models_no_co_egfr40_or_ckd5_psm_1_1_male_baye[[i]] <- brms::brm(formula = formula(formula_baye),
-                                                         data = group.no_co.dataset.matched %>%
-                                                           select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
-                                                           cbind(time = group.no_co.dataset.matched$postdrug_egfr40_or_ckd5_censtime_yrs,
-                                                                 censored = group.no_co.dataset.matched$postdrug_egfr40_or_ckd5_censvar,
-                                                                 qrisk2_10yr_score_1 = rcs(group.no_co.dataset.matched$qrisk2_10yr_score, 3)[,1],
-                                                                 qrisk2_10yr_score_2 = rcs(group.no_co.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
-                                                           as.data.frame() %>%
-                                                           drop_na() %>%
-                                                           mutate(sex = relevel(sex, ref = "Male"),
-                                                                  intervals = relevel(intervals, ref = levels(group.no_co.dataset.matched$intervals)[i])),
-                                                         family = "cox",
-                                                         chains = 2)
-
+                                                                    data = group.no_co.dataset.matched %>%
+                                                                      select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
+                                                                      cbind(time = group.no_co.dataset.matched$postdrug_egfr40_or_ckd5_censtime_yrs,
+                                                                            censored = group.no_co.dataset.matched$postdrug_egfr40_or_ckd5_censvar,
+                                                                            qrisk2_10yr_score_1 = rcs(group.no_co.dataset.matched$qrisk2_10yr_score, 3)[,1],
+                                                                            qrisk2_10yr_score_2 = rcs(group.no_co.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
+                                                                      as.data.frame() %>%
+                                                                      drop_na() %>%
+                                                                      mutate(sex = relevel(sex, ref = "Male"),
+                                                                             intervals = relevel(intervals, ref = levels(group.no_co.dataset.matched$intervals)[i])),
+                                                                    family = "cox",
+                                                                    chains = 2)
+    
     predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_baye <- rbind(predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_baye, cbind(mean = fixef(models_no_co_egfr40_or_ckd5_psm_1_1_male_baye[[i]])[2,1],
-                                                                                                    lci = fixef(models_no_co_egfr40_or_ckd5_psm_1_1_male_baye[[i]])[2,3],
-                                                                                                    uci = fixef(models_no_co_egfr40_or_ckd5_psm_1_1_male_baye[[i]])[2,4],
-                                                                                                    sex = "Male",
-                                                                                                    intervals = levels(group.no_co.dataset.matched$intervals)[i]))
-
+                                                                                                                          lci = fixef(models_no_co_egfr40_or_ckd5_psm_1_1_male_baye[[i]])[2,3],
+                                                                                                                          uci = fixef(models_no_co_egfr40_or_ckd5_psm_1_1_male_baye[[i]])[2,4],
+                                                                                                                          sex = "Male",
+                                                                                                                          intervals = levels(group.no_co.dataset.matched$intervals)[i]))
+    
     models_no_co_egfr40_or_ckd5_psm_1_1_female_baye[[i]] <- brms::brm(formula = formula(formula_baye),
-                                                           data = group.no_co.dataset.matched %>%
-                                                             select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
-                                                             cbind(time = group.no_co.dataset.matched$postdrug_egfr40_or_ckd5_censtime_yrs,
-                                                                   censored = group.no_co.dataset.matched$postdrug_egfr40_or_ckd5_censvar,
-                                                                   qrisk2_10yr_score_1 = rcs(group.no_co.dataset.matched$qrisk2_10yr_score, 3)[,1],
-                                                                   qrisk2_10yr_score_2 = rcs(group.no_co.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
-                                                             as.data.frame() %>%
-                                                             drop_na() %>%
-                                                             mutate(sex = relevel(sex, ref = "Female"),
-                                                                    intervals = relevel(intervals, ref = levels(group.no_co.dataset.matched$intervals)[i])),
-                                                           family = "cox",
-                                                           chains = 2)
-
+                                                                      data = group.no_co.dataset.matched %>%
+                                                                        select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
+                                                                        cbind(time = group.no_co.dataset.matched$postdrug_egfr40_or_ckd5_censtime_yrs,
+                                                                              censored = group.no_co.dataset.matched$postdrug_egfr40_or_ckd5_censvar,
+                                                                              qrisk2_10yr_score_1 = rcs(group.no_co.dataset.matched$qrisk2_10yr_score, 3)[,1],
+                                                                              qrisk2_10yr_score_2 = rcs(group.no_co.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
+                                                                        as.data.frame() %>%
+                                                                        drop_na() %>%
+                                                                        mutate(sex = relevel(sex, ref = "Female"),
+                                                                               intervals = relevel(intervals, ref = levels(group.no_co.dataset.matched$intervals)[i])),
+                                                                      family = "cox",
+                                                                      chains = 2)
+    
     predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_baye <- rbind(predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_baye, cbind(mean = fixef(models_no_co_egfr40_or_ckd5_psm_1_1_female_baye[[i]])[2,1],
-                                                                                                    lci = fixef(models_no_co_egfr40_or_ckd5_psm_1_1_female_baye[[i]])[2,3],
-                                                                                                    uci = fixef(models_no_co_egfr40_or_ckd5_psm_1_1_female_baye[[i]])[2,4],
-                                                                                                    sex = "Female",
-                                                                                                    intervals = levels(group.no_co.dataset.matched$intervals)[i]))
-
+                                                                                                                          lci = fixef(models_no_co_egfr40_or_ckd5_psm_1_1_female_baye[[i]])[2,3],
+                                                                                                                          uci = fixef(models_no_co_egfr40_or_ckd5_psm_1_1_female_baye[[i]])[2,4],
+                                                                                                                          sex = "Female",
+                                                                                                                          intervals = levels(group.no_co.dataset.matched$intervals)[i]))
+    
   }
-
+  
   saveRDS(models_no_co_egfr40_or_ckd5_psm_1_1_male_baye, paste0(output_path, "/additional_outcomes/models_no_co_egfr40_or_ckd5_psm_1_1_male_baye.rds"))
-
+  
   saveRDS(models_no_co_egfr40_or_ckd5_psm_1_1_female_baye, paste0(output_path, "/additional_outcomes/models_no_co_egfr40_or_ckd5_psm_1_1_female_baye.rds"))
-
+  
   predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_baye <- predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_baye, paste0(output_path, "/additional_outcomes/predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_baye.rds"))
-
+  
 }
 
 # No sex strata
 if (class(try(
-
+  
   # predictions for the CKD egfr drop 40 and ckd 5 outcomes in the population with no CVD/HF/CKD
   predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_overall_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_overall_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
-  formula_baye <- "time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2"
-
+  
+  formula_baye <- "time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2"
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.no_co.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_overall_baye <- vector()
-
+  
   models_no_co_egfr40_or_ckd5_psm_1_1_overall_baye <- vector("list", quantiles)
-
+  
   for (i in mnumber) {
-
+    
     models_no_co_egfr40_or_ckd5_psm_1_1_overall_baye[[i]] <- brms::brm(formula = formula(formula_baye),
-                                                            data = group.no_co.dataset.matched %>%
-                                                              select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
-                                                              cbind(time = group.no_co.dataset.matched$postdrug_egfr40_or_ckd5_censtime_yrs,
-                                                                    censored = group.no_co.dataset.matched$postdrug_egfr40_or_ckd5_censvar,
-                                                                    qrisk2_10yr_score_1 = rcs(group.no_co.dataset.matched$qrisk2_10yr_score, 3)[,1],
-                                                                    qrisk2_10yr_score_2 = rcs(group.no_co.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
-                                                              as.data.frame() %>%
-                                                              drop_na() %>%
-                                                              mutate(intervals = relevel(intervals, ref = levels(group.no_co.dataset.matched$intervals)[i])),
-                                                            family = "cox",
-                                                            chains = 2)
-
+                                                                       data = group.no_co.dataset.matched %>%
+                                                                         select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
+                                                                         cbind(time = group.no_co.dataset.matched$postdrug_egfr40_or_ckd5_censtime_yrs,
+                                                                               censored = group.no_co.dataset.matched$postdrug_egfr40_or_ckd5_censvar,
+                                                                               qrisk2_10yr_score_1 = rcs(group.no_co.dataset.matched$qrisk2_10yr_score, 3)[,1],
+                                                                               qrisk2_10yr_score_2 = rcs(group.no_co.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
+                                                                         as.data.frame() %>%
+                                                                         drop_na() %>%
+                                                                         mutate(intervals = relevel(intervals, ref = levels(group.no_co.dataset.matched$intervals)[i])),
+                                                                       family = "cox",
+                                                                       chains = 2)
+    
     predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_overall_baye <- rbind(predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_overall_baye, cbind(mean = fixef(models_no_co_egfr40_or_ckd5_psm_1_1_overall_baye[[i]])[2,1],
-                                                                                                                    lci = fixef(models_no_co_egfr40_or_ckd5_psm_1_1_overall_baye[[i]])[2,3],
-                                                                                                                    uci = fixef(models_no_co_egfr40_or_ckd5_psm_1_1_overall_baye[[i]])[2,4],
-                                                                                                                    intervals = levels(group.no_co.dataset.matched$intervals)[i]))
-
+                                                                                                                                          lci = fixef(models_no_co_egfr40_or_ckd5_psm_1_1_overall_baye[[i]])[2,3],
+                                                                                                                                          uci = fixef(models_no_co_egfr40_or_ckd5_psm_1_1_overall_baye[[i]])[2,4],
+                                                                                                                                          intervals = levels(group.no_co.dataset.matched$intervals)[i]))
+    
   }
-
+  
   saveRDS(models_no_co_egfr40_or_ckd5_psm_1_1_overall_baye, paste0(output_path, "/additional_outcomes/models_no_co_egfr40_or_ckd5_psm_1_1_overall_baye.rds"))
-
+  
   predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_overall_baye <- predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_overall_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_overall_baye, paste0(output_path, "/additional_outcomes/predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_overall_baye.rds"))
-
-
+  
+  
 }
 # Full population (interval as a continuous, without subgrouping individuals)
 if (class(try(
-
+  
   # predictions for the CKD egfr drop 40 and ckd 5 outcomes in the population with no CVD/HF/CKD
   predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_full_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_full_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
-  formula_baye <- "time | cens(censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2"
-
+  
+  formula_baye <- "time | cens(1 - censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2"
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.no_co.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_full_baye <- vector()
-
+  
   models_no_co_egfr40_or_ckd5_psm_1_1_full_baye <- brms::brm(formula = formula(formula_baye),
-                                                  data = group.no_co.dataset.matched %>%
-                                                    select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
-                                                    cbind(time = group.no_co.dataset.matched$postdrug_egfr40_or_ckd5_censtime_yrs,
-                                                          censored = group.no_co.dataset.matched$postdrug_egfr40_or_ckd5_censvar,
-                                                          qrisk2_10yr_score_1 = rcs(group.no_co.dataset.matched$qrisk2_10yr_score, 3)[,1],
-                                                          qrisk2_10yr_score_2 = rcs(group.no_co.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
-                                                    as.data.frame() %>%
-                                                    drop_na(),
-                                                  family = "cox",
-                                                  chains = 2)
-
+                                                             data = group.no_co.dataset.matched %>%
+                                                               select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
+                                                               cbind(time = group.no_co.dataset.matched$postdrug_egfr40_or_ckd5_censtime_yrs,
+                                                                     censored = group.no_co.dataset.matched$postdrug_egfr40_or_ckd5_censvar,
+                                                                     qrisk2_10yr_score_1 = rcs(group.no_co.dataset.matched$qrisk2_10yr_score, 3)[,1],
+                                                                     qrisk2_10yr_score_2 = rcs(group.no_co.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
+                                                               as.data.frame() %>%
+                                                               drop_na(),
+                                                             family = "cox",
+                                                             chains = 2)
+  
   predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_full_baye <- rbind(predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_full_baye, cbind(mean = fixef(models_no_co_egfr40_or_ckd5_psm_1_1_full_baye)[2,1],
-                                                                                                            lci = fixef(models_no_co_egfr40_or_ckd5_psm_1_1_full_baye)[2,3],
-                                                                                                            uci = fixef(models_no_co_egfr40_or_ckd5_psm_1_1_full_baye)[2,4]))
-
+                                                                                                                                  lci = fixef(models_no_co_egfr40_or_ckd5_psm_1_1_full_baye)[2,3],
+                                                                                                                                  uci = fixef(models_no_co_egfr40_or_ckd5_psm_1_1_full_baye)[2,4]))
+  
   saveRDS(models_no_co_egfr40_or_ckd5_psm_1_1_full_baye, paste0(output_path, "/additional_outcomes/models_no_co_egfr40_or_ckd5_psm_1_1_full_baye.rds"))
-
+  
   predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_full_baye <- predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_full_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_full_baye, paste0(output_path, "/additional_outcomes/predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_full_baye.rds"))
-
+  
 }
 
 
 ## Propensity score matching + adjusted
 
 if (class(try(
-
+  
   # predictions for the CKD egfr drop 40 and ckd 5 outcomes in population with no CVD/HF/CKD strata sex and intervals
   predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_adjusted_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_adjusted_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.no_co.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_adjusted_baye <- vector()
-
-
+  
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.no_co.dataset.matched[,breakdown_adjust], is.factor)
-
+  
   models_no_co_egfr40_or_ckd5_psm_1_1_adjusted_male_baye <- vector("list", quantiles)
-
+  
   models_no_co_egfr40_or_ckd5_psm_1_1_adjusted_female_baye <- vector("list", quantiles)
-
+  
   for (i in mnumber) {
-
+    
     dataset.now <- group.no_co.dataset.matched %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.no_co.dataset.matched$postdrug_egfr40_or_ckd5_censtime_yrs,
@@ -8381,23 +8417,23 @@ if (class(try(
       drop_na() %>%
       mutate(sex = relevel(sex, ref = "Male"),
              intervals = relevel(intervals, ref = levels(group.no_co.dataset.matched$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_no_co_egfr40_or_ckd5_psm_1_1_adjusted_male_baye[[i]] <- brms::brm(formula = formula(formula_baye),
-                                                                 data = dataset.now,
-                                                                 family = "cox",
-                                                                 chains = 2,
-                                                                 iter = 10000)
-
+                                                                             data = dataset.now,
+                                                                             family = "cox",
+                                                                             chains = 2,
+                                                                             iter = 10000)
+    
     predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_adjusted_baye <- rbind(predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_adjusted_baye, cbind(mean = fixef(models_no_co_egfr40_or_ckd5_psm_1_1_adjusted_male_baye[[i]])[2,1],
-                                                                                                                    lci = fixef(models_no_co_egfr40_or_ckd5_psm_1_1_adjusted_male_baye[[i]])[2,3],
-                                                                                                                    uci = fixef(models_no_co_egfr40_or_ckd5_psm_1_1_adjusted_male_baye[[i]])[2,4],
-                                                                                                                    sex = "Male",
-                                                                                                                    intervals = levels(group.no_co.dataset.matched$intervals)[i]))
-
+                                                                                                                                            lci = fixef(models_no_co_egfr40_or_ckd5_psm_1_1_adjusted_male_baye[[i]])[2,3],
+                                                                                                                                            uci = fixef(models_no_co_egfr40_or_ckd5_psm_1_1_adjusted_male_baye[[i]])[2,4],
+                                                                                                                                            sex = "Male",
+                                                                                                                                            intervals = levels(group.no_co.dataset.matched$intervals)[i]))
+    
     dataset.now <- group.no_co.dataset.matched %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.no_co.dataset.matched$postdrug_egfr40_or_ckd5_censtime_yrs,
@@ -8418,57 +8454,57 @@ if (class(try(
       drop_na() %>%
       mutate(sex = relevel(sex, ref = "Female"),
              intervals = relevel(intervals, ref = levels(group.no_co.dataset.matched$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_no_co_egfr40_or_ckd5_psm_1_1_adjusted_female_baye[[i]] <-  brms::brm(formula = formula(formula_baye),
-                                                                    data = dataset.now,
-                                                                    family = "cox",
-                                                                    chains = 2,
-                                                                    iter = 10000)
-
+                                                                                data = dataset.now,
+                                                                                family = "cox",
+                                                                                chains = 2,
+                                                                                iter = 10000)
+    
     predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_adjusted_baye <- rbind(predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_adjusted_baye, cbind(mean = fixef(models_no_co_egfr40_or_ckd5_psm_1_1_adjusted_female_baye[[i]])[2,1],
-                                                                                                                    lci = fixef(models_no_co_egfr40_or_ckd5_psm_1_1_adjusted_female_baye[[i]])[2,3],
-                                                                                                                    uci = fixef(models_no_co_egfr40_or_ckd5_psm_1_1_adjusted_female_baye[[i]])[2,4],
-                                                                                                                    sex = "Female",
-                                                                                                                    intervals = levels(group.no_co.dataset.matched$intervals)[i]))
-
+                                                                                                                                            lci = fixef(models_no_co_egfr40_or_ckd5_psm_1_1_adjusted_female_baye[[i]])[2,3],
+                                                                                                                                            uci = fixef(models_no_co_egfr40_or_ckd5_psm_1_1_adjusted_female_baye[[i]])[2,4],
+                                                                                                                                            sex = "Female",
+                                                                                                                                            intervals = levels(group.no_co.dataset.matched$intervals)[i]))
+    
   }
-
+  
   saveRDS(models_no_co_egfr40_or_ckd5_psm_1_1_adjusted_male_baye, paste0(output_path, "/additional_outcomes/models_no_co_egfr40_or_ckd5_psm_1_1_adjusted_male_baye.rds"))
-
+  
   saveRDS(models_no_co_egfr40_or_ckd5_psm_1_1_adjusted_female_baye, paste0(output_path, "/additional_outcomes/models_no_co_egfr40_or_ckd5_psm_1_1_adjusted_female_baye.rds"))
-
+  
   predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_adjusted_baye <- predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_adjusted_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_adjusted_baye, paste0(output_path, "/additional_outcomes/predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_adjusted_baye.rds"))
-
+  
 }
 
 if (class(try(
-
+  
   # predictions for the CKD egfr drop 40 and ckd 5 outcomes in the population with no CVD/HF/CKD
   predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_adjusted_overall_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_adjusted_overall_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.no_co.dataset.matched[,breakdown_adjust], is.factor)
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.no_co.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_adjusted_overall_baye <- vector()
-
+  
   models_no_co_egfr40_or_ckd5_psm_1_1_adjusted_overall_baye <- vector("list", quantiles)
-
+  
   for (i in mnumber) {
-
+    
     dataset.now <- group.no_co.dataset.matched %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.no_co.dataset.matched$postdrug_egfr40_or_ckd5_censtime_yrs,
@@ -8488,50 +8524,50 @@ if (class(try(
       as.data.frame() %>%
       drop_na() %>%
       mutate(intervals = relevel(intervals, ref = levels(group.no_co.dataset.matched$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_no_co_egfr40_or_ckd5_psm_1_1_adjusted_overall_baye[[i]] <- brms::brm(formula = formula(formula_baye),
-                                                                    data = dataset.now,
-                                                                    family = "cox",
-                                                                    chains = 2,
-                                                                    iter = 10000)
-
+                                                                                data = dataset.now,
+                                                                                family = "cox",
+                                                                                chains = 2,
+                                                                                iter = 10000)
+    
     predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_adjusted_overall_baye <- rbind(predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_adjusted_overall_baye, cbind(mean = fixef(models_no_co_egfr40_or_ckd5_psm_1_1_adjusted_overall_baye[[i]])[2,1],
-                                                                                                                                    lci = fixef(models_no_co_egfr40_or_ckd5_psm_1_1_adjusted_overall_baye[[i]])[2,3],
-                                                                                                                                    uci = fixef(models_no_co_egfr40_or_ckd5_psm_1_1_adjusted_overall_baye[[i]])[2,4],
-                                                                                                                                    intervals = levels(group.no_co.dataset.matched$intervals)[i]))
-
+                                                                                                                                                            lci = fixef(models_no_co_egfr40_or_ckd5_psm_1_1_adjusted_overall_baye[[i]])[2,3],
+                                                                                                                                                            uci = fixef(models_no_co_egfr40_or_ckd5_psm_1_1_adjusted_overall_baye[[i]])[2,4],
+                                                                                                                                                            intervals = levels(group.no_co.dataset.matched$intervals)[i]))
+    
   }
-
+  
   saveRDS(models_no_co_egfr40_or_ckd5_psm_1_1_adjusted_overall_baye, paste0(output_path, "/additional_outcomes/models_no_co_egfr40_or_ckd5_psm_1_1_adjusted_overall_baye.rds"))
-
+  
   predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_adjusted_overall_baye <- predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_adjusted_overall_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_adjusted_overall_baye, paste0(output_path, "/additional_outcomes/predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_adjusted_overall_baye.rds"))
-
+  
 }
 # Full population (interval as a continuous, without subgrouping individuals)
 if (class(try(
-
+  
   # predictions for the CKD egfr drop 40 and ckd 5 outcomes in the population with no CVD/HF/CKD
   predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_adjusted_full_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_adjusted_full_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.no_co.dataset.matched[,breakdown_adjust], is.factor)
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.no_co.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_adjusted_full_baye <- vector()
-
+  
   dataset.now <- group.no_co.dataset.matched %>%
     select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
     cbind(time = group.no_co.dataset.matched$postdrug_egfr40_or_ckd5_censtime_yrs,
@@ -8550,28 +8586,28 @@ if (class(try(
           prealt_2 = rcs(group.no_co.dataset.matched$prealt, 3)[,2]) %>%
     as.data.frame() %>%
     drop_na()
-
+  
   checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-  formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+  
+  formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+  
   models_no_co_egfr40_or_ckd5_psm_1_1_adjusted_full_baye <- brms::brm(formula = formula(formula_baye),
-                                                          data = dataset.now,
-                                                          family = "cox",
-                                                          chains = 2,
-                                                          iter = 10000)
-
+                                                                      data = dataset.now,
+                                                                      family = "cox",
+                                                                      chains = 2,
+                                                                      iter = 10000)
+  
   predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_adjusted_full_baye <- rbind(predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_adjusted_full_baye, cbind(mean = fixef(models_no_co_egfr40_or_ckd5_psm_1_1_adjusted_full_baye)[2,1],
-                                                                                                                            lci = fixef(models_no_co_egfr40_or_ckd5_psm_1_1_adjusted_full_baye)[2,3],
-                                                                                                                            uci = fixef(models_no_co_egfr40_or_ckd5_psm_1_1_adjusted_full_baye)[2,4]))
-
+                                                                                                                                                    lci = fixef(models_no_co_egfr40_or_ckd5_psm_1_1_adjusted_full_baye)[2,3],
+                                                                                                                                                    uci = fixef(models_no_co_egfr40_or_ckd5_psm_1_1_adjusted_full_baye)[2,4]))
+  
   saveRDS(models_no_co_egfr40_or_ckd5_psm_1_1_adjusted_full_baye, paste0(output_path, "additional_outcomes/models_no_co_egfr40_or_ckd5_psm_1_1_adjusted_full_baye.rds"))
-
+  
   predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_adjusted_full_baye <- predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_adjusted_full_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_adjusted_full_baye, paste0(output_path, "/additional_outcomes/predictions_no_co_egfr40_or_ckd5_stan_psm_1_1_adjusted_full_baye.rds"))
-
+  
 }
 
 
@@ -8579,29 +8615,29 @@ if (class(try(
 
 #--- Cox
 if (class(try(
-
+  
   # predictions for the CKD egfr drop 40 and ckd 5 outcomes in population with no CVD/HF/CKD strata sex and intervals
   predictions_no_co_egfr40_or_ckd5_stan_adjusted_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_no_co_egfr40_or_ckd5_stan_adjusted_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.no_co.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_no_co_egfr40_or_ckd5_stan_adjusted_baye <- vector()
-
-
+  
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.no_co.dataset[,breakdown_adjust], is.factor)
-
+  
   models_no_co_egfr40_or_ckd5_adjusted_male_baye <- vector("list", quantiles)
-
+  
   models_no_co_egfr40_or_ckd5_adjusted_female_baye <- vector("list", quantiles)
-
+  
   for (i in mnumber) {
-
+    
     dataset.now <- group.no_co.dataset %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.no_co.dataset$postdrug_egfr40_or_ckd5_censtime_yrs,
@@ -8622,23 +8658,23 @@ if (class(try(
       drop_na() %>%
       mutate(sex = relevel(sex, ref = "Male"),
              intervals = relevel(intervals, ref = levels(group.no_co.dataset$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_no_co_egfr40_or_ckd5_adjusted_male_baye[[i]] <- brms::brm(formula = formula(formula_baye),
-                                                         data = dataset.now,
-                                                         family = "cox",
-                                                         chains = 2,
-                                                         iter = 10000)
-
+                                                                     data = dataset.now,
+                                                                     family = "cox",
+                                                                     chains = 2,
+                                                                     iter = 10000)
+    
     predictions_no_co_egfr40_or_ckd5_stan_adjusted_baye <- rbind(predictions_no_co_egfr40_or_ckd5_stan_adjusted_baye, cbind(mean = fixef(models_no_co_egfr40_or_ckd5_adjusted_male_baye[[i]])[2,1],
-                                                                                                    lci = fixef(models_no_co_egfr40_or_ckd5_adjusted_male_baye[[i]])[2,3],
-                                                                                                    uci = fixef(models_no_co_egfr40_or_ckd5_adjusted_male_baye[[i]])[2,4],
-                                                                                                    sex = "Male",
-                                                                                                    intervals = levels(group.no_co.dataset$intervals)[i]))
-
+                                                                                                                            lci = fixef(models_no_co_egfr40_or_ckd5_adjusted_male_baye[[i]])[2,3],
+                                                                                                                            uci = fixef(models_no_co_egfr40_or_ckd5_adjusted_male_baye[[i]])[2,4],
+                                                                                                                            sex = "Male",
+                                                                                                                            intervals = levels(group.no_co.dataset$intervals)[i]))
+    
     dataset.now <- group.no_co.dataset %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.no_co.dataset$postdrug_egfr40_or_ckd5_censtime_yrs,
@@ -8659,57 +8695,57 @@ if (class(try(
       drop_na() %>%
       mutate(sex = relevel(sex, ref = "Female"),
              intervals = relevel(intervals, ref = levels(group.no_co.dataset$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_no_co_egfr40_or_ckd5_adjusted_female_baye[[i]] <- brms::brm(formula = formula(formula_baye),
-                                                           data = dataset.now,
-                                                           family = "cox",
-                                                           chains = 2,
-                                                           iter = 10000)
-
+                                                                       data = dataset.now,
+                                                                       family = "cox",
+                                                                       chains = 2,
+                                                                       iter = 10000)
+    
     predictions_no_co_egfr40_or_ckd5_stan_adjusted_baye <- rbind(predictions_no_co_egfr40_or_ckd5_stan_adjusted_baye, cbind(mean = fixef(models_no_co_egfr40_or_ckd5_adjusted_female_baye[[i]])[2,1],
-                                                                                                    lci = fixef(models_no_co_egfr40_or_ckd5_adjusted_female_baye[[i]])[2,3],
-                                                                                                    uci = fixef(models_no_co_egfr40_or_ckd5_adjusted_female_baye[[i]])[2,4],
-                                                                                                    sex = "Female",
-                                                                                                    intervals = levels(group.no_co.dataset$intervals)[i]))
-
+                                                                                                                            lci = fixef(models_no_co_egfr40_or_ckd5_adjusted_female_baye[[i]])[2,3],
+                                                                                                                            uci = fixef(models_no_co_egfr40_or_ckd5_adjusted_female_baye[[i]])[2,4],
+                                                                                                                            sex = "Female",
+                                                                                                                            intervals = levels(group.no_co.dataset$intervals)[i]))
+    
   }
-
+  
   saveRDS(models_no_co_egfr40_or_ckd5_adjusted_male_baye, paste0(output_path, "/additional_outcomes/models_no_co_egfr40_or_ckd5_adjusted_male_baye.rds"))
-
+  
   saveRDS(models_no_co_egfr40_or_ckd5_adjusted_female_baye, paste0(output_path, "/additional_outcomes/models_no_co_egfr40_or_ckd5_adjusted_female_baye.rds"))
-
+  
   predictions_no_co_egfr40_or_ckd5_stan_adjusted_baye <- predictions_no_co_egfr40_or_ckd5_stan_adjusted_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_no_co_egfr40_or_ckd5_stan_adjusted_baye, paste0(output_path, "/additional_outcomes/predictions_no_co_egfr40_or_ckd5_stan_adjusted_baye.rds"))
-
+  
 }
 
 if (class(try(
-
+  
   # predictions for the CKD egfr drop 40 and ckd 5 outcomes in the population with no CVD/HF/CKD
   predictions_no_co_egfr40_or_ckd5_stan_adjusted_overall_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_no_co_egfr40_or_ckd5_stan_adjusted_overall_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.no_co.dataset[,breakdown_adjust], is.factor)
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.no_co.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_no_co_egfr40_or_ckd5_stan_adjusted_overall_baye <- vector()
-
+  
   models_no_co_egfr40_or_ckd5_adjusted_overall_baye <- vector("list", quantiles)
-
+  
   for (i in mnumber) {
-
+    
     dataset.now <- group.no_co.dataset %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.no_co.dataset$postdrug_egfr40_or_ckd5_censtime_yrs,
@@ -8729,50 +8765,50 @@ if (class(try(
       as.data.frame() %>%
       drop_na() %>%
       mutate(intervals = relevel(intervals, ref = levels(group.no_co.dataset$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_no_co_egfr40_or_ckd5_adjusted_overall_baye[[i]] <- brms::brm(formula = formula(formula_baye),
-                                                            data = dataset.now,
-                                                            family = "cox",
-                                                            chains = 2,
-                                                            iter = 10000)
-
+                                                                        data = dataset.now,
+                                                                        family = "cox",
+                                                                        chains = 2,
+                                                                        iter = 10000)
+    
     predictions_no_co_egfr40_or_ckd5_stan_adjusted_overall_baye <- rbind(predictions_no_co_egfr40_or_ckd5_stan_adjusted_overall_baye, cbind(mean = fixef(models_no_co_egfr40_or_ckd5_adjusted_overall_baye[[i]])[2,1],
-                                                                                                                    lci = fixef(models_no_co_egfr40_or_ckd5_adjusted_overall_baye[[i]])[2,3],
-                                                                                                                    uci = fixef(models_no_co_egfr40_or_ckd5_adjusted_overall_baye[[i]])[2,4],
-                                                                                                                    intervals = levels(group.no_co.dataset$intervals)[i]))
-
+                                                                                                                                            lci = fixef(models_no_co_egfr40_or_ckd5_adjusted_overall_baye[[i]])[2,3],
+                                                                                                                                            uci = fixef(models_no_co_egfr40_or_ckd5_adjusted_overall_baye[[i]])[2,4],
+                                                                                                                                            intervals = levels(group.no_co.dataset$intervals)[i]))
+    
   }
-
+  
   saveRDS(models_no_co_egfr40_or_ckd5_adjusted_overall_baye, paste0(output_path, "/additional_outcomes/models_no_co_egfr40_or_ckd5_adjusted_overall_baye.rds"))
-
+  
   predictions_no_co_egfr40_or_ckd5_stan_adjusted_overall_baye <- predictions_no_co_egfr40_or_ckd5_stan_adjusted_overall_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_no_co_egfr40_or_ckd5_stan_adjusted_overall_baye, paste0(output_path, "/additional_outcomes/predictions_no_co_egfr40_or_ckd5_stan_adjusted_overall_baye.rds"))
-
+  
 }
 # Full population (interval as a continuous, without subgrouping individuals)
 if (class(try(
-
+  
   # predictions for the CKD egfr drop 40 and ckd 5 outcomes in the population with no CVD/HF/CKD
   predictions_no_co_egfr40_or_ckd5_stan_adjusted_full_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_no_co_egfr40_or_ckd5_stan_adjusted_full_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.no_co.dataset[,breakdown_adjust], is.factor)
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.no_co.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_no_co_egfr40_or_ckd5_stan_adjusted_full_baye <- vector()
-
+  
   dataset.now <- group.no_co.dataset %>%
     select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
     cbind(time = group.no_co.dataset$postdrug_egfr40_or_ckd5_censtime_yrs,
@@ -8791,28 +8827,28 @@ if (class(try(
           prealt_2 = rcs(group.no_co.dataset$prealt, 3)[,2]) %>%
     as.data.frame() %>%
     drop_na()
-
+  
   checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-  formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+  
+  formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+  
   models_no_co_egfr40_or_ckd5_adjusted_full_baye <- brms::brm(formula = formula(formula_baye),
-                                                  data = dataset.now,
-                                                  family = "cox",
-                                                  chains = 2,
-                                                  iter = 10000)
-
+                                                              data = dataset.now,
+                                                              family = "cox",
+                                                              chains = 2,
+                                                              iter = 10000)
+  
   predictions_no_co_egfr40_or_ckd5_stan_adjusted_full_baye <- rbind(predictions_no_co_egfr40_or_ckd5_stan_adjusted_full_baye, cbind(mean = fixef(models_no_co_egfr40_or_ckd5_adjusted_full_baye)[2,1],
-                                                                                                            lci = fixef(models_no_co_egfr40_or_ckd5_adjusted_full_baye)[2,3],
-                                                                                                            uci = fixef(models_no_co_egfr40_or_ckd5_adjusted_full_baye)[2,4]))
-
+                                                                                                                                    lci = fixef(models_no_co_egfr40_or_ckd5_adjusted_full_baye)[2,3],
+                                                                                                                                    uci = fixef(models_no_co_egfr40_or_ckd5_adjusted_full_baye)[2,4]))
+  
   saveRDS(models_no_co_egfr40_or_ckd5_adjusted_full_baye, paste0(output_path, "/additional_outcomes/models_no_co_egfr40_or_ckd5_adjusted_full_baye.rds"))
-
+  
   predictions_no_co_egfr40_or_ckd5_stan_adjusted_full_baye <- predictions_no_co_egfr40_or_ckd5_stan_adjusted_full_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_no_co_egfr40_or_ckd5_stan_adjusted_full_baye, paste0(output_path, "/additional_outcomes/predictions_no_co_egfr40_or_ckd5_stan_adjusted_full_baye.rds"))
-
+  
 }
 
 
@@ -9259,27 +9295,47 @@ group.cvd.dataset.matched <- group.cvd.dataset %>%
 ## Propensity score matching
 
 if (class(try(
-
+  
   # predictions for the CVD outcomes in population with no CVD strata sex and intervals
   predictions_cvd_cvd_stan_psm_1_1_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_cvd_cvd_stan_psm_1_1_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.cvd.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_cvd_cvd_stan_psm_1_1_baye <- vector()
-
-  formula_baye <- "time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2"
-
+  
+  formula_baye <- "time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2"
+  
   models_cvd_cvd_psm_1_1_male_baye <- vector("list", quantiles)
-
+  
   models_cvd_cvd_psm_1_1_female_baye <- vector("list", quantiles)
-
+  
   for(i in mnumber) {
-
+    
     models_cvd_cvd_psm_1_1_male_baye[[i]] <- brms::brm(formula = formula(formula_baye),
+                                                       data = group.cvd.dataset.matched %>%
+                                                         select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
+                                                         cbind(time = group.cvd.dataset.matched$postdrug_mace_censtime_yrs,
+                                                               censored = group.cvd.dataset.matched$postdrug_mace_censvar,
+                                                               qrisk2_10yr_score_1 = rcs(group.cvd.dataset.matched$qrisk2_10yr_score, 3)[,1],
+                                                               qrisk2_10yr_score_2 = rcs(group.cvd.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
+                                                         as.data.frame() %>%
+                                                         drop_na() %>%
+                                                         mutate(sex = relevel(sex, ref = "Male"),
+                                                                intervals = relevel(intervals, ref = levels(group.cvd.dataset.matched$intervals)[i])),
+                                                       family = "cox",
+                                                       chains = 2)
+    
+    predictions_cvd_cvd_stan_psm_1_1_baye <- rbind(predictions_cvd_cvd_stan_psm_1_1_baye, cbind(mean = fixef(models_cvd_cvd_psm_1_1_male_baye[[i]])[2,1],
+                                                                                                lci = fixef(models_cvd_cvd_psm_1_1_male_baye[[i]])[2,3],
+                                                                                                uci = fixef(models_cvd_cvd_psm_1_1_male_baye[[i]])[2,4],
+                                                                                                sex = "Male",
+                                                                                                intervals = levels(group.cvd.dataset.matched$intervals)[i]))
+    
+    models_cvd_cvd_psm_1_1_female_baye[[i]] <- brms::brm(formula = formula(formula_baye),
                                                          data = group.cvd.dataset.matched %>%
                                                            select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
                                                            cbind(time = group.cvd.dataset.matched$postdrug_mace_censtime_yrs,
@@ -9288,167 +9344,147 @@ if (class(try(
                                                                  qrisk2_10yr_score_2 = rcs(group.cvd.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
                                                            as.data.frame() %>%
                                                            drop_na() %>%
-                                                           mutate(sex = relevel(sex, ref = "Male"),
+                                                           mutate(sex = relevel(sex, ref = "Female"),
                                                                   intervals = relevel(intervals, ref = levels(group.cvd.dataset.matched$intervals)[i])),
                                                          family = "cox",
                                                          chains = 2)
-
-    predictions_cvd_cvd_stan_psm_1_1_baye <- rbind(predictions_cvd_cvd_stan_psm_1_1_baye, cbind(mean = fixef(models_cvd_cvd_psm_1_1_male_baye[[i]])[2,1],
-                                                                                                    lci = fixef(models_cvd_cvd_psm_1_1_male_baye[[i]])[2,3],
-                                                                                                    uci = fixef(models_cvd_cvd_psm_1_1_male_baye[[i]])[2,4],
-                                                                                                    sex = "Male",
-                                                                                                    intervals = levels(group.cvd.dataset.matched$intervals)[i]))
-
-    models_cvd_cvd_psm_1_1_female_baye[[i]] <- brms::brm(formula = formula(formula_baye),
-                                                           data = group.cvd.dataset.matched %>%
-                                                             select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
-                                                             cbind(time = group.cvd.dataset.matched$postdrug_mace_censtime_yrs,
-                                                                   censored = group.cvd.dataset.matched$postdrug_mace_censvar,
-                                                                   qrisk2_10yr_score_1 = rcs(group.cvd.dataset.matched$qrisk2_10yr_score, 3)[,1],
-                                                                   qrisk2_10yr_score_2 = rcs(group.cvd.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
-                                                             as.data.frame() %>%
-                                                             drop_na() %>%
-                                                             mutate(sex = relevel(sex, ref = "Female"),
-                                                                    intervals = relevel(intervals, ref = levels(group.cvd.dataset.matched$intervals)[i])),
-                                                           family = "cox",
-                                                           chains = 2)
-
+    
     predictions_cvd_cvd_stan_psm_1_1_baye <- rbind(predictions_cvd_cvd_stan_psm_1_1_baye, cbind(mean = fixef(models_cvd_cvd_psm_1_1_female_baye[[i]])[2,1],
-                                                                                                    lci = fixef(models_cvd_cvd_psm_1_1_female_baye[[i]])[2,3],
-                                                                                                    uci = fixef(models_cvd_cvd_psm_1_1_female_baye[[i]])[2,4],
-                                                                                                    sex = "Female",
-                                                                                                    intervals = levels(group.cvd.dataset.matched$intervals)[i]))
-
+                                                                                                lci = fixef(models_cvd_cvd_psm_1_1_female_baye[[i]])[2,3],
+                                                                                                uci = fixef(models_cvd_cvd_psm_1_1_female_baye[[i]])[2,4],
+                                                                                                sex = "Female",
+                                                                                                intervals = levels(group.cvd.dataset.matched$intervals)[i]))
+    
   }
-
+  
   saveRDS(models_cvd_cvd_psm_1_1_male_baye, paste0(output_path, "/additional_outcomes/models_cvd_cvd_psm_1_1_male_baye.rds"))
-
+  
   saveRDS(models_cvd_cvd_psm_1_1_female_baye, paste0(output_path, "/additional_outcomes/models_cvd_cvd_psm_1_1_female_baye.rds"))
-
+  
   predictions_cvd_cvd_stan_psm_1_1_baye <- predictions_cvd_cvd_stan_psm_1_1_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_cvd_cvd_stan_psm_1_1_baye, paste0(output_path, "/additional_outcomes/predictions_cvd_cvd_stan_psm_1_1_baye.rds"))
-
+  
 }
 
 # No sex strata
 if (class(try(
-
+  
   # predictions for the CVD outcomes in the population with no CVD
   predictions_cvd_cvd_stan_psm_1_1_overall_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_cvd_cvd_stan_psm_1_1_overall_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
-  formula_baye <- "time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2"
-
+  
+  formula_baye <- "time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2"
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.cvd.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_cvd_cvd_stan_psm_1_1_overall_baye <- vector()
-
+  
   models_cvd_cvd_psm_1_1_overall_baye <- vector("list", quantiles)
-
+  
   for (i in mnumber) {
-
+    
     models_cvd_cvd_psm_1_1_overall_baye[[i]] <- brms::brm(formula = formula(formula_baye),
-                                                            data = group.cvd.dataset.matched %>%
-                                                              select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
-                                                              cbind(time = group.cvd.dataset.matched$postdrug_mace_censtime_yrs,
-                                                                    censored = group.cvd.dataset.matched$postdrug_mace_censvar,
-                                                                    qrisk2_10yr_score_1 = rcs(group.cvd.dataset.matched$qrisk2_10yr_score, 3)[,1],
-                                                                    qrisk2_10yr_score_2 = rcs(group.cvd.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
-                                                              as.data.frame() %>%
-                                                              drop_na() %>%
-                                                              mutate(intervals = relevel(intervals, ref = levels(group.cvd.dataset.matched$intervals)[i])),
-                                                            family = "cox",
-                                                            chains = 2)
-
+                                                          data = group.cvd.dataset.matched %>%
+                                                            select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
+                                                            cbind(time = group.cvd.dataset.matched$postdrug_mace_censtime_yrs,
+                                                                  censored = group.cvd.dataset.matched$postdrug_mace_censvar,
+                                                                  qrisk2_10yr_score_1 = rcs(group.cvd.dataset.matched$qrisk2_10yr_score, 3)[,1],
+                                                                  qrisk2_10yr_score_2 = rcs(group.cvd.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
+                                                            as.data.frame() %>%
+                                                            drop_na() %>%
+                                                            mutate(intervals = relevel(intervals, ref = levels(group.cvd.dataset.matched$intervals)[i])),
+                                                          family = "cox",
+                                                          chains = 2)
+    
     predictions_cvd_cvd_stan_psm_1_1_overall_baye <- rbind(predictions_cvd_cvd_stan_psm_1_1_overall_baye, cbind(mean = fixef(models_cvd_cvd_psm_1_1_overall_baye[[i]])[2,1],
-                                                                                                                    lci = fixef(models_cvd_cvd_psm_1_1_overall_baye[[i]])[2,3],
-                                                                                                                    uci = fixef(models_cvd_cvd_psm_1_1_overall_baye[[i]])[2,4],
-                                                                                                                    intervals = levels(group.cvd.dataset.matched$intervals)[i]))
-
+                                                                                                                lci = fixef(models_cvd_cvd_psm_1_1_overall_baye[[i]])[2,3],
+                                                                                                                uci = fixef(models_cvd_cvd_psm_1_1_overall_baye[[i]])[2,4],
+                                                                                                                intervals = levels(group.cvd.dataset.matched$intervals)[i]))
+    
   }
-
+  
   saveRDS(models_cvd_cvd_psm_1_1_overall_baye, paste0(output_path, "/additional_outcomes/models_cvd_cvd_psm_1_1_overall_baye.rds"))
-
+  
   predictions_cvd_cvd_stan_psm_1_1_overall_baye <- predictions_cvd_cvd_stan_psm_1_1_overall_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_cvd_cvd_stan_psm_1_1_overall_baye, paste0(output_path, "/additional_outcomes/predictions_cvd_cvd_stan_psm_1_1_overall_baye.rds"))
-
-
+  
+  
 }
 # Full population (interval as a continuous, without subgrouping individuals)
 if (class(try(
-
+  
   # predictions for the CVD outcomes in the population with no CVD
   predictions_cvd_cvd_stan_psm_1_1_full_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_cvd_cvd_stan_psm_1_1_full_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
-  formula_baye <- "time | cens(censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2"
-
+  
+  formula_baye <- "time | cens(1 - censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2"
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.cvd.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_cvd_cvd_stan_psm_1_1_full_baye <- vector()
-
+  
   models_cvd_cvd_psm_1_1_full_baye <- brms::brm(formula = formula(formula_baye),
-                                                  data = group.cvd.dataset.matched %>%
-                                                    select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
-                                                    cbind(time = group.cvd.dataset.matched$postdrug_mace_censtime_yrs,
-                                                          censored = group.cvd.dataset.matched$postdrug_mace_censvar,
-                                                          qrisk2_10yr_score_1 = rcs(group.cvd.dataset.matched$qrisk2_10yr_score, 3)[,1],
-                                                          qrisk2_10yr_score_2 = rcs(group.cvd.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
-                                                    as.data.frame() %>%
-                                                    drop_na(),
-                                                  family = "cox",
-                                                  chains = 2)
-
+                                                data = group.cvd.dataset.matched %>%
+                                                  select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
+                                                  cbind(time = group.cvd.dataset.matched$postdrug_mace_censtime_yrs,
+                                                        censored = group.cvd.dataset.matched$postdrug_mace_censvar,
+                                                        qrisk2_10yr_score_1 = rcs(group.cvd.dataset.matched$qrisk2_10yr_score, 3)[,1],
+                                                        qrisk2_10yr_score_2 = rcs(group.cvd.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
+                                                  as.data.frame() %>%
+                                                  drop_na(),
+                                                family = "cox",
+                                                chains = 2)
+  
   predictions_cvd_cvd_stan_psm_1_1_full_baye <- rbind(predictions_cvd_cvd_stan_psm_1_1_full_baye, cbind(mean = fixef(models_cvd_cvd_psm_1_1_full_baye)[2,1],
-                                                                                                            lci = fixef(models_cvd_cvd_psm_1_1_full_baye)[2,3],
-                                                                                                            uci = fixef(models_cvd_cvd_psm_1_1_full_baye)[2,4]))
-
+                                                                                                        lci = fixef(models_cvd_cvd_psm_1_1_full_baye)[2,3],
+                                                                                                        uci = fixef(models_cvd_cvd_psm_1_1_full_baye)[2,4]))
+  
   saveRDS(models_cvd_cvd_psm_1_1_full_baye, paste0(output_path, "/additional_outcomes/models_cvd_cvd_psm_1_1_full_baye.rds"))
-
+  
   predictions_cvd_cvd_stan_psm_1_1_full_baye <- predictions_cvd_cvd_stan_psm_1_1_full_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_cvd_cvd_stan_psm_1_1_full_baye, paste0(output_path, "/additional_outcomes/predictions_cvd_cvd_stan_psm_1_1_full_baye.rds"))
-
+  
 }
 
 
 ## Propensity score matching + adjusted
 
 if (class(try(
-
+  
   # predictions for the CVD outcomes in population with no CVD strata sex and intervals
   predictions_cvd_cvd_stan_psm_1_1_adjusted_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_cvd_cvd_stan_psm_1_1_adjusted_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.cvd.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_cvd_cvd_stan_psm_1_1_adjusted_baye <- vector()
-
-
+  
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.cvd.dataset.matched[,breakdown_adjust], is.factor)
-
+  
   models_cvd_cvd_psm_1_1_adjusted_male_baye <- vector("list", quantiles)
-
+  
   models_cvd_cvd_psm_1_1_adjusted_female_baye <- vector("list", quantiles)
-
+  
   for (i in mnumber) {
-
+    
     dataset.now <- group.cvd.dataset.matched %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.cvd.dataset.matched$postdrug_mace_censtime_yrs,
@@ -9469,23 +9505,23 @@ if (class(try(
       drop_na() %>%
       mutate(sex = relevel(sex, ref = "Male"),
              intervals = relevel(intervals, ref = levels(group.cvd.dataset.matched$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_cvd_cvd_psm_1_1_adjusted_male_baye[[i]] <- brms::brm(formula = formula(formula_baye),
                                                                 data = dataset.now,
                                                                 family = "cox",
                                                                 chains = 2,
                                                                 iter = 10000)
-
+    
     predictions_cvd_cvd_stan_psm_1_1_adjusted_baye <- rbind(predictions_cvd_cvd_stan_psm_1_1_adjusted_baye, cbind(mean = fixef(models_cvd_cvd_psm_1_1_adjusted_male_baye[[i]])[2,1],
                                                                                                                   lci = fixef(models_cvd_cvd_psm_1_1_adjusted_male_baye[[i]])[2,3],
                                                                                                                   uci = fixef(models_cvd_cvd_psm_1_1_adjusted_male_baye[[i]])[2,4],
                                                                                                                   sex = "Male",
                                                                                                                   intervals = levels(group.cvd.dataset.matched$intervals)[i]))
-
+    
     dataset.now <- group.cvd.dataset.matched %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.cvd.dataset.matched$postdrug_mace_censtime_yrs,
@@ -9506,57 +9542,57 @@ if (class(try(
       drop_na() %>%
       mutate(sex = relevel(sex, ref = "Female"),
              intervals = relevel(intervals, ref = levels(group.cvd.dataset.matched$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_cvd_cvd_psm_1_1_adjusted_female_baye[[i]] <-  brms::brm(formula = formula(formula_baye),
                                                                    data = dataset.now,
                                                                    family = "cox",
                                                                    chains = 2,
                                                                    iter = 10000)
-
+    
     predictions_cvd_cvd_stan_psm_1_1_adjusted_baye <- rbind(predictions_cvd_cvd_stan_psm_1_1_adjusted_baye, cbind(mean = fixef(models_cvd_cvd_psm_1_1_adjusted_female_baye[[i]])[2,1],
                                                                                                                   lci = fixef(models_cvd_cvd_psm_1_1_adjusted_female_baye[[i]])[2,3],
                                                                                                                   uci = fixef(models_cvd_cvd_psm_1_1_adjusted_female_baye[[i]])[2,4],
                                                                                                                   sex = "Female",
                                                                                                                   intervals = levels(group.cvd.dataset.matched$intervals)[i]))
-
+    
   }
-
+  
   saveRDS(models_cvd_cvd_psm_1_1_adjusted_male_baye, paste0(output_path, "/additional_outcomes/models_cvd_cvd_psm_1_1_adjusted_male_baye.rds"))
-
+  
   saveRDS(models_cvd_cvd_psm_1_1_adjusted_female_baye, paste0(output_path, "/additional_outcomes/models_cvd_cvd_psm_1_1_adjusted_female_baye.rds"))
-
+  
   predictions_cvd_cvd_stan_psm_1_1_adjusted_baye <- predictions_cvd_cvd_stan_psm_1_1_adjusted_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_cvd_cvd_stan_psm_1_1_adjusted_baye, paste0(output_path, "/additional_outcomes/predictions_cvd_cvd_stan_psm_1_1_adjusted_baye.rds"))
-
+  
 }
 
 if (class(try(
-
+  
   # predictions for the CVD outcomes in the population with no CVD
   predictions_cvd_cvd_stan_psm_1_1_adjusted_overall_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_cvd_cvd_stan_psm_1_1_adjusted_overall_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.cvd.dataset.matched[,breakdown_adjust], is.factor)
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.cvd.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_cvd_cvd_stan_psm_1_1_adjusted_overall_baye <- vector()
-
+  
   models_cvd_cvd_psm_1_1_adjusted_overall_baye <- vector("list", quantiles)
-
+  
   for (i in mnumber) {
-
+    
     dataset.now <- group.cvd.dataset.matched %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.cvd.dataset.matched$postdrug_mace_censtime_yrs,
@@ -9576,50 +9612,50 @@ if (class(try(
       as.data.frame() %>%
       drop_na() %>%
       mutate(intervals = relevel(intervals, ref = levels(group.cvd.dataset.matched$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_cvd_cvd_psm_1_1_adjusted_overall_baye[[i]] <- brms::brm(formula = formula(formula_baye),
                                                                    data = dataset.now,
                                                                    family = "cox",
                                                                    chains = 2,
                                                                    iter = 10000)
-
+    
     predictions_cvd_cvd_stan_psm_1_1_adjusted_overall_baye <- rbind(predictions_cvd_cvd_stan_psm_1_1_adjusted_overall_baye, cbind(mean = fixef(models_cvd_cvd_psm_1_1_adjusted_overall_baye[[i]])[2,1],
                                                                                                                                   lci = fixef(models_cvd_cvd_psm_1_1_adjusted_overall_baye[[i]])[2,3],
                                                                                                                                   uci = fixef(models_cvd_cvd_psm_1_1_adjusted_overall_baye[[i]])[2,4],
                                                                                                                                   intervals = levels(group.cvd.dataset.matched$intervals)[i]))
-
+    
   }
-
+  
   saveRDS(models_cvd_cvd_psm_1_1_adjusted_overall_baye, paste0(output_path, "/additional_outcomes/models_cvd_cvd_psm_1_1_adjusted_overall_baye.rds"))
-
+  
   predictions_cvd_cvd_stan_psm_1_1_adjusted_overall_baye <- predictions_cvd_cvd_stan_psm_1_1_adjusted_overall_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_cvd_cvd_stan_psm_1_1_adjusted_overall_baye, paste0(output_path, "/additional_outcomes/predictions_cvd_cvd_stan_psm_1_1_adjusted_overall_baye.rds"))
-
+  
 }
 # Full population (interval as a continuous, without subgrouping individuals)
 if (class(try(
-
+  
   # predictions for the CVD outcomes in the population with no CVD
   predictions_cvd_cvd_stan_psm_1_1_adjusted_full_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_cvd_cvd_stan_psm_1_1_adjusted_full_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.cvd.dataset.matched[,breakdown_adjust], is.factor)
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.cvd.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_cvd_cvd_stan_psm_1_1_adjusted_full_baye <- vector()
-
+  
   dataset.now <- group.cvd.dataset.matched %>%
     select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
     cbind(time = group.cvd.dataset.matched$postdrug_mace_censtime_yrs,
@@ -9638,28 +9674,28 @@ if (class(try(
           prealt_2 = rcs(group.cvd.dataset.matched$prealt, 3)[,2]) %>%
     as.data.frame() %>%
     drop_na()
-
+  
   checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-  formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+  
+  formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+  
   models_cvd_cvd_psm_1_1_adjusted_full_baye <- brms::brm(formula = formula(formula_baye),
                                                          data = dataset.now,
                                                          family = "cox",
                                                          chains = 2,
                                                          iter = 10000)
-
+  
   predictions_cvd_cvd_stan_psm_1_1_adjusted_full_baye <- rbind(predictions_cvd_cvd_stan_psm_1_1_adjusted_full_baye, cbind(mean = fixef(models_cvd_cvd_psm_1_1_adjusted_full_baye)[2,1],
                                                                                                                           lci = fixef(models_cvd_cvd_psm_1_1_adjusted_full_baye)[2,3],
                                                                                                                           uci = fixef(models_cvd_cvd_psm_1_1_adjusted_full_baye)[2,4]))
-
+  
   saveRDS(models_cvd_cvd_psm_1_1_adjusted_full_baye, paste0(output_path, "additional_outcomes/models_cvd_cvd_psm_1_1_adjusted_full_baye.rds"))
-
+  
   predictions_cvd_cvd_stan_psm_1_1_adjusted_full_baye <- predictions_cvd_cvd_stan_psm_1_1_adjusted_full_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_cvd_cvd_stan_psm_1_1_adjusted_full_baye, paste0(output_path, "/additional_outcomes/predictions_cvd_cvd_stan_psm_1_1_adjusted_full_baye.rds"))
-
+  
 }
 
 
@@ -9667,29 +9703,29 @@ if (class(try(
 
 #--- Cox
 if (class(try(
-
+  
   # predictions for the CVD outcomes in population with no CVD strata sex and intervals
   predictions_cvd_cvd_stan_adjusted_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_cvd_cvd_stan_adjusted_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.cvd.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_cvd_cvd_stan_adjusted_baye <- vector()
-
-
+  
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.cvd.dataset[,breakdown_adjust], is.factor)
-
+  
   models_cvd_cvd_adjusted_male_baye <- vector("list", quantiles)
-
+  
   models_cvd_cvd_adjusted_female_baye <- vector("list", quantiles)
-
+  
   for (i in mnumber) {
-
+    
     dataset.now <- group.cvd.dataset %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.cvd.dataset$postdrug_mace_censtime_yrs,
@@ -9710,23 +9746,23 @@ if (class(try(
       drop_na() %>%
       mutate(sex = relevel(sex, ref = "Male"),
              intervals = relevel(intervals, ref = levels(group.cvd.dataset$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_cvd_cvd_adjusted_male_baye[[i]] <- brms::brm(formula = formula(formula_baye),
                                                         data = dataset.now,
                                                         family = "cox",
                                                         chains = 2,
                                                         iter = 10000)
-
+    
     predictions_cvd_cvd_stan_adjusted_baye <- rbind(predictions_cvd_cvd_stan_adjusted_baye, cbind(mean = fixef(models_cvd_cvd_adjusted_male_baye[[i]])[2,1],
                                                                                                   lci = fixef(models_cvd_cvd_adjusted_male_baye[[i]])[2,3],
                                                                                                   uci = fixef(models_cvd_cvd_adjusted_male_baye[[i]])[2,4],
                                                                                                   sex = "Male",
                                                                                                   intervals = levels(group.cvd.dataset$intervals)[i]))
-
+    
     dataset.now <- group.cvd.dataset %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.cvd.dataset$postdrug_mace_censtime_yrs,
@@ -9747,57 +9783,57 @@ if (class(try(
       drop_na() %>%
       mutate(sex = relevel(sex, ref = "Female"),
              intervals = relevel(intervals, ref = levels(group.cvd.dataset$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_cvd_cvd_adjusted_female_baye[[i]] <- brms::brm(formula = formula(formula_baye),
                                                           data = dataset.now,
                                                           family = "cox",
                                                           chains = 2,
                                                           iter = 10000)
-
+    
     predictions_cvd_cvd_stan_adjusted_baye <- rbind(predictions_cvd_cvd_stan_adjusted_baye, cbind(mean = fixef(models_cvd_cvd_adjusted_female_baye[[i]])[2,1],
                                                                                                   lci = fixef(models_cvd_cvd_adjusted_female_baye[[i]])[2,3],
                                                                                                   uci = fixef(models_cvd_cvd_adjusted_female_baye[[i]])[2,4],
                                                                                                   sex = "Female",
                                                                                                   intervals = levels(group.cvd.dataset$intervals)[i]))
-
+    
   }
-
+  
   saveRDS(models_cvd_cvd_adjusted_male_baye, paste0(output_path, "/additional_outcomes/models_cvd_cvd_adjusted_male_baye.rds"))
-
+  
   saveRDS(models_cvd_cvd_adjusted_female_baye, paste0(output_path, "/additional_outcomes/models_cvd_cvd_adjusted_female_baye.rds"))
-
+  
   predictions_cvd_cvd_stan_adjusted_baye <- predictions_cvd_cvd_stan_adjusted_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_cvd_cvd_stan_adjusted_baye, paste0(output_path, "/additional_outcomes/predictions_cvd_cvd_stan_adjusted_baye.rds"))
-
+  
 }
 
 if (class(try(
-
+  
   # predictions for the CVD outcomes in the population with no CVD
   predictions_cvd_cvd_stan_adjusted_overall_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_cvd_cvd_stan_adjusted_overall_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.cvd.dataset[,breakdown_adjust], is.factor)
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.cvd.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_cvd_cvd_stan_adjusted_overall_baye <- vector()
-
+  
   models_cvd_cvd_adjusted_overall_baye <- vector("list", quantiles)
-
+  
   for (i in mnumber) {
-
+    
     dataset.now <- group.cvd.dataset %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.cvd.dataset$postdrug_mace_censtime_yrs,
@@ -9817,50 +9853,50 @@ if (class(try(
       as.data.frame() %>%
       drop_na() %>%
       mutate(intervals = relevel(intervals, ref = levels(group.cvd.dataset$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_cvd_cvd_adjusted_overall_baye[[i]] <- brms::brm(formula = formula(formula_baye),
                                                            data = dataset.now,
                                                            family = "cox",
                                                            chains = 2,
                                                            iter = 10000)
-
+    
     predictions_cvd_cvd_stan_adjusted_overall_baye <- rbind(predictions_cvd_cvd_stan_adjusted_overall_baye, cbind(mean = fixef(models_cvd_cvd_adjusted_overall_baye[[i]])[2,1],
                                                                                                                   lci = fixef(models_cvd_cvd_adjusted_overall_baye[[i]])[2,3],
                                                                                                                   uci = fixef(models_cvd_cvd_adjusted_overall_baye[[i]])[2,4],
                                                                                                                   intervals = levels(group.cvd.dataset$intervals)[i]))
-
+    
   }
-
+  
   saveRDS(models_cvd_cvd_adjusted_overall_baye, paste0(output_path, "/additional_outcomes/models_cvd_cvd_adjusted_overall_baye.rds"))
-
+  
   predictions_cvd_cvd_stan_adjusted_overall_baye <- predictions_cvd_cvd_stan_adjusted_overall_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_cvd_cvd_stan_adjusted_overall_baye, paste0(output_path, "/additional_outcomes/predictions_cvd_cvd_stan_adjusted_overall_baye.rds"))
-
+  
 }
 # Full population (interval as a continuous, without subgrouping individuals)
 if (class(try(
-
+  
   # predictions for the CVD outcomes in the population with no CVD
   predictions_cvd_cvd_stan_adjusted_full_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_cvd_cvd_stan_adjusted_full_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.cvd.dataset[,breakdown_adjust], is.factor)
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.cvd.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_cvd_cvd_stan_adjusted_full_baye <- vector()
-
+  
   dataset.now <- group.cvd.dataset %>%
     select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
     cbind(time = group.cvd.dataset$postdrug_mace_censtime_yrs,
@@ -9879,28 +9915,28 @@ if (class(try(
           prealt_2 = rcs(group.cvd.dataset$prealt, 3)[,2]) %>%
     as.data.frame() %>%
     drop_na()
-
+  
   checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-  formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+  
+  formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+  
   models_cvd_cvd_adjusted_full_baye <- brms::brm(formula = formula(formula_baye),
                                                  data = dataset.now,
                                                  family = "cox",
                                                  chains = 2,
                                                  iter = 10000)
-
+  
   predictions_cvd_cvd_stan_adjusted_full_baye <- rbind(predictions_cvd_cvd_stan_adjusted_full_baye, cbind(mean = fixef(models_cvd_cvd_adjusted_full_baye)[2,1],
                                                                                                           lci = fixef(models_cvd_cvd_adjusted_full_baye)[2,3],
                                                                                                           uci = fixef(models_cvd_cvd_adjusted_full_baye)[2,4]))
-
+  
   saveRDS(models_cvd_cvd_adjusted_full_baye, paste0(output_path, "/additional_outcomes/models_cvd_cvd_adjusted_full_baye.rds"))
-
+  
   predictions_cvd_cvd_stan_adjusted_full_baye <- predictions_cvd_cvd_stan_adjusted_full_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_cvd_cvd_stan_adjusted_full_baye, paste0(output_path, "/additional_outcomes/predictions_cvd_cvd_stan_adjusted_full_baye.rds"))
-
+  
 }
 
 #:--------------------
@@ -10346,27 +10382,100 @@ group.hf.dataset.matched <- group.hf.dataset %>%
 ## Propensity score matching
 
 if (class(try(
-
+  
   # predictions for the CVD outcomes in population with no CVD/HF/CKD strata sex and intervals
   predictions_hf_hf_stan_psm_1_1_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_hf_hf_stan_psm_1_1_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.hf.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_hf_hf_stan_psm_1_1_baye <- vector()
-
-  formula_baye <- "time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2"
-
+  
+  formula_baye <- "time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2"
+  
   models_hf_hf_psm_1_1_male_baye <- vector("list", quantiles)
-
+  
   models_hf_hf_psm_1_1_female_baye <- vector("list", quantiles)
-
+  
   for(i in mnumber) {
-
+    
     models_hf_hf_psm_1_1_male_baye[[i]] <- brms::brm(formula = formula(formula_baye),
+                                                     data = group.hf.dataset.matched %>%
+                                                       select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
+                                                       cbind(time = group.hf.dataset.matched$postdrug_hf_censtime_yrs,
+                                                             censored = group.hf.dataset.matched$postdrug_hf_censvar,
+                                                             qrisk2_10yr_score_1 = rcs(group.hf.dataset.matched$qrisk2_10yr_score, 3)[,1],
+                                                             qrisk2_10yr_score_2 = rcs(group.hf.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
+                                                       as.data.frame() %>%
+                                                       drop_na() %>%
+                                                       mutate(sex = relevel(sex, ref = "Male"),
+                                                              intervals = relevel(intervals, ref = levels(group.hf.dataset.matched$intervals)[i])),
+                                                     family = "cox",
+                                                     chains = 2)
+    
+    predictions_hf_hf_stan_psm_1_1_baye <- rbind(predictions_hf_hf_stan_psm_1_1_baye, cbind(mean = fixef(models_hf_hf_psm_1_1_male_baye[[i]])[2,1],
+                                                                                            lci = fixef(models_hf_hf_psm_1_1_male_baye[[i]])[2,3],
+                                                                                            uci = fixef(models_hf_hf_psm_1_1_male_baye[[i]])[2,4],
+                                                                                            sex = "Male",
+                                                                                            intervals = levels(group.hf.dataset.matched$intervals)[i]))
+    
+    models_hf_hf_psm_1_1_female_baye[[i]] <- brms::brm(formula = formula(formula_baye),
+                                                       data = group.hf.dataset.matched %>%
+                                                         select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
+                                                         cbind(time = group.hf.dataset.matched$postdrug_hf_censtime_yrs,
+                                                               censored = group.hf.dataset.matched$postdrug_hf_censvar,
+                                                               qrisk2_10yr_score_1 = rcs(group.hf.dataset.matched$qrisk2_10yr_score, 3)[,1],
+                                                               qrisk2_10yr_score_2 = rcs(group.hf.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
+                                                         as.data.frame() %>%
+                                                         drop_na() %>%
+                                                         mutate(sex = relevel(sex, ref = "Female"),
+                                                                intervals = relevel(intervals, ref = levels(group.hf.dataset.matched$intervals)[i])),
+                                                       family = "cox",
+                                                       chains = 2)
+    
+    predictions_hf_hf_stan_psm_1_1_baye <- rbind(predictions_hf_hf_stan_psm_1_1_baye, cbind(mean = fixef(models_hf_hf_psm_1_1_female_baye[[i]])[2,1],
+                                                                                            lci = fixef(models_hf_hf_psm_1_1_female_baye[[i]])[2,3],
+                                                                                            uci = fixef(models_hf_hf_psm_1_1_female_baye[[i]])[2,4],
+                                                                                            sex = "Female",
+                                                                                            intervals = levels(group.hf.dataset.matched$intervals)[i]))
+    
+  }
+  
+  saveRDS(models_hf_hf_psm_1_1_male_baye, paste0(output_path, "/additional_outcomes/models_hf_hf_psm_1_1_male_baye.rds"))
+  
+  saveRDS(models_hf_hf_psm_1_1_female_baye, paste0(output_path, "/additional_outcomes/models_hf_hf_psm_1_1_female_baye.rds"))
+  
+  predictions_hf_hf_stan_psm_1_1_baye <- predictions_hf_hf_stan_psm_1_1_baye %>%
+    as.data.frame()
+  
+  saveRDS(predictions_hf_hf_stan_psm_1_1_baye, paste0(output_path, "/additional_outcomes/predictions_hf_hf_stan_psm_1_1_baye.rds"))
+  
+}
+
+# No sex strata
+if (class(try(
+  
+  # predictions for the CVD outcomes in the population with no CVD/HF/CKD
+  predictions_hf_hf_stan_psm_1_1_overall_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_hf_hf_stan_psm_1_1_overall_baye.rds"))
+  
+  , silent = TRUE)) == "try-error") {
+  
+  formula_baye <- "time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2"
+  
+  # maximum number of deciles being tested
+  quantiles <- length(levels(group.hf.dataset[,"intervals"]))
+  # create lists with results
+  mnumber = c(1:quantiles)
+  predictions_hf_hf_stan_psm_1_1_overall_baye <- vector()
+  
+  models_hf_hf_psm_1_1_overall_baye <- vector("list", quantiles)
+  
+  for (i in mnumber) {
+    
+    models_hf_hf_psm_1_1_overall_baye[[i]] <- brms::brm(formula = formula(formula_baye),
                                                         data = group.hf.dataset.matched %>%
                                                           select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
                                                           cbind(time = group.hf.dataset.matched$postdrug_hf_censtime_yrs,
@@ -10375,167 +10484,94 @@ if (class(try(
                                                                 qrisk2_10yr_score_2 = rcs(group.hf.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
                                                           as.data.frame() %>%
                                                           drop_na() %>%
-                                                          mutate(sex = relevel(sex, ref = "Male"),
-                                                                 intervals = relevel(intervals, ref = levels(group.hf.dataset.matched$intervals)[i])),
+                                                          mutate(intervals = relevel(intervals, ref = levels(group.hf.dataset.matched$intervals)[i])),
                                                         family = "cox",
                                                         chains = 2)
-
-    predictions_hf_hf_stan_psm_1_1_baye <- rbind(predictions_hf_hf_stan_psm_1_1_baye, cbind(mean = fixef(models_hf_hf_psm_1_1_male_baye[[i]])[2,1],
-                                                                                                  lci = fixef(models_hf_hf_psm_1_1_male_baye[[i]])[2,3],
-                                                                                                  uci = fixef(models_hf_hf_psm_1_1_male_baye[[i]])[2,4],
-                                                                                                  sex = "Male",
-                                                                                                  intervals = levels(group.hf.dataset.matched$intervals)[i]))
-
-    models_hf_hf_psm_1_1_female_baye[[i]] <- brms::brm(formula = formula(formula_baye),
-                                                          data = group.hf.dataset.matched %>%
-                                                            select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
-                                                            cbind(time = group.hf.dataset.matched$postdrug_hf_censtime_yrs,
-                                                                  censored = group.hf.dataset.matched$postdrug_hf_censvar,
-                                                                  qrisk2_10yr_score_1 = rcs(group.hf.dataset.matched$qrisk2_10yr_score, 3)[,1],
-                                                                  qrisk2_10yr_score_2 = rcs(group.hf.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
-                                                            as.data.frame() %>%
-                                                            drop_na() %>%
-                                                            mutate(sex = relevel(sex, ref = "Female"),
-                                                                   intervals = relevel(intervals, ref = levels(group.hf.dataset.matched$intervals)[i])),
-                                                          family = "cox",
-                                                          chains = 2)
-
-    predictions_hf_hf_stan_psm_1_1_baye <- rbind(predictions_hf_hf_stan_psm_1_1_baye, cbind(mean = fixef(models_hf_hf_psm_1_1_female_baye[[i]])[2,1],
-                                                                                                  lci = fixef(models_hf_hf_psm_1_1_female_baye[[i]])[2,3],
-                                                                                                  uci = fixef(models_hf_hf_psm_1_1_female_baye[[i]])[2,4],
-                                                                                                  sex = "Female",
-                                                                                                  intervals = levels(group.hf.dataset.matched$intervals)[i]))
-
-  }
-
-  saveRDS(models_hf_hf_psm_1_1_male_baye, paste0(output_path, "/additional_outcomes/models_hf_hf_psm_1_1_male_baye.rds"))
-
-  saveRDS(models_hf_hf_psm_1_1_female_baye, paste0(output_path, "/additional_outcomes/models_hf_hf_psm_1_1_female_baye.rds"))
-
-  predictions_hf_hf_stan_psm_1_1_baye <- predictions_hf_hf_stan_psm_1_1_baye %>%
-    as.data.frame()
-
-  saveRDS(predictions_hf_hf_stan_psm_1_1_baye, paste0(output_path, "/additional_outcomes/predictions_hf_hf_stan_psm_1_1_baye.rds"))
-
-}
-
-# No sex strata
-if (class(try(
-
-  # predictions for the CVD outcomes in the population with no CVD/HF/CKD
-  predictions_hf_hf_stan_psm_1_1_overall_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_hf_hf_stan_psm_1_1_overall_baye.rds"))
-
-  , silent = TRUE)) == "try-error") {
-
-  formula_baye <- "time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2"
-
-  # maximum number of deciles being tested
-  quantiles <- length(levels(group.hf.dataset[,"intervals"]))
-  # create lists with results
-  mnumber = c(1:quantiles)
-  predictions_hf_hf_stan_psm_1_1_overall_baye <- vector()
-
-  models_hf_hf_psm_1_1_overall_baye <- vector("list", quantiles)
-
-  for (i in mnumber) {
-
-    models_hf_hf_psm_1_1_overall_baye[[i]] <- brms::brm(formula = formula(formula_baye),
-                                                           data = group.hf.dataset.matched %>%
-                                                             select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
-                                                             cbind(time = group.hf.dataset.matched$postdrug_hf_censtime_yrs,
-                                                                   censored = group.hf.dataset.matched$postdrug_hf_censvar,
-                                                                   qrisk2_10yr_score_1 = rcs(group.hf.dataset.matched$qrisk2_10yr_score, 3)[,1],
-                                                                   qrisk2_10yr_score_2 = rcs(group.hf.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
-                                                             as.data.frame() %>%
-                                                             drop_na() %>%
-                                                             mutate(intervals = relevel(intervals, ref = levels(group.hf.dataset.matched$intervals)[i])),
-                                                           family = "cox",
-                                                           chains = 2)
-
+    
     predictions_hf_hf_stan_psm_1_1_overall_baye <- rbind(predictions_hf_hf_stan_psm_1_1_overall_baye, cbind(mean = fixef(models_hf_hf_psm_1_1_overall_baye[[i]])[2,1],
-                                                                                                                  lci = fixef(models_hf_hf_psm_1_1_overall_baye[[i]])[2,3],
-                                                                                                                  uci = fixef(models_hf_hf_psm_1_1_overall_baye[[i]])[2,4],
-                                                                                                                  intervals = levels(group.hf.dataset.matched$intervals)[i]))
-
+                                                                                                            lci = fixef(models_hf_hf_psm_1_1_overall_baye[[i]])[2,3],
+                                                                                                            uci = fixef(models_hf_hf_psm_1_1_overall_baye[[i]])[2,4],
+                                                                                                            intervals = levels(group.hf.dataset.matched$intervals)[i]))
+    
   }
-
+  
   saveRDS(models_hf_hf_psm_1_1_overall_baye, paste0(output_path, "/additional_outcomes/models_hf_hf_psm_1_1_overall_baye.rds"))
-
+  
   predictions_hf_hf_stan_psm_1_1_overall_baye <- predictions_hf_hf_stan_psm_1_1_overall_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_hf_hf_stan_psm_1_1_overall_baye, paste0(output_path, "/additional_outcomes/predictions_hf_hf_stan_psm_1_1_overall_baye.rds"))
-
-
+  
+  
 }
 # Full population (interval as a continuous, without subgrouping individuals)
 if (class(try(
-
+  
   # predictions for the CVD outcomes in the population with no CVD/HF/CKD
   predictions_hf_hf_stan_psm_1_1_full_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_hf_hf_stan_psm_1_1_full_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
-  formula_baye <- "time | cens(censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2"
-
+  
+  formula_baye <- "time | cens(1 - censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2"
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.hf.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_hf_hf_stan_psm_1_1_full_baye <- vector()
-
+  
   models_hf_hf_psm_1_1_full_baye <- brms::brm(formula = formula(formula_baye),
-                                                 data = group.hf.dataset.matched %>%
-                                                   select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
-                                                   cbind(time = group.hf.dataset.matched$postdrug_hf_censtime_yrs,
-                                                         censored = group.hf.dataset.matched$postdrug_hf_censvar,
-                                                         qrisk2_10yr_score_1 = rcs(group.hf.dataset.matched$qrisk2_10yr_score, 3)[,1],
-                                                         qrisk2_10yr_score_2 = rcs(group.hf.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
-                                                   as.data.frame() %>%
-                                                   drop_na(),
-                                                 family = "cox",
-                                                 chains = 2)
-
+                                              data = group.hf.dataset.matched %>%
+                                                select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
+                                                cbind(time = group.hf.dataset.matched$postdrug_hf_censtime_yrs,
+                                                      censored = group.hf.dataset.matched$postdrug_hf_censvar,
+                                                      qrisk2_10yr_score_1 = rcs(group.hf.dataset.matched$qrisk2_10yr_score, 3)[,1],
+                                                      qrisk2_10yr_score_2 = rcs(group.hf.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
+                                                as.data.frame() %>%
+                                                drop_na(),
+                                              family = "cox",
+                                              chains = 2)
+  
   predictions_hf_hf_stan_psm_1_1_full_baye <- rbind(predictions_hf_hf_stan_psm_1_1_full_baye, cbind(mean = fixef(models_hf_hf_psm_1_1_full_baye])[2,1],
-                                                                                                          lci = fixef(models_hf_hf_psm_1_1_full_baye)[2,3],
-                                                                                                          uci = fixef(models_hf_hf_psm_1_1_full_baye)[2,4]))
-
+                                                                                                    lci = fixef(models_hf_hf_psm_1_1_full_baye)[2,3],
+                                                                                                    uci = fixef(models_hf_hf_psm_1_1_full_baye)[2,4]))
+  
   saveRDS(models_hf_hf_psm_1_1_full_baye, paste0(output_path, "/additional_outcomes/models_hf_hf_psm_1_1_full_baye.rds"))
-
+  
   predictions_hf_hf_stan_psm_1_1_full_baye <- predictions_hf_hf_stan_psm_1_1_full_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_hf_hf_stan_psm_1_1_full_baye, paste0(output_path, "/additional_outcomes/predictions_hf_hf_stan_psm_1_1_full_baye.rds"))
-
+  
 }
 
 
 ## Propensity score matching + adjusted
 
 if (class(try(
-
+  
   # predictions for the CVD outcomes in population with no CVD/HF/CKD strata sex and intervals
   predictions_hf_hf_stan_psm_1_1_adjusted_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_hf_hf_stan_psm_1_1_adjusted_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.hf.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_hf_hf_stan_psm_1_1_adjusted_baye <- vector()
-
-
+  
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.hf.dataset.matched[,breakdown_adjust], is.factor)
-
+  
   models_hf_hf_psm_1_1_adjusted_male_baye <- vector("list", quantiles)
-
+  
   models_hf_hf_psm_1_1_adjusted_female_baye <- vector("list", quantiles)
-
+  
   for (i in mnumber) {
-
+    
     dataset.now <- group.hf.dataset.matched %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.hf.dataset.matched$postdrug_hf_censtime_yrs,
@@ -10556,23 +10592,23 @@ if (class(try(
       drop_na() %>%
       mutate(sex = relevel(sex, ref = "Male"),
              intervals = relevel(intervals, ref = levels(group.hf.dataset.matched$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_hf_hf_psm_1_1_adjusted_male_baye[[i]] <- brms::brm(formula = formula(formula_baye),
                                                               data = dataset.now,
                                                               family = "cox",
                                                               chains = 2,
                                                               iter = 10000)
-
+    
     predictions_hf_hf_stan_psm_1_1_adjusted_baye <- rbind(predictions_hf_hf_stan_psm_1_1_adjusted_baye, cbind(mean = fixef(models_hf_hf_psm_1_1_adjusted_male_baye[[i]])[2,1],
                                                                                                               lci = fixef(models_hf_hf_psm_1_1_adjusted_male_baye[[i]])[2,3],
                                                                                                               uci = fixef(models_hf_hf_psm_1_1_adjusted_male_baye[[i]])[2,4],
                                                                                                               sex = "Male",
                                                                                                               intervals = levels(group.hf.dataset.matched$intervals)[i]))
-
+    
     dataset.now <- group.hf.dataset.matched %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.hf.dataset.matched$postdrug_hf_censtime_yrs,
@@ -10593,57 +10629,57 @@ if (class(try(
       drop_na() %>%
       mutate(sex = relevel(sex, ref = "Female"),
              intervals = relevel(intervals, ref = levels(group.hf.dataset.matched$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_hf_hf_psm_1_1_adjusted_female_baye[[i]] <-  brms::brm(formula = formula(formula_baye),
                                                                  data = dataset.now,
                                                                  family = "cox",
                                                                  chains = 2,
                                                                  iter = 10000)
-
+    
     predictions_hf_hf_stan_psm_1_1_adjusted_baye <- rbind(predictions_hf_hf_stan_psm_1_1_adjusted_baye, cbind(mean = fixef(models_hf_hf_psm_1_1_adjusted_female_baye[[i]])[2,1],
                                                                                                               lci = fixef(models_hf_hf_psm_1_1_adjusted_female_baye[[i]])[2,3],
                                                                                                               uci = fixef(models_hf_hf_psm_1_1_adjusted_female_baye[[i]])[2,4],
                                                                                                               sex = "Female",
                                                                                                               intervals = levels(group.hf.dataset.matched$intervals)[i]))
-
+    
   }
-
+  
   saveRDS(models_hf_hf_psm_1_1_adjusted_male_baye, paste0(output_path, "/additional_outcomes/models_hf_hf_psm_1_1_adjusted_male_baye.rds"))
-
+  
   saveRDS(models_hf_hf_psm_1_1_adjusted_female_baye, paste0(output_path, "/additional_outcomes/models_hf_hf_psm_1_1_adjusted_female_baye.rds"))
-
+  
   predictions_hf_hf_stan_psm_1_1_adjusted_baye <- predictions_hf_hf_stan_psm_1_1_adjusted_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_hf_hf_stan_psm_1_1_adjusted_baye, paste0(output_path, "/additional_outcomes/predictions_hf_hf_stan_psm_1_1_adjusted_baye.rds"))
-
+  
 }
 
 if (class(try(
-
+  
   # predictions for the CVD outcomes in the population with no CVD/HF/CKD
   predictions_hf_hf_stan_psm_1_1_adjusted_overall_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_hf_hf_stan_psm_1_1_adjusted_overall_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.hf.dataset.matched[,breakdown_adjust], is.factor)
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.hf.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_hf_hf_stan_psm_1_1_adjusted_overall_baye <- vector()
-
+  
   models_hf_hf_psm_1_1_adjusted_overall_baye <- vector("list", quantiles)
-
+  
   for (i in mnumber) {
-
+    
     dataset.now <- group.hf.dataset.matched %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.hf.dataset.matched$postdrug_hf_censtime_yrs,
@@ -10663,50 +10699,50 @@ if (class(try(
       as.data.frame() %>%
       drop_na() %>%
       mutate(intervals = relevel(intervals, ref = levels(group.hf.dataset.matched$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_hf_hf_psm_1_1_adjusted_overall_baye[[i]] <- brms::brm(formula = formula(formula_baye),
                                                                  data = dataset.now,
                                                                  family = "cox",
                                                                  chains = 2,
                                                                  iter = 10000)
-
+    
     predictions_hf_hf_stan_psm_1_1_adjusted_overall_baye <- rbind(predictions_hf_hf_stan_psm_1_1_adjusted_overall_baye, cbind(mean = fixef(models_hf_hf_psm_1_1_adjusted_overall_baye[[i]])[2,1],
                                                                                                                               lci = fixef(models_hf_hf_psm_1_1_adjusted_overall_baye[[i]])[2,3],
                                                                                                                               uci = fixef(models_hf_hf_psm_1_1_adjusted_overall_baye[[i]])[2,4],
                                                                                                                               intervals = levels(group.hf.dataset.matched$intervals)[i]))
-
+    
   }
-
+  
   saveRDS(models_hf_hf_psm_1_1_adjusted_overall_baye, paste0(output_path, "/additional_outcomes/models_hf_hf_psm_1_1_adjusted_overall_baye.rds"))
-
+  
   predictions_hf_hf_stan_psm_1_1_adjusted_overall_baye <- predictions_hf_hf_stan_psm_1_1_adjusted_overall_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_hf_hf_stan_psm_1_1_adjusted_overall_baye, paste0(output_path, "/additional_outcomes/predictions_hf_hf_stan_psm_1_1_adjusted_overall_baye.rds"))
-
+  
 }
 # Full population (interval as a continuous, without subgrouping individuals)
 if (class(try(
-
+  
   # predictions for the CVD outcomes in the population with no CVD/HF/CKD
   predictions_hf_hf_stan_psm_1_1_adjusted_full_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_hf_hf_stan_psm_1_1_adjusted_full_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.hf.dataset.matched[,breakdown_adjust], is.factor)
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.hf.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_hf_hf_stan_psm_1_1_adjusted_full_baye <- vector()
-
+  
   dataset.now <- group.hf.dataset.matched %>%
     select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
     cbind(time = group.hf.dataset.matched$postdrug_hf_censtime_yrs,
@@ -10725,28 +10761,28 @@ if (class(try(
           prealt_2 = rcs(group.hf.dataset.matched$prealt, 3)[,2]) %>%
     as.data.frame() %>%
     drop_na()
-
+  
   checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-  formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+  
+  formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+  
   models_hf_hf_psm_1_1_adjusted_full_baye <- brms::brm(formula = formula(formula_baye),
                                                        data = dataset.now,
                                                        family = "cox",
                                                        chains = 2,
                                                        iter = 10000)
-
+  
   predictions_hf_hf_stan_psm_1_1_adjusted_full_baye <- rbind(predictions_hf_hf_stan_psm_1_1_adjusted_full_baye, cbind(mean = fixef(models_hf_hf_psm_1_1_adjusted_full_baye)[2,1],
                                                                                                                       lci = fixef(models_hf_hf_psm_1_1_adjusted_full_baye)[2,3],
                                                                                                                       uci = fixef(models_hf_hf_psm_1_1_adjusted_full_baye)[2,4]))
-
+  
   saveRDS(models_hf_hf_psm_1_1_adjusted_full_baye, paste0(output_path, "additional_outcomes/models_hf_hf_psm_1_1_adjusted_full_baye.rds"))
-
+  
   predictions_hf_hf_stan_psm_1_1_adjusted_full_baye <- predictions_hf_hf_stan_psm_1_1_adjusted_full_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_hf_hf_stan_psm_1_1_adjusted_full_baye, paste0(output_path, "/additional_outcomes/predictions_hf_hf_stan_psm_1_1_adjusted_full_baye.rds"))
-
+  
 }
 
 
@@ -10754,29 +10790,29 @@ if (class(try(
 
 #--- Cox
 if (class(try(
-
+  
   # predictions for the CVD outcomes in population with no CVD/HF/CKD strata sex and intervals
   predictions_hf_hf_stan_adjusted_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_hf_hf_stan_adjusted_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.hf.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_hf_hf_stan_adjusted_baye <- vector()
-
-
+  
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.hf.dataset[,breakdown_adjust], is.factor)
-
+  
   models_hf_hf_adjusted_male_baye <- vector("list", quantiles)
-
+  
   models_hf_hf_adjusted_female_baye <- vector("list", quantiles)
-
+  
   for (i in mnumber) {
-
+    
     dataset.now <- group.hf.dataset %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.hf.dataset$postdrug_hf_censtime_yrs,
@@ -10797,23 +10833,23 @@ if (class(try(
       drop_na() %>%
       mutate(sex = relevel(sex, ref = "Male"),
              intervals = relevel(intervals, ref = levels(group.hf.dataset$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_hf_hf_adjusted_male_baye[[i]] <- brms::brm(formula = formula(formula_baye),
                                                       data = dataset.now,
                                                       family = "cox",
                                                       chains = 2,
                                                       iter = 10000)
-
+    
     predictions_hf_hf_stan_adjusted_baye <- rbind(predictions_hf_hf_stan_adjusted_baye, cbind(mean = fixef(models_hf_hf_adjusted_male_baye[[i]])[2,1],
                                                                                               lci = fixef(models_hf_hf_adjusted_male_baye[[i]])[2,3],
                                                                                               uci = fixef(models_hf_hf_adjusted_male_baye[[i]])[2,4],
                                                                                               sex = "Male",
                                                                                               intervals = levels(group.hf.dataset$intervals)[i]))
-
+    
     dataset.now <- group.hf.dataset %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.hf.dataset$postdrug_hf_censtime_yrs,
@@ -10834,57 +10870,57 @@ if (class(try(
       drop_na() %>%
       mutate(sex = relevel(sex, ref = "Female"),
              intervals = relevel(intervals, ref = levels(group.hf.dataset$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_hf_hf_adjusted_female_baye[[i]] <- brms::brm(formula = formula(formula_baye),
                                                         data = dataset.now,
                                                         family = "cox",
                                                         chains = 2,
                                                         iter = 10000)
-
+    
     predictions_hf_hf_stan_adjusted_baye <- rbind(predictions_hf_hf_stan_adjusted_baye, cbind(mean = fixef(models_hf_hf_adjusted_female_baye[[i]])[2,1],
                                                                                               lci = fixef(models_hf_hf_adjusted_female_baye[[i]])[2,3],
                                                                                               uci = fixef(models_hf_hf_adjusted_female_baye[[i]])[2,4],
                                                                                               sex = "Female",
                                                                                               intervals = levels(group.hf.dataset$intervals)[i]))
-
+    
   }
-
+  
   saveRDS(models_hf_hf_adjusted_male_baye, paste0(output_path, "/additional_outcomes/models_hf_hf_adjusted_male_baye.rds"))
-
+  
   saveRDS(models_hf_hf_adjusted_female_baye, paste0(output_path, "/additional_outcomes/models_hf_hf_adjusted_female_baye.rds"))
-
+  
   predictions_hf_hf_stan_adjusted_baye <- predictions_hf_hf_stan_adjusted_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_hf_hf_stan_adjusted_baye, paste0(output_path, "/additional_outcomes/predictions_hf_hf_stan_adjusted_baye.rds"))
-
+  
 }
 
 if (class(try(
-
+  
   # predictions for the CVD outcomes in the population with no CVD/HF/CKD
   predictions_hf_hf_stan_adjusted_overall_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_hf_hf_stan_adjusted_overall_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.hf.dataset[,breakdown_adjust], is.factor)
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.hf.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_hf_hf_stan_adjusted_overall_baye <- vector()
-
+  
   models_hf_hf_adjusted_overall_baye <- vector("list", quantiles)
-
+  
   for (i in mnumber) {
-
+    
     dataset.now <- group.hf.dataset %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.hf.dataset$postdrug_hf_censtime_yrs,
@@ -10904,50 +10940,50 @@ if (class(try(
       as.data.frame() %>%
       drop_na() %>%
       mutate(intervals = relevel(intervals, ref = levels(group.hf.dataset$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_hf_hf_adjusted_overall_baye[[i]] <- brms::brm(formula = formula(formula_baye),
                                                          data = dataset.now,
                                                          family = "cox",
                                                          chains = 2,
                                                          iter = 10000)
-
+    
     predictions_hf_hf_stan_adjusted_overall_baye <- rbind(predictions_hf_hf_stan_adjusted_overall_baye, cbind(mean = fixef(models_hf_hf_adjusted_overall_baye[[i]])[2,1],
                                                                                                               lci = fixef(models_hf_hf_adjusted_overall_baye[[i]])[2,3],
                                                                                                               uci = fixef(models_hf_hf_adjusted_overall_baye[[i]])[2,4],
                                                                                                               intervals = levels(group.hf.dataset$intervals)[i]))
-
+    
   }
-
+  
   saveRDS(models_hf_hf_adjusted_overall_baye, paste0(output_path, "/additional_outcomes/models_hf_hf_adjusted_overall_baye.rds"))
-
+  
   predictions_hf_hf_stan_adjusted_overall_baye <- predictions_hf_hf_stan_adjusted_overall_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_hf_hf_stan_adjusted_overall_baye, paste0(output_path, "/additional_outcomes/predictions_hf_hf_stan_adjusted_overall_baye.rds"))
-
+  
 }
 # Full population (interval as a continuous, without subgrouping individuals)
 if (class(try(
-
+  
   # predictions for the CVD outcomes in the population with no CVD/HF/CKD
   predictions_hf_hf_stan_adjusted_full_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_hf_hf_stan_adjusted_full_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.hf.dataset[,breakdown_adjust], is.factor)
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.hf.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_hf_hf_stan_adjusted_full_baye <- vector()
-
+  
   dataset.now <- group.hf.dataset %>%
     select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
     cbind(time = group.hf.dataset$postdrug_hf_censtime_yrs,
@@ -10966,28 +11002,28 @@ if (class(try(
           prealt_2 = rcs(group.hf.dataset$prealt, 3)[,2]) %>%
     as.data.frame() %>%
     drop_na()
-
+  
   checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-  formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+  
+  formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+  
   models_hf_hf_adjusted_full_baye <- brms::brm(formula = formula(formula_baye),
                                                data = dataset.now,
                                                family = "cox",
                                                chains = 2,
                                                iter = 10000)
-
+  
   predictions_hf_hf_stan_adjusted_full_baye <- rbind(predictions_hf_hf_stan_adjusted_full_baye, cbind(mean = fixef(models_hf_hf_adjusted_full_baye)[2,1],
                                                                                                       lci = fixef(models_hf_hf_adjusted_full_baye)[2,3],
                                                                                                       uci = fixef(models_hf_hf_adjusted_full_baye)[2,4]))
-
+  
   saveRDS(models_hf_hf_adjusted_full_baye, paste0(output_path, "/additional_outcomes/models_hf_hf_adjusted_full_baye.rds"))
-
+  
   predictions_hf_hf_stan_adjusted_full_baye <- predictions_hf_hf_stan_adjusted_full_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_hf_hf_stan_adjusted_full_baye, paste0(output_path, "/additional_outcomes/predictions_hf_hf_stan_adjusted_full_baye.rds"))
-
+  
 }
 
 
@@ -11437,196 +11473,196 @@ group.micro_comp.dataset.matched <- group.micro_comp.dataset %>%
 ## Propensity score matching
 
 if (class(try(
-
+  
   # predictions for the CVD outcomes in population with no CVD/HF/CKD strata sex and intervals
   predictions_micro_comp_micro_comp_stan_psm_1_1_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_micro_comp_micro_comp_stan_psm_1_1_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.micro_comp.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_micro_comp_micro_comp_stan_psm_1_1_baye <- vector()
-
-  formula_baye <- "time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2"
-
+  
+  formula_baye <- "time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2"
+  
   models_micro_comp_micro_comp_psm_1_1_male_baye <- vector("list", quantiles)
-
+  
   models_micro_comp_micro_comp_psm_1_1_female_baye <- vector("list", quantiles)
-
+  
   for(i in mnumber) {
-
+    
     models_micro_comp_micro_comp_psm_1_1_male_baye[[i]] <- brms::brm(formula = formula(formula_baye),
-                                                        data = group.micro_comp.dataset.matched %>%
-                                                          select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
-                                                          cbind(time = group.micro_comp.dataset.matched$postdrug_micro_comp_censtime_yrs,
-                                                                censored = group.micro_comp.dataset.matched$postdrug_micro_comp_censvar,
-                                                                qrisk2_10yr_score_1 = rcs(group.micro_comp.dataset.matched$qrisk2_10yr_score, 3)[,1],
-                                                                qrisk2_10yr_score_2 = rcs(group.micro_comp.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
-                                                          as.data.frame() %>%
-                                                          drop_na() %>%
-                                                          mutate(sex = relevel(sex, ref = "Male"),
-                                                                 intervals = relevel(intervals, ref = levels(group.micro_comp.dataset.matched$intervals)[i])),
-                                                        family = "cox",
-                                                        chains = 2)
-
+                                                                     data = group.micro_comp.dataset.matched %>%
+                                                                       select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
+                                                                       cbind(time = group.micro_comp.dataset.matched$postdrug_micro_comp_censtime_yrs,
+                                                                             censored = group.micro_comp.dataset.matched$postdrug_micro_comp_censvar,
+                                                                             qrisk2_10yr_score_1 = rcs(group.micro_comp.dataset.matched$qrisk2_10yr_score, 3)[,1],
+                                                                             qrisk2_10yr_score_2 = rcs(group.micro_comp.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
+                                                                       as.data.frame() %>%
+                                                                       drop_na() %>%
+                                                                       mutate(sex = relevel(sex, ref = "Male"),
+                                                                              intervals = relevel(intervals, ref = levels(group.micro_comp.dataset.matched$intervals)[i])),
+                                                                     family = "cox",
+                                                                     chains = 2)
+    
     predictions_micro_comp_micro_comp_stan_psm_1_1_baye <- rbind(predictions_micro_comp_micro_comp_stan_psm_1_1_baye, cbind(mean = fixef(models_micro_comp_micro_comp_psm_1_1_male_baye[[i]])[2,1],
-                                                                                                  lci = fixef(models_micro_comp_micro_comp_psm_1_1_male_baye[[i]])[2,3],
-                                                                                                  uci = fixef(models_micro_comp_micro_comp_psm_1_1_male_baye[[i]])[2,4],
-                                                                                                  sex = "Male",
-                                                                                                  intervals = levels(group.micro_comp.dataset.matched$intervals)[i]))
-
+                                                                                                                            lci = fixef(models_micro_comp_micro_comp_psm_1_1_male_baye[[i]])[2,3],
+                                                                                                                            uci = fixef(models_micro_comp_micro_comp_psm_1_1_male_baye[[i]])[2,4],
+                                                                                                                            sex = "Male",
+                                                                                                                            intervals = levels(group.micro_comp.dataset.matched$intervals)[i]))
+    
     models_micro_comp_micro_comp_psm_1_1_female_baye[[i]] <- brms::brm(formula = formula(formula_baye),
-                                                          data = group.micro_comp.dataset.matched %>%
-                                                            select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
-                                                            cbind(time = group.micro_comp.dataset.matched$postdrug_micro_comp_censtime_yrs,
-                                                                  censored = group.micro_comp.dataset.matched$postdrug_micro_comp_censvar,
-                                                                  qrisk2_10yr_score_1 = rcs(group.micro_comp.dataset.matched$qrisk2_10yr_score, 3)[,1],
-                                                                  qrisk2_10yr_score_2 = rcs(group.micro_comp.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
-                                                            as.data.frame() %>%
-                                                            drop_na() %>%
-                                                            mutate(sex = relevel(sex, ref = "Female"),
-                                                                   intervals = relevel(intervals, ref = levels(group.micro_comp.dataset.matched$intervals)[i])),
-                                                          family = "cox",
-                                                          chains = 2)
-
+                                                                       data = group.micro_comp.dataset.matched %>%
+                                                                         select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
+                                                                         cbind(time = group.micro_comp.dataset.matched$postdrug_micro_comp_censtime_yrs,
+                                                                               censored = group.micro_comp.dataset.matched$postdrug_micro_comp_censvar,
+                                                                               qrisk2_10yr_score_1 = rcs(group.micro_comp.dataset.matched$qrisk2_10yr_score, 3)[,1],
+                                                                               qrisk2_10yr_score_2 = rcs(group.micro_comp.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
+                                                                         as.data.frame() %>%
+                                                                         drop_na() %>%
+                                                                         mutate(sex = relevel(sex, ref = "Female"),
+                                                                                intervals = relevel(intervals, ref = levels(group.micro_comp.dataset.matched$intervals)[i])),
+                                                                       family = "cox",
+                                                                       chains = 2)
+    
     predictions_micro_comp_micro_comp_stan_psm_1_1_baye <- rbind(predictions_micro_comp_micro_comp_stan_psm_1_1_baye, cbind(mean = fixef(models_micro_comp_micro_comp_psm_1_1_female_baye[[i]])[2,1],
-                                                                                                  lci = fixef(models_micro_comp_micro_comp_psm_1_1_female_baye[[i]])[2,3],
-                                                                                                  uci = fixef(models_micro_comp_micro_comp_psm_1_1_female_baye[[i]])[2,4],
-                                                                                                  sex = "Female",
-                                                                                                  intervals = levels(group.micro_comp.dataset.matched$intervals)[i]))
-
+                                                                                                                            lci = fixef(models_micro_comp_micro_comp_psm_1_1_female_baye[[i]])[2,3],
+                                                                                                                            uci = fixef(models_micro_comp_micro_comp_psm_1_1_female_baye[[i]])[2,4],
+                                                                                                                            sex = "Female",
+                                                                                                                            intervals = levels(group.micro_comp.dataset.matched$intervals)[i]))
+    
   }
-
+  
   saveRDS(models_micro_comp_micro_comp_psm_1_1_male_baye, paste0(output_path, "/additional_outcomes/models_micro_comp_micro_comp_psm_1_1_male_baye.rds"))
-
+  
   saveRDS(models_micro_comp_micro_comp_psm_1_1_female_baye, paste0(output_path, "/additional_outcomes/models_micro_comp_micro_comp_psm_1_1_female_baye.rds"))
-
+  
   predictions_micro_comp_micro_comp_stan_psm_1_1_baye <- predictions_micro_comp_micro_comp_stan_psm_1_1_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_micro_comp_micro_comp_stan_psm_1_1_baye, paste0(output_path, "/additional_outcomes/predictions_micro_comp_micro_comp_stan_psm_1_1_baye.rds"))
-
+  
 }
 
 # No sex strata
 if (class(try(
-
+  
   # predictions for the CVD outcomes in the population with no CVD/HF/CKD
   predictions_micro_comp_micro_comp_stan_psm_1_1_overall_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_micro_comp_micro_comp_stan_psm_1_1_overall_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
-  formula_baye <- "time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2"
-
+  
+  formula_baye <- "time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2"
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.micro_comp.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_micro_comp_micro_comp_stan_psm_1_1_overall_baye <- vector()
-
+  
   models_micro_comp_micro_comp_psm_1_1_overall_baye <- vector("list", quantiles)
-
+  
   for (i in mnumber) {
-
+    
     models_micro_comp_micro_comp_psm_1_1_overall_baye[[i]] <- brms::brm(formula = formula(formula_baye),
-                                                           data = group.micro_comp.dataset.matched %>%
-                                                             select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
-                                                             cbind(time = group.micro_comp.dataset.matched$postdrug_micro_comp_censtime_yrs,
-                                                                   censored = group.micro_comp.dataset.matched$postdrug_micro_comp_censvar,
-                                                                   qrisk2_10yr_score_1 = rcs(group.micro_comp.dataset.matched$qrisk2_10yr_score, 3)[,1],
-                                                                   qrisk2_10yr_score_2 = rcs(group.micro_comp.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
-                                                             as.data.frame() %>%
-                                                             drop_na() %>%
-                                                             mutate(intervals = relevel(intervals, ref = levels(group.micro_comp.dataset.matched$intervals)[i])),
-                                                           family = "cox",
-                                                           chains = 2)
-
+                                                                        data = group.micro_comp.dataset.matched %>%
+                                                                          select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
+                                                                          cbind(time = group.micro_comp.dataset.matched$postdrug_micro_comp_censtime_yrs,
+                                                                                censored = group.micro_comp.dataset.matched$postdrug_micro_comp_censvar,
+                                                                                qrisk2_10yr_score_1 = rcs(group.micro_comp.dataset.matched$qrisk2_10yr_score, 3)[,1],
+                                                                                qrisk2_10yr_score_2 = rcs(group.micro_comp.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
+                                                                          as.data.frame() %>%
+                                                                          drop_na() %>%
+                                                                          mutate(intervals = relevel(intervals, ref = levels(group.micro_comp.dataset.matched$intervals)[i])),
+                                                                        family = "cox",
+                                                                        chains = 2)
+    
     predictions_micro_comp_micro_comp_stan_psm_1_1_overall_baye <- rbind(predictions_micro_comp_micro_comp_stan_psm_1_1_overall_baye, cbind(mean = fixef(models_micro_comp_micro_comp_psm_1_1_overall_baye[[i]])[2,1],
-                                                                                                                  lci = fixef(models_micro_comp_micro_comp_psm_1_1_overall_baye[[i]])[2,3],
-                                                                                                                  uci = fixef(models_micro_comp_micro_comp_psm_1_1_overall_baye[[i]])[2,4],
-                                                                                                                  intervals = levels(group.micro_comp.dataset.matched$intervals)[i]))
-
+                                                                                                                                            lci = fixef(models_micro_comp_micro_comp_psm_1_1_overall_baye[[i]])[2,3],
+                                                                                                                                            uci = fixef(models_micro_comp_micro_comp_psm_1_1_overall_baye[[i]])[2,4],
+                                                                                                                                            intervals = levels(group.micro_comp.dataset.matched$intervals)[i]))
+    
   }
-
+  
   saveRDS(models_micro_comp_micro_comp_psm_1_1_overall_baye, paste0(output_path, "/additional_outcomes/models_micro_comp_micro_comp_psm_1_1_overall_baye.rds"))
-
+  
   predictions_micro_comp_micro_comp_stan_psm_1_1_overall_baye <- predictions_micro_comp_micro_comp_stan_psm_1_1_overall_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_micro_comp_micro_comp_stan_psm_1_1_overall_baye, paste0(output_path, "/additional_outcomes/predictions_micro_comp_micro_comp_stan_psm_1_1_overall_baye.rds"))
-
-
+  
+  
 }
 # Full population (interval as a continuous, without subgrouping individuals)
 if (class(try(
-
+  
   # predictions for the CVD outcomes in the population with no CVD/HF/CKD
   predictions_micro_comp_micro_comp_stan_psm_1_1_full_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_micro_comp_micro_comp_stan_psm_1_1_full_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
-  formula_baye <- "time | cens(censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2"
-
+  
+  formula_baye <- "time | cens(1 - censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2"
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.micro_comp.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_micro_comp_micro_comp_stan_psm_1_1_full_baye <- vector()
-
+  
   models_micro_comp_micro_comp_psm_1_1_full_baye <- brms::brm(formula = formula(formula_baye),
-                                                 data = group.micro_comp.dataset.matched %>%
-                                                   select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
-                                                   cbind(time = group.micro_comp.dataset.matched$postdrug_micro_comp_censtime_yrs,
-                                                         censored = group.micro_comp.dataset.matched$postdrug_micro_comp_censvar,
-                                                         qrisk2_10yr_score_1 = rcs(group.micro_comp.dataset.matched$qrisk2_10yr_score, 3)[,1],
-                                                         qrisk2_10yr_score_2 = rcs(group.micro_comp.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
-                                                   as.data.frame() %>%
-                                                   drop_na(),
-                                                 family = "cox",
-                                                 chains = 2)
-
+                                                              data = group.micro_comp.dataset.matched %>%
+                                                                select(drugclass, intervals, sex, qrisk2_10yr_score) %>%
+                                                                cbind(time = group.micro_comp.dataset.matched$postdrug_micro_comp_censtime_yrs,
+                                                                      censored = group.micro_comp.dataset.matched$postdrug_micro_comp_censvar,
+                                                                      qrisk2_10yr_score_1 = rcs(group.micro_comp.dataset.matched$qrisk2_10yr_score, 3)[,1],
+                                                                      qrisk2_10yr_score_2 = rcs(group.micro_comp.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
+                                                                as.data.frame() %>%
+                                                                drop_na(),
+                                                              family = "cox",
+                                                              chains = 2)
+  
   predictions_micro_comp_micro_comp_stan_psm_1_1_full_baye <- rbind(predictions_micro_comp_micro_comp_stan_psm_1_1_full_baye, cbind(mean = fixef(models_micro_comp_micro_comp_psm_1_1_full_baye)[2,1],
-                                                                                                          lci = fixef(models_micro_comp_micro_comp_psm_1_1_full_baye)[2,3],
-                                                                                                          uci = fixef(models_micro_comp_micro_comp_psm_1_1_full_baye)[2,4]))
-
+                                                                                                                                    lci = fixef(models_micro_comp_micro_comp_psm_1_1_full_baye)[2,3],
+                                                                                                                                    uci = fixef(models_micro_comp_micro_comp_psm_1_1_full_baye)[2,4]))
+  
   saveRDS(models_micro_comp_micro_comp_psm_1_1_full_baye, paste0(output_path, "/additional_outcomes/models_micro_comp_micro_comp_psm_1_1_full_baye.rds"))
-
+  
   predictions_micro_comp_micro_comp_stan_psm_1_1_full_baye <- predictions_micro_comp_micro_comp_stan_psm_1_1_full_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_micro_comp_micro_comp_stan_psm_1_1_full_baye, paste0(output_path, "/additional_outcomes/predictions_micro_comp_micro_comp_stan_psm_1_1_full_baye.rds"))
-
+  
 }
 
 
 ## Propensity score matching + adjusted
 
 if (class(try(
-
+  
   # predictions for the CVD outcomes in population with no CVD/HF/CKD strata sex and intervals
   predictions_micro_comp_micro_comp_stan_psm_1_1_adjusted_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_micro_comp_micro_comp_stan_psm_1_1_adjusted_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.micro_comp.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_micro_comp_micro_comp_stan_psm_1_1_adjusted_baye <- vector()
-
-
+  
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.micro_comp.dataset.matched[,breakdown_adjust], is.factor)
-
+  
   models_micro_comp_micro_comp_psm_1_1_adjusted_male_baye <- vector("list", quantiles)
-
+  
   models_micro_comp_micro_comp_psm_1_1_adjusted_female_baye <- vector("list", quantiles)
-
+  
   for (i in mnumber) {
-
+    
     dataset.now <- group.micro_comp.dataset.matched %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.micro_comp.dataset.matched$postdrug_micro_comp_censtime_yrs,
@@ -11647,23 +11683,23 @@ if (class(try(
       drop_na() %>%
       mutate(sex = relevel(sex, ref = "Male"),
              intervals = relevel(intervals, ref = levels(group.micro_comp.dataset.matched$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_micro_comp_micro_comp_psm_1_1_adjusted_male_baye[[i]] <- brms::brm(formula = formula(formula_baye),
-                                                              data = dataset.now,
-                                                              family = "cox",
-                                                              chains = 2,
-                                                              iter = 10000)
-
+                                                                              data = dataset.now,
+                                                                              family = "cox",
+                                                                              chains = 2,
+                                                                              iter = 10000)
+    
     predictions_micro_comp_micro_comp_stan_psm_1_1_adjusted_baye <- rbind(predictions_micro_comp_micro_comp_stan_psm_1_1_adjusted_baye, cbind(mean = fixef(models_micro_comp_micro_comp_psm_1_1_adjusted_male_baye[[i]])[2,1],
-                                                                                                              lci = fixef(models_micro_comp_micro_comp_psm_1_1_adjusted_male_baye[[i]])[2,3],
-                                                                                                              uci = fixef(models_micro_comp_micro_comp_psm_1_1_adjusted_male_baye[[i]])[2,4],
-                                                                                                              sex = "Male",
-                                                                                                              intervals = levels(group.micro_comp.dataset.matched$intervals)[i]))
-
+                                                                                                                                              lci = fixef(models_micro_comp_micro_comp_psm_1_1_adjusted_male_baye[[i]])[2,3],
+                                                                                                                                              uci = fixef(models_micro_comp_micro_comp_psm_1_1_adjusted_male_baye[[i]])[2,4],
+                                                                                                                                              sex = "Male",
+                                                                                                                                              intervals = levels(group.micro_comp.dataset.matched$intervals)[i]))
+    
     dataset.now <- group.micro_comp.dataset.matched %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.micro_comp.dataset.matched$postdrug_micro_comp_censtime_yrs,
@@ -11684,57 +11720,57 @@ if (class(try(
       drop_na() %>%
       mutate(sex = relevel(sex, ref = "Female"),
              intervals = relevel(intervals, ref = levels(group.micro_comp.dataset.matched$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_micro_comp_micro_comp_psm_1_1_adjusted_female_baye[[i]] <-  brms::brm(formula = formula(formula_baye),
-                                                                 data = dataset.now,
-                                                                 family = "cox",
-                                                                 chains = 2,
-                                                                 iter = 10000)
-
+                                                                                 data = dataset.now,
+                                                                                 family = "cox",
+                                                                                 chains = 2,
+                                                                                 iter = 10000)
+    
     predictions_micro_comp_micro_comp_stan_psm_1_1_adjusted_baye <- rbind(predictions_micro_comp_micro_comp_stan_psm_1_1_adjusted_baye, cbind(mean = fixef(models_micro_comp_micro_comp_psm_1_1_adjusted_female_baye[[i]])[2,1],
-                                                                                                              lci = fixef(models_micro_comp_micro_comp_psm_1_1_adjusted_female_baye[[i]])[2,3],
-                                                                                                              uci = fixef(models_micro_comp_micro_comp_psm_1_1_adjusted_female_baye[[i]])[2,4],
-                                                                                                              sex = "Female",
-                                                                                                              intervals = levels(group.micro_comp.dataset.matched$intervals)[i]))
-
+                                                                                                                                              lci = fixef(models_micro_comp_micro_comp_psm_1_1_adjusted_female_baye[[i]])[2,3],
+                                                                                                                                              uci = fixef(models_micro_comp_micro_comp_psm_1_1_adjusted_female_baye[[i]])[2,4],
+                                                                                                                                              sex = "Female",
+                                                                                                                                              intervals = levels(group.micro_comp.dataset.matched$intervals)[i]))
+    
   }
-
+  
   saveRDS(models_micro_comp_micro_comp_psm_1_1_adjusted_male_baye, paste0(output_path, "/additional_outcomes/models_micro_comp_micro_comp_psm_1_1_adjusted_male_baye.rds"))
-
+  
   saveRDS(models_micro_comp_micro_comp_psm_1_1_adjusted_female_baye, paste0(output_path, "/additional_outcomes/models_micro_comp_micro_comp_psm_1_1_adjusted_female_baye.rds"))
-
+  
   predictions_micro_comp_micro_comp_stan_psm_1_1_adjusted_baye <- predictions_micro_comp_micro_comp_stan_psm_1_1_adjusted_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_micro_comp_micro_comp_stan_psm_1_1_adjusted_baye, paste0(output_path, "/additional_outcomes/predictions_micro_comp_micro_comp_stan_psm_1_1_adjusted_baye.rds"))
-
+  
 }
 
 if (class(try(
-
+  
   # predictions for the CVD outcomes in the population with no CVD/HF/CKD
   predictions_micro_comp_micro_comp_stan_psm_1_1_adjusted_overall_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_micro_comp_micro_comp_stan_psm_1_1_adjusted_overall_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.micro_comp.dataset.matched[,breakdown_adjust], is.factor)
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.micro_comp.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_micro_comp_micro_comp_stan_psm_1_1_adjusted_overall_baye <- vector()
-
+  
   models_micro_comp_micro_comp_psm_1_1_adjusted_overall_baye <- vector("list", quantiles)
-
+  
   for (i in mnumber) {
-
+    
     dataset.now <- group.micro_comp.dataset.matched %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.micro_comp.dataset.matched$postdrug_micro_comp_censtime_yrs,
@@ -11754,50 +11790,50 @@ if (class(try(
       as.data.frame() %>%
       drop_na() %>%
       mutate(intervals = relevel(intervals, ref = levels(group.micro_comp.dataset.matched$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_micro_comp_micro_comp_psm_1_1_adjusted_overall_baye[[i]] <- brms::brm(formula = formula(formula_baye),
-                                                                 data = dataset.now,
-                                                                 family = "cox",
-                                                                 chains = 2,
-                                                                 iter = 10000)
-
+                                                                                 data = dataset.now,
+                                                                                 family = "cox",
+                                                                                 chains = 2,
+                                                                                 iter = 10000)
+    
     predictions_micro_comp_micro_comp_stan_psm_1_1_adjusted_overall_baye <- rbind(predictions_micro_comp_micro_comp_stan_psm_1_1_adjusted_overall_baye, cbind(mean = fixef(models_micro_comp_micro_comp_psm_1_1_adjusted_overall_baye[[i]])[2,1],
-                                                                                                                              lci = fixef(models_micro_comp_micro_comp_psm_1_1_adjusted_overall_baye[[i]])[2,3],
-                                                                                                                              uci = fixef(models_micro_comp_micro_comp_psm_1_1_adjusted_overall_baye[[i]])[2,4],
-                                                                                                                              intervals = levels(group.micro_comp.dataset.matched$intervals)[i]))
-
+                                                                                                                                                              lci = fixef(models_micro_comp_micro_comp_psm_1_1_adjusted_overall_baye[[i]])[2,3],
+                                                                                                                                                              uci = fixef(models_micro_comp_micro_comp_psm_1_1_adjusted_overall_baye[[i]])[2,4],
+                                                                                                                                                              intervals = levels(group.micro_comp.dataset.matched$intervals)[i]))
+    
   }
-
+  
   saveRDS(models_micro_comp_micro_comp_psm_1_1_adjusted_overall_baye, paste0(output_path, "/additional_outcomes/models_micro_comp_micro_comp_psm_1_1_adjusted_overall_baye.rds"))
-
+  
   predictions_micro_comp_micro_comp_stan_psm_1_1_adjusted_overall_baye <- predictions_micro_comp_micro_comp_stan_psm_1_1_adjusted_overall_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_micro_comp_micro_comp_stan_psm_1_1_adjusted_overall_baye, paste0(output_path, "/additional_outcomes/predictions_micro_comp_micro_comp_stan_psm_1_1_adjusted_overall_baye.rds"))
-
+  
 }
 # Full population (interval as a continuous, without subgrouping individuals)
 if (class(try(
-
+  
   # predictions for the CVD outcomes in the population with no CVD/HF/CKD
   predictions_micro_comp_micro_comp_stan_psm_1_1_adjusted_full_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_micro_comp_micro_comp_stan_psm_1_1_adjusted_full_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.micro_comp.dataset.matched[,breakdown_adjust], is.factor)
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.micro_comp.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_micro_comp_micro_comp_stan_psm_1_1_adjusted_full_baye <- vector()
-
+  
   dataset.now <- group.micro_comp.dataset.matched %>%
     select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
     cbind(time = group.micro_comp.dataset.matched$postdrug_micro_comp_censtime_yrs,
@@ -11816,28 +11852,28 @@ if (class(try(
           prealt_2 = rcs(group.micro_comp.dataset.matched$prealt, 3)[,2]) %>%
     as.data.frame() %>%
     drop_na()
-
+  
   checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-  formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+  
+  formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+  
   models_micro_comp_micro_comp_psm_1_1_adjusted_full_baye <- brms::brm(formula = formula(formula_baye),
-                                                       data = dataset.now,
-                                                       family = "cox",
-                                                       chains = 2,
-                                                       iter = 10000)
-
+                                                                       data = dataset.now,
+                                                                       family = "cox",
+                                                                       chains = 2,
+                                                                       iter = 10000)
+  
   predictions_micro_comp_micro_comp_stan_psm_1_1_adjusted_full_baye <- rbind(predictions_micro_comp_micro_comp_stan_psm_1_1_adjusted_full_baye, cbind(mean = fixef(models_micro_comp_micro_comp_psm_1_1_adjusted_full_baye)[2,1],
-                                                                                                                      lci = fixef(models_micro_comp_micro_comp_psm_1_1_adjusted_full_baye)[2,3],
-                                                                                                                      uci = fixef(models_micro_comp_micro_comp_psm_1_1_adjusted_full_baye)[2,4]))
-
+                                                                                                                                                      lci = fixef(models_micro_comp_micro_comp_psm_1_1_adjusted_full_baye)[2,3],
+                                                                                                                                                      uci = fixef(models_micro_comp_micro_comp_psm_1_1_adjusted_full_baye)[2,4]))
+  
   saveRDS(models_micro_comp_micro_comp_psm_1_1_adjusted_full_baye, paste0(output_path, "additional_outcomes/models_micro_comp_micro_comp_psm_1_1_adjusted_full_baye.rds"))
-
+  
   predictions_micro_comp_micro_comp_stan_psm_1_1_adjusted_full_baye <- predictions_micro_comp_micro_comp_stan_psm_1_1_adjusted_full_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_micro_comp_micro_comp_stan_psm_1_1_adjusted_full_baye, paste0(output_path, "/additional_outcomes/predictions_micro_comp_micro_comp_stan_psm_1_1_adjusted_full_baye.rds"))
-
+  
 }
 
 
@@ -11845,29 +11881,29 @@ if (class(try(
 
 #--- Cox
 if (class(try(
-
+  
   # predictions for the CVD outcomes in population with no CVD/HF/CKD strata sex and intervals
   predictions_micro_comp_micro_comp_stan_adjusted_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_micro_comp_micro_comp_stan_adjusted_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.micro_comp.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_micro_comp_micro_comp_stan_adjusted_baye <- vector()
-
-
+  
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.micro_comp.dataset[,breakdown_adjust], is.factor)
-
+  
   models_micro_comp_micro_comp_adjusted_male_baye <- vector("list", quantiles)
-
+  
   models_micro_comp_micro_comp_adjusted_female_baye <- vector("list", quantiles)
-
+  
   for (i in mnumber) {
-
+    
     dataset.now <- group.micro_comp.dataset %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.micro_comp.dataset$postdrug_micro_comp_censtime_yrs,
@@ -11888,23 +11924,23 @@ if (class(try(
       drop_na() %>%
       mutate(sex = relevel(sex, ref = "Male"),
              intervals = relevel(intervals, ref = levels(group.micro_comp.dataset$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_micro_comp_micro_comp_adjusted_male_baye[[i]] <- brms::brm(formula = formula(formula_baye),
-                                                      data = dataset.now,
-                                                      family = "cox",
-                                                      chains = 2,
-                                                      iter = 10000)
-
+                                                                      data = dataset.now,
+                                                                      family = "cox",
+                                                                      chains = 2,
+                                                                      iter = 10000)
+    
     predictions_micro_comp_micro_comp_stan_adjusted_baye <- rbind(predictions_micro_comp_micro_comp_stan_adjusted_baye, cbind(mean = fixef(models_micro_comp_micro_comp_adjusted_male_baye[[i]])[2,1],
-                                                                                              lci = fixef(models_micro_comp_micro_comp_adjusted_male_baye[[i]])[2,3],
-                                                                                              uci = fixef(models_micro_comp_micro_comp_adjusted_male_baye[[i]])[2,4],
-                                                                                              sex = "Male",
-                                                                                              intervals = levels(group.micro_comp.dataset$intervals)[i]))
-
+                                                                                                                              lci = fixef(models_micro_comp_micro_comp_adjusted_male_baye[[i]])[2,3],
+                                                                                                                              uci = fixef(models_micro_comp_micro_comp_adjusted_male_baye[[i]])[2,4],
+                                                                                                                              sex = "Male",
+                                                                                                                              intervals = levels(group.micro_comp.dataset$intervals)[i]))
+    
     dataset.now <- group.micro_comp.dataset %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.micro_comp.dataset$postdrug_micro_comp_censtime_yrs,
@@ -11925,57 +11961,57 @@ if (class(try(
       drop_na() %>%
       mutate(sex = relevel(sex, ref = "Female"),
              intervals = relevel(intervals, ref = levels(group.micro_comp.dataset$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_micro_comp_micro_comp_adjusted_female_baye[[i]] <- brms::brm(formula = formula(formula_baye),
-                                                        data = dataset.now,
-                                                        family = "cox",
-                                                        chains = 2,
-                                                        iter = 10000)
-
+                                                                        data = dataset.now,
+                                                                        family = "cox",
+                                                                        chains = 2,
+                                                                        iter = 10000)
+    
     predictions_micro_comp_micro_comp_stan_adjusted_baye <- rbind(predictions_micro_comp_micro_comp_stan_adjusted_baye, cbind(mean = fixef(models_micro_comp_micro_comp_adjusted_female_baye[[i]])[2,1],
-                                                                                              lci = fixef(models_micro_comp_micro_comp_adjusted_female_baye[[i]])[2,3],
-                                                                                              uci = fixef(models_micro_comp_micro_comp_adjusted_female_baye[[i]])[2,4],
-                                                                                              sex = "Female",
-                                                                                              intervals = levels(group.micro_comp.dataset$intervals)[i]))
-
+                                                                                                                              lci = fixef(models_micro_comp_micro_comp_adjusted_female_baye[[i]])[2,3],
+                                                                                                                              uci = fixef(models_micro_comp_micro_comp_adjusted_female_baye[[i]])[2,4],
+                                                                                                                              sex = "Female",
+                                                                                                                              intervals = levels(group.micro_comp.dataset$intervals)[i]))
+    
   }
-
+  
   saveRDS(models_micro_comp_micro_comp_adjusted_male_baye, paste0(output_path, "/additional_outcomes/models_micro_comp_micro_comp_adjusted_male_baye.rds"))
-
+  
   saveRDS(models_micro_comp_micro_comp_adjusted_female_baye, paste0(output_path, "/additional_outcomes/models_micro_comp_micro_comp_adjusted_female_baye.rds"))
-
+  
   predictions_micro_comp_micro_comp_stan_adjusted_baye <- predictions_micro_comp_micro_comp_stan_adjusted_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_micro_comp_micro_comp_stan_adjusted_baye, paste0(output_path, "/additional_outcomes/predictions_micro_comp_micro_comp_stan_adjusted_baye.rds"))
-
+  
 }
 
 if (class(try(
-
+  
   # predictions for the CVD outcomes in the population with no CVD/HF/CKD
   predictions_micro_comp_micro_comp_stan_adjusted_overall_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_micro_comp_micro_comp_stan_adjusted_overall_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.micro_comp.dataset[,breakdown_adjust], is.factor)
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.micro_comp.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_micro_comp_micro_comp_stan_adjusted_overall_baye <- vector()
-
+  
   models_micro_comp_micro_comp_adjusted_overall_baye <- vector("list", quantiles)
-
+  
   for (i in mnumber) {
-
+    
     dataset.now <- group.micro_comp.dataset %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.micro_comp.dataset$postdrug_micro_comp_censtime_yrs,
@@ -11995,50 +12031,50 @@ if (class(try(
       as.data.frame() %>%
       drop_na() %>%
       mutate(intervals = relevel(intervals, ref = levels(group.micro_comp.dataset$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_micro_comp_micro_comp_adjusted_overall_baye[[i]] <- brms::brm(formula = formula(formula_baye),
-                                                         data = dataset.now,
-                                                         family = "cox",
-                                                         chains = 2,
-                                                         iter = 10000)
-
+                                                                         data = dataset.now,
+                                                                         family = "cox",
+                                                                         chains = 2,
+                                                                         iter = 10000)
+    
     predictions_micro_comp_micro_comp_stan_adjusted_overall_baye <- rbind(predictions_micro_comp_micro_comp_stan_adjusted_overall_baye, cbind(mean = fixef(models_micro_comp_micro_comp_adjusted_overall_baye[[i]])[2,1],
-                                                                                                              lci = fixef(models_micro_comp_micro_comp_adjusted_overall_baye[[i]])[2,3],
-                                                                                                              uci = fixef(models_micro_comp_micro_comp_adjusted_overall_baye[[i]])[2,4],
-                                                                                                              intervals = levels(group.micro_comp.dataset$intervals)[i]))
-
+                                                                                                                                              lci = fixef(models_micro_comp_micro_comp_adjusted_overall_baye[[i]])[2,3],
+                                                                                                                                              uci = fixef(models_micro_comp_micro_comp_adjusted_overall_baye[[i]])[2,4],
+                                                                                                                                              intervals = levels(group.micro_comp.dataset$intervals)[i]))
+    
   }
-
+  
   saveRDS(models_micro_comp_micro_comp_adjusted_overall_baye, paste0(output_path, "/additional_outcomes/models_micro_comp_micro_comp_adjusted_overall_baye.rds"))
-
+  
   predictions_micro_comp_micro_comp_stan_adjusted_overall_baye <- predictions_micro_comp_micro_comp_stan_adjusted_overall_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_micro_comp_micro_comp_stan_adjusted_overall_baye, paste0(output_path, "/additional_outcomes/predictions_micro_comp_micro_comp_stan_adjusted_overall_baye.rds"))
-
+  
 }
 # Full population (interval as a continuous, without subgrouping individuals)
 if (class(try(
-
+  
   # predictions for the CVD outcomes in the population with no CVD/HF/CKD
   predictions_micro_comp_micro_comp_stan_adjusted_full_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_micro_comp_micro_comp_stan_adjusted_full_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.micro_comp.dataset[,breakdown_adjust], is.factor)
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.micro_comp.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_micro_comp_micro_comp_stan_adjusted_full_baye <- vector()
-
+  
   dataset.now <- group.micro_comp.dataset %>%
     select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
     cbind(time = group.micro_comp.dataset$postdrug_micro_comp_censtime_yrs,
@@ -12057,28 +12093,28 @@ if (class(try(
           prealt_2 = rcs(group.micro_comp.dataset$prealt, 3)[,2]) %>%
     as.data.frame() %>%
     drop_na()
-
+  
   checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-  formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+  
+  formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+  
   models_micro_comp_micro_comp_adjusted_full_baye <- brms::brm(formula = formula(formula_baye),
-                                               data = dataset.now,
-                                               family = "cox",
-                                               chains = 2,
-                                               iter = 10000)
-
+                                                               data = dataset.now,
+                                                               family = "cox",
+                                                               chains = 2,
+                                                               iter = 10000)
+  
   predictions_micro_comp_micro_comp_stan_adjusted_full_baye <- rbind(predictions_micro_comp_micro_comp_stan_adjusted_full_baye, cbind(mean = fixef(models_micro_comp_micro_comp_adjusted_full_baye)[2,1],
-                                                                                                      lci = fixef(models_micro_comp_micro_comp_adjusted_full_baye)[2,3],
-                                                                                                      uci = fixef(models_micro_comp_micro_comp_adjusted_full_baye)[2,4]))
-
+                                                                                                                                      lci = fixef(models_micro_comp_micro_comp_adjusted_full_baye)[2,3],
+                                                                                                                                      uci = fixef(models_micro_comp_micro_comp_adjusted_full_baye)[2,4]))
+  
   saveRDS(models_micro_comp_micro_comp_adjusted_full_baye, paste0(output_path, "/additional_outcomes/models_micro_comp_micro_comp_adjusted_full_baye.rds"))
-
+  
   predictions_micro_comp_micro_comp_stan_adjusted_full_baye <- predictions_micro_comp_micro_comp_stan_adjusted_full_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_micro_comp_micro_comp_stan_adjusted_full_baye, paste0(output_path, "/additional_outcomes/predictions_micro_comp_micro_comp_stan_adjusted_full_baye.rds"))
-
+  
 }
 
 
@@ -12498,8 +12534,8 @@ retinopathy.dataset <- set_up_data_sglt2_glp1(dataset.type="retinopathy.dataset"
   left_join(treatment_effects, by = c("patid", "pated"))
 
 group.retinopathy.dataset <- group_values(data = retinopathy.dataset,
-                                 variable = "effects",
-                                 breaks = interval_breaks) %>%
+                                          variable = "effects",
+                                          breaks = interval_breaks) %>%
   drop_na(intervals)
 
 matching_retinopathy <- MatchIt::matchit(
@@ -12527,196 +12563,196 @@ group.retinopathy.dataset.matched <- group.retinopathy.dataset %>%
 ## Propensity score matching
 
 if (class(try(
-
+  
   # predictions for the CVD outcomes in population with no CVD/HF/CKD strata sex and intervals
   predictions_retinopathy_retinopathy_stan_psm_1_1_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_retinopathy_retinopathy_stan_psm_1_1_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.retinopathy.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_retinopathy_retinopathy_stan_psm_1_1_baye <- vector()
-
-  formula_baye <- "time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + preneuropathy + prediabeticnephropathy"
-
+  
+  formula_baye <- "time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + preneuropathy + prediabeticnephropathy"
+  
   models_retinopathy_retinopathy_psm_1_1_male_baye <- vector("list", quantiles)
-
+  
   models_retinopathy_retinopathy_psm_1_1_female_baye <- vector("list", quantiles)
-
+  
   for(i in mnumber) {
-
+    
     models_retinopathy_retinopathy_psm_1_1_male_baye[[i]] <- brms::brm(formula = formula(formula_baye),
-                                                        data = group.retinopathy.dataset.matched %>%
-                                                          select(drugclass, intervals, sex, qrisk2_10yr_score, preneuropathy, prediabeticnephropathy) %>%
-                                                          cbind(time = group.retinopathy.dataset.matched$postdrug_retinopathy_censtime_yrs,
-                                                                censored = group.retinopathy.dataset.matched$postdrug_retinopathy_censvar,
-                                                                qrisk2_10yr_score_1 = rcs(group.retinopathy.dataset.matched$qrisk2_10yr_score, 3)[,1],
-                                                                qrisk2_10yr_score_2 = rcs(group.retinopathy.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
-                                                          as.data.frame() %>%
-                                                          drop_na() %>%
-                                                          mutate(sex = relevel(sex, ref = "Male"),
-                                                                 intervals = relevel(intervals, ref = levels(group.retinopathy.dataset.matched$intervals)[i])),
-                                                        family = "cox",
-                                                        chains = 2)
-
+                                                                       data = group.retinopathy.dataset.matched %>%
+                                                                         select(drugclass, intervals, sex, qrisk2_10yr_score, preneuropathy, prediabeticnephropathy) %>%
+                                                                         cbind(time = group.retinopathy.dataset.matched$postdrug_retinopathy_censtime_yrs,
+                                                                               censored = group.retinopathy.dataset.matched$postdrug_retinopathy_censvar,
+                                                                               qrisk2_10yr_score_1 = rcs(group.retinopathy.dataset.matched$qrisk2_10yr_score, 3)[,1],
+                                                                               qrisk2_10yr_score_2 = rcs(group.retinopathy.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
+                                                                         as.data.frame() %>%
+                                                                         drop_na() %>%
+                                                                         mutate(sex = relevel(sex, ref = "Male"),
+                                                                                intervals = relevel(intervals, ref = levels(group.retinopathy.dataset.matched$intervals)[i])),
+                                                                       family = "cox",
+                                                                       chains = 2)
+    
     predictions_retinopathy_retinopathy_stan_psm_1_1_baye <- rbind(predictions_retinopathy_retinopathy_stan_psm_1_1_baye, cbind(mean = fixef(models_retinopathy_retinopathy_psm_1_1_male_baye[[i]])[2,1],
-                                                                                                  lci = fixef(models_retinopathy_retinopathy_psm_1_1_male_baye[[i]])[2,3],
-                                                                                                  uci = fixef(models_retinopathy_retinopathy_psm_1_1_male_baye[[i]])[2,4],
-                                                                                                  sex = "Male",
-                                                                                                  intervals = levels(group.retinopathy.dataset.matched$intervals)[i]))
-
+                                                                                                                                lci = fixef(models_retinopathy_retinopathy_psm_1_1_male_baye[[i]])[2,3],
+                                                                                                                                uci = fixef(models_retinopathy_retinopathy_psm_1_1_male_baye[[i]])[2,4],
+                                                                                                                                sex = "Male",
+                                                                                                                                intervals = levels(group.retinopathy.dataset.matched$intervals)[i]))
+    
     models_retinopathy_retinopathy_psm_1_1_female_baye[[i]] <- brms::brm(formula = formula(formula_baye),
-                                                          data = group.retinopathy.dataset.matched %>%
-                                                            select(drugclass, intervals, sex, qrisk2_10yr_score, preneuropathy, prediabeticnephropathy) %>%
-                                                            cbind(time = group.retinopathy.dataset.matched$postdrug_retinopathy_censtime_yrs,
-                                                                  censored = group.retinopathy.dataset.matched$postdrug_retinopathy_censvar,
-                                                                  qrisk2_10yr_score_1 = rcs(group.retinopathy.dataset.matched$qrisk2_10yr_score, 3)[,1],
-                                                                  qrisk2_10yr_score_2 = rcs(group.retinopathy.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
-                                                            as.data.frame() %>%
-                                                            drop_na() %>%
-                                                            mutate(sex = relevel(sex, ref = "Female"),
-                                                                   intervals = relevel(intervals, ref = levels(group.retinopathy.dataset.matched$intervals)[i])),
-                                                          family = "cox",
-                                                          chains = 2)
-
+                                                                         data = group.retinopathy.dataset.matched %>%
+                                                                           select(drugclass, intervals, sex, qrisk2_10yr_score, preneuropathy, prediabeticnephropathy) %>%
+                                                                           cbind(time = group.retinopathy.dataset.matched$postdrug_retinopathy_censtime_yrs,
+                                                                                 censored = group.retinopathy.dataset.matched$postdrug_retinopathy_censvar,
+                                                                                 qrisk2_10yr_score_1 = rcs(group.retinopathy.dataset.matched$qrisk2_10yr_score, 3)[,1],
+                                                                                 qrisk2_10yr_score_2 = rcs(group.retinopathy.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
+                                                                           as.data.frame() %>%
+                                                                           drop_na() %>%
+                                                                           mutate(sex = relevel(sex, ref = "Female"),
+                                                                                  intervals = relevel(intervals, ref = levels(group.retinopathy.dataset.matched$intervals)[i])),
+                                                                         family = "cox",
+                                                                         chains = 2)
+    
     predictions_retinopathy_retinopathy_stan_psm_1_1_baye <- rbind(predictions_retinopathy_retinopathy_stan_psm_1_1_baye, cbind(mean = fixef(models_retinopathy_retinopathy_psm_1_1_female_baye[[i]])[2,1],
-                                                                                                  lci = fixef(models_retinopathy_retinopathy_psm_1_1_female_baye[[i]])[2,3],
-                                                                                                  uci = fixef(models_retinopathy_retinopathy_psm_1_1_female_baye[[i]])[2,4],
-                                                                                                  sex = "Female",
-                                                                                                  intervals = levels(group.retinopathy.dataset.matched$intervals)[i]))
-
+                                                                                                                                lci = fixef(models_retinopathy_retinopathy_psm_1_1_female_baye[[i]])[2,3],
+                                                                                                                                uci = fixef(models_retinopathy_retinopathy_psm_1_1_female_baye[[i]])[2,4],
+                                                                                                                                sex = "Female",
+                                                                                                                                intervals = levels(group.retinopathy.dataset.matched$intervals)[i]))
+    
   }
-
+  
   saveRDS(models_retinopathy_retinopathy_psm_1_1_male_baye, paste0(output_path, "/additional_outcomes/models_retinopathy_retinopathy_psm_1_1_male_baye.rds"))
-
+  
   saveRDS(models_retinopathy_retinopathy_psm_1_1_female_baye, paste0(output_path, "/additional_outcomes/models_retinopathy_retinopathy_psm_1_1_female_baye.rds"))
-
+  
   predictions_retinopathy_retinopathy_stan_psm_1_1_baye <- predictions_retinopathy_retinopathy_stan_psm_1_1_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_retinopathy_retinopathy_stan_psm_1_1_baye, paste0(output_path, "/additional_outcomes/predictions_retinopathy_retinopathy_stan_psm_1_1_baye.rds"))
-
+  
 }
 
 # No sex strata
 if (class(try(
-
+  
   # predictions for the CVD outcomes in the population with no CVD/HF/CKD
   predictions_retinopathy_retinopathy_stan_psm_1_1_overall_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_retinopathy_retinopathy_stan_psm_1_1_overall_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
-  formula_baye <- "time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + preneuropathy + prediabeticnephropathy"
-
+  
+  formula_baye <- "time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + preneuropathy + prediabeticnephropathy"
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.retinopathy.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_retinopathy_retinopathy_stan_psm_1_1_overall_baye <- vector()
-
+  
   models_retinopathy_retinopathy_psm_1_1_overall_baye <- vector("list", quantiles)
-
+  
   for (i in mnumber) {
-
+    
     models_retinopathy_retinopathy_psm_1_1_overall_baye[[i]] <- brms::brm(formula = formula(formula_baye),
-                                                           data = group.retinopathy.dataset.matched %>%
-                                                             select(drugclass, intervals, sex, qrisk2_10yr_score, preneuropathy, prediabeticnephropathy) %>%
-                                                             cbind(time = group.retinopathy.dataset.matched$postdrug_retinopathy_censtime_yrs,
-                                                                   censored = group.retinopathy.dataset.matched$postdrug_retinopathy_censvar,
-                                                                   qrisk2_10yr_score_1 = rcs(group.retinopathy.dataset.matched$qrisk2_10yr_score, 3)[,1],
-                                                                   qrisk2_10yr_score_2 = rcs(group.retinopathy.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
-                                                             as.data.frame() %>%
-                                                             drop_na() %>%
-                                                             mutate(intervals = relevel(intervals, ref = levels(group.retinopathy.dataset.matched$intervals)[i])),
-                                                           family = "cox",
-                                                           chains = 2)
-
+                                                                          data = group.retinopathy.dataset.matched %>%
+                                                                            select(drugclass, intervals, sex, qrisk2_10yr_score, preneuropathy, prediabeticnephropathy) %>%
+                                                                            cbind(time = group.retinopathy.dataset.matched$postdrug_retinopathy_censtime_yrs,
+                                                                                  censored = group.retinopathy.dataset.matched$postdrug_retinopathy_censvar,
+                                                                                  qrisk2_10yr_score_1 = rcs(group.retinopathy.dataset.matched$qrisk2_10yr_score, 3)[,1],
+                                                                                  qrisk2_10yr_score_2 = rcs(group.retinopathy.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
+                                                                            as.data.frame() %>%
+                                                                            drop_na() %>%
+                                                                            mutate(intervals = relevel(intervals, ref = levels(group.retinopathy.dataset.matched$intervals)[i])),
+                                                                          family = "cox",
+                                                                          chains = 2)
+    
     predictions_retinopathy_retinopathy_stan_psm_1_1_overall_baye <- rbind(predictions_retinopathy_retinopathy_stan_psm_1_1_overall_baye, cbind(mean = fixef(models_retinopathy_retinopathy_psm_1_1_overall_baye[[i]])[2,1],
-                                                                                                                  lci = fixef(models_retinopathy_retinopathy_psm_1_1_overall_baye[[i]])[2,3],
-                                                                                                                  uci = fixef(models_retinopathy_retinopathy_psm_1_1_overall_baye[[i]])[2,4],
-                                                                                                                  intervals = levels(group.retinopathy.dataset.matched$intervals)[i]))
-
+                                                                                                                                                lci = fixef(models_retinopathy_retinopathy_psm_1_1_overall_baye[[i]])[2,3],
+                                                                                                                                                uci = fixef(models_retinopathy_retinopathy_psm_1_1_overall_baye[[i]])[2,4],
+                                                                                                                                                intervals = levels(group.retinopathy.dataset.matched$intervals)[i]))
+    
   }
-
+  
   saveRDS(models_retinopathy_retinopathy_psm_1_1_overall_baye, paste0(output_path, "/additional_outcomes/models_retinopathy_retinopathy_psm_1_1_overall_baye.rds"))
-
+  
   predictions_retinopathy_retinopathy_stan_psm_1_1_overall_baye <- predictions_retinopathy_retinopathy_stan_psm_1_1_overall_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_retinopathy_retinopathy_stan_psm_1_1_overall_baye, paste0(output_path, "/additional_outcomes/predictions_retinopathy_retinopathy_stan_psm_1_1_overall_baye.rds"))
-
-
+  
+  
 }
 # Full population (interval as a continuous, without subgrouping individuals)
 if (class(try(
-
+  
   # predictions for the CVD outcomes in the population with no CVD/HF/CKD
   predictions_retinopathy_retinopathy_stan_psm_1_1_full_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_retinopathy_retinopathy_stan_psm_1_1_full_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
-  formula_baye <- "time | cens(censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + preneuropathy + prediabeticnephropathy"
-
+  
+  formula_baye <- "time | cens(1 - censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + preneuropathy + prediabeticnephropathy"
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.retinopathy.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_retinopathy_retinopathy_stan_psm_1_1_full_baye <- vector()
-
+  
   models_retinopathy_retinopathy_psm_1_1_full_baye <- brms::brm(formula = formula(formula_baye),
-                                                 data = group.retinopathy.dataset.matched %>%
-                                                   select(drugclass, intervals, sex, qrisk2_10yr_score, preneuropathy, prediabeticnephropathy) %>%
-                                                   cbind(time = group.retinopathy.dataset.matched$postdrug_retinopathy_censtime_yrs,
-                                                         censored = group.retinopathy.dataset.matched$postdrug_retinopathy_censvar,
-                                                         qrisk2_10yr_score_1 = rcs(group.retinopathy.dataset.matched$qrisk2_10yr_score, 3)[,1],
-                                                         qrisk2_10yr_score_2 = rcs(group.retinopathy.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
-                                                   as.data.frame() %>%
-                                                   drop_na(),
-                                                 family = "cox",
-                                                 chains = 2)
-
+                                                                data = group.retinopathy.dataset.matched %>%
+                                                                  select(drugclass, intervals, sex, qrisk2_10yr_score, preneuropathy, prediabeticnephropathy) %>%
+                                                                  cbind(time = group.retinopathy.dataset.matched$postdrug_retinopathy_censtime_yrs,
+                                                                        censored = group.retinopathy.dataset.matched$postdrug_retinopathy_censvar,
+                                                                        qrisk2_10yr_score_1 = rcs(group.retinopathy.dataset.matched$qrisk2_10yr_score, 3)[,1],
+                                                                        qrisk2_10yr_score_2 = rcs(group.retinopathy.dataset.matched$qrisk2_10yr_score, 3)[,2]) %>%
+                                                                  as.data.frame() %>%
+                                                                  drop_na(),
+                                                                family = "cox",
+                                                                chains = 2)
+  
   predictions_retinopathy_retinopathy_stan_psm_1_1_full_baye <- rbind(predictions_retinopathy_retinopathy_stan_psm_1_1_full_baye, cbind(mean = fixef(models_retinopathy_retinopathy_psm_1_1_full_baye)[2,1],
-                                                                                                          lci = fixef(models_retinopathy_retinopathy_psm_1_1_full_baye)[2,3],
-                                                                                                          uci = fixef(models_retinopathy_retinopathy_psm_1_1_full_baye)[2,4]))
-
+                                                                                                                                        lci = fixef(models_retinopathy_retinopathy_psm_1_1_full_baye)[2,3],
+                                                                                                                                        uci = fixef(models_retinopathy_retinopathy_psm_1_1_full_baye)[2,4]))
+  
   saveRDS(models_retinopathy_retinopathy_psm_1_1_full_baye, paste0(output_path, "/additional_outcomes/models_retinopathy_retinopathy_psm_1_1_full_baye.rds"))
-
+  
   predictions_retinopathy_retinopathy_stan_psm_1_1_full_baye <- predictions_retinopathy_retinopathy_stan_psm_1_1_full_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_retinopathy_retinopathy_stan_psm_1_1_full_baye, paste0(output_path, "/additional_outcomes/predictions_retinopathy_retinopathy_stan_psm_1_1_full_baye.rds"))
-
+  
 }
 
 
 ## Propensity score matching + adjusted
 
 if (class(try(
-
+  
   # predictions for the CVD outcomes in population with no CVD/HF/CKD strata sex and intervals
   predictions_retinopathy_retinopathy_stan_psm_1_1_adjusted_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_retinopathy_retinopathy_stan_psm_1_1_adjusted_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.retinopathy.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_retinopathy_retinopathy_stan_psm_1_1_adjusted_baye <- vector()
-
-
+  
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.retinopathy.dataset.matched[,breakdown_adjust], is.factor)
-
+  
   models_retinopathy_retinopathy_psm_1_1_adjusted_male_baye <- vector("list", quantiles)
-
+  
   models_retinopathy_retinopathy_psm_1_1_adjusted_female_baye <- vector("list", quantiles)
-
+  
   for (i in mnumber) {
-
+    
     dataset.now <- group.retinopathy.dataset.matched %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.retinopathy.dataset.matched$postdrug_retinopathy_censtime_yrs,
@@ -12737,23 +12773,23 @@ if (class(try(
       drop_na() %>%
       mutate(sex = relevel(sex, ref = "Male"),
              intervals = relevel(intervals, ref = levels(group.retinopathy.dataset.matched$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_retinopathy_retinopathy_psm_1_1_adjusted_male_baye[[i]] <- brms::brm(formula = formula(formula_baye),
-                                                              data = dataset.now,
-                                                              family = "cox",
-                                                              chains = 2,
-                                                              iter = 10000)
-
+                                                                                data = dataset.now,
+                                                                                family = "cox",
+                                                                                chains = 2,
+                                                                                iter = 10000)
+    
     predictions_retinopathy_retinopathy_stan_psm_1_1_adjusted_baye <- rbind(predictions_retinopathy_retinopathy_stan_psm_1_1_adjusted_baye, cbind(mean = fixef(models_retinopathy_retinopathy_psm_1_1_adjusted_male_baye[[i]])[2,1],
-                                                                                                              lci = fixef(models_retinopathy_retinopathy_psm_1_1_adjusted_male_baye[[i]])[2,3],
-                                                                                                              uci = fixef(models_retinopathy_retinopathy_psm_1_1_adjusted_male_baye[[i]])[2,4],
-                                                                                                              sex = "Male",
-                                                                                                              intervals = levels(group.retinopathy.dataset.matched$intervals)[i]))
-
+                                                                                                                                                  lci = fixef(models_retinopathy_retinopathy_psm_1_1_adjusted_male_baye[[i]])[2,3],
+                                                                                                                                                  uci = fixef(models_retinopathy_retinopathy_psm_1_1_adjusted_male_baye[[i]])[2,4],
+                                                                                                                                                  sex = "Male",
+                                                                                                                                                  intervals = levels(group.retinopathy.dataset.matched$intervals)[i]))
+    
     dataset.now <- group.retinopathy.dataset.matched %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.retinopathy.dataset.matched$postdrug_retinopathy_censtime_yrs,
@@ -12774,57 +12810,57 @@ if (class(try(
       drop_na() %>%
       mutate(sex = relevel(sex, ref = "Female"),
              intervals = relevel(intervals, ref = levels(group.retinopathy.dataset.matched$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_retinopathy_retinopathy_psm_1_1_adjusted_female_baye[[i]] <-  brms::brm(formula = formula(formula_baye),
-                                                                 data = dataset.now,
-                                                                 family = "cox",
-                                                                 chains = 2,
-                                                                 iter = 10000)
-
+                                                                                   data = dataset.now,
+                                                                                   family = "cox",
+                                                                                   chains = 2,
+                                                                                   iter = 10000)
+    
     predictions_retinopathy_retinopathy_stan_psm_1_1_adjusted_baye <- rbind(predictions_retinopathy_retinopathy_stan_psm_1_1_adjusted_baye, cbind(mean = fixef(models_retinopathy_retinopathy_psm_1_1_adjusted_female_baye[[i]])[2,1],
-                                                                                                              lci = fixef(models_retinopathy_retinopathy_psm_1_1_adjusted_female_baye[[i]])[2,3],
-                                                                                                              uci = fixef(models_retinopathy_retinopathy_psm_1_1_adjusted_female_baye[[i]])[2,4],
-                                                                                                              sex = "Female",
-                                                                                                              intervals = levels(group.retinopathy.dataset.matched$intervals)[i]))
-
+                                                                                                                                                  lci = fixef(models_retinopathy_retinopathy_psm_1_1_adjusted_female_baye[[i]])[2,3],
+                                                                                                                                                  uci = fixef(models_retinopathy_retinopathy_psm_1_1_adjusted_female_baye[[i]])[2,4],
+                                                                                                                                                  sex = "Female",
+                                                                                                                                                  intervals = levels(group.retinopathy.dataset.matched$intervals)[i]))
+    
   }
-
+  
   saveRDS(models_retinopathy_retinopathy_psm_1_1_adjusted_male_baye, paste0(output_path, "/additional_outcomes/models_retinopathy_retinopathy_psm_1_1_adjusted_male_baye.rds"))
-
+  
   saveRDS(models_retinopathy_retinopathy_psm_1_1_adjusted_female_baye, paste0(output_path, "/additional_outcomes/models_retinopathy_retinopathy_psm_1_1_adjusted_female_baye.rds"))
-
+  
   predictions_retinopathy_retinopathy_stan_psm_1_1_adjusted_baye <- predictions_retinopathy_retinopathy_stan_psm_1_1_adjusted_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_retinopathy_retinopathy_stan_psm_1_1_adjusted_baye, paste0(output_path, "/additional_outcomes/predictions_retinopathy_retinopathy_stan_psm_1_1_adjusted_baye.rds"))
-
+  
 }
 
 if (class(try(
-
+  
   # predictions for the CVD outcomes in the population with no CVD/HF/CKD
   predictions_retinopathy_retinopathy_stan_psm_1_1_adjusted_overall_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_retinopathy_retinopathy_stan_psm_1_1_adjusted_overall_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.retinopathy.dataset.matched[,breakdown_adjust], is.factor)
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.retinopathy.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_retinopathy_retinopathy_stan_psm_1_1_adjusted_overall_baye <- vector()
-
+  
   models_retinopathy_retinopathy_psm_1_1_adjusted_overall_baye <- vector("list", quantiles)
-
+  
   for (i in mnumber) {
-
+    
     dataset.now <- group.retinopathy.dataset.matched %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.retinopathy.dataset.matched$postdrug_retinopathy_censtime_yrs,
@@ -12844,50 +12880,50 @@ if (class(try(
       as.data.frame() %>%
       drop_na() %>%
       mutate(intervals = relevel(intervals, ref = levels(group.retinopathy.dataset.matched$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_retinopathy_retinopathy_psm_1_1_adjusted_overall_baye[[i]] <- brms::brm(formula = formula(formula_baye),
-                                                                 data = dataset.now,
-                                                                 family = "cox",
-                                                                 chains = 2,
-                                                                 iter = 10000)
-
+                                                                                   data = dataset.now,
+                                                                                   family = "cox",
+                                                                                   chains = 2,
+                                                                                   iter = 10000)
+    
     predictions_retinopathy_retinopathy_stan_psm_1_1_adjusted_overall_baye <- rbind(predictions_retinopathy_retinopathy_stan_psm_1_1_adjusted_overall_baye, cbind(mean = fixef(models_retinopathy_retinopathy_psm_1_1_adjusted_overall_baye[[i]])[2,1],
-                                                                                                                              lci = fixef(models_retinopathy_retinopathy_psm_1_1_adjusted_overall_baye[[i]])[2,3],
-                                                                                                                              uci = fixef(models_retinopathy_retinopathy_psm_1_1_adjusted_overall_baye[[i]])[2,4],
-                                                                                                                              intervals = levels(group.retinopathy.dataset.matched$intervals)[i]))
-
+                                                                                                                                                                  lci = fixef(models_retinopathy_retinopathy_psm_1_1_adjusted_overall_baye[[i]])[2,3],
+                                                                                                                                                                  uci = fixef(models_retinopathy_retinopathy_psm_1_1_adjusted_overall_baye[[i]])[2,4],
+                                                                                                                                                                  intervals = levels(group.retinopathy.dataset.matched$intervals)[i]))
+    
   }
-
+  
   saveRDS(models_retinopathy_retinopathy_psm_1_1_adjusted_overall_baye, paste0(output_path, "/additional_outcomes/models_retinopathy_retinopathy_psm_1_1_adjusted_overall_baye.rds"))
-
+  
   predictions_retinopathy_retinopathy_stan_psm_1_1_adjusted_overall_baye <- predictions_retinopathy_retinopathy_stan_psm_1_1_adjusted_overall_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_retinopathy_retinopathy_stan_psm_1_1_adjusted_overall_baye, paste0(output_path, "/additional_outcomes/predictions_retinopathy_retinopathy_stan_psm_1_1_adjusted_overall_baye.rds"))
-
+  
 }
 # Full population (interval as a continuous, without subgrouping individuals)
 if (class(try(
-
+  
   # predictions for the CVD outcomes in the population with no CVD/HF/CKD
   predictions_retinopathy_retinopathy_stan_psm_1_1_adjusted_full_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_retinopathy_retinopathy_stan_psm_1_1_adjusted_full_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.retinopathy.dataset.matched[,breakdown_adjust], is.factor)
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.retinopathy.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_retinopathy_retinopathy_stan_psm_1_1_adjusted_full_baye <- vector()
-
+  
   dataset.now <- group.retinopathy.dataset.matched %>%
     select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
     cbind(time = group.retinopathy.dataset.matched$postdrug_retinopathy_censtime_yrs,
@@ -12906,28 +12942,28 @@ if (class(try(
           prealt_2 = rcs(group.retinopathy.dataset.matched$prealt, 3)[,2]) %>%
     as.data.frame() %>%
     drop_na()
-
+  
   checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-  formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+  
+  formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+  
   models_retinopathy_retinopathy_psm_1_1_adjusted_full_baye <- brms::brm(formula = formula(formula_baye),
-                                                       data = dataset.now,
-                                                       family = "cox",
-                                                       chains = 2,
-                                                       iter = 10000)
-
+                                                                         data = dataset.now,
+                                                                         family = "cox",
+                                                                         chains = 2,
+                                                                         iter = 10000)
+  
   predictions_retinopathy_retinopathy_stan_psm_1_1_adjusted_full_baye <- rbind(predictions_retinopathy_retinopathy_stan_psm_1_1_adjusted_full_baye, cbind(mean = fixef(models_retinopathy_retinopathy_psm_1_1_adjusted_full_baye)[2,1],
-                                                                                                                      lci = fixef(models_retinopathy_retinopathy_psm_1_1_adjusted_full_baye)[2,3],
-                                                                                                                      uci = fixef(models_retinopathy_retinopathy_psm_1_1_adjusted_full_baye)[2,4]))
-
+                                                                                                                                                          lci = fixef(models_retinopathy_retinopathy_psm_1_1_adjusted_full_baye)[2,3],
+                                                                                                                                                          uci = fixef(models_retinopathy_retinopathy_psm_1_1_adjusted_full_baye)[2,4]))
+  
   saveRDS(models_retinopathy_retinopathy_psm_1_1_adjusted_full_baye, paste0(output_path, "additional_outcomes/models_retinopathy_retinopathy_psm_1_1_adjusted_full_baye.rds"))
-
+  
   predictions_retinopathy_retinopathy_stan_psm_1_1_adjusted_full_baye <- predictions_retinopathy_retinopathy_stan_psm_1_1_adjusted_full_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_retinopathy_retinopathy_stan_psm_1_1_adjusted_full_baye, paste0(output_path, "/additional_outcomes/predictions_retinopathy_retinopathy_stan_psm_1_1_adjusted_full_baye.rds"))
-
+  
 }
 
 
@@ -12935,29 +12971,29 @@ if (class(try(
 
 #--- Cox
 if (class(try(
-
+  
   # predictions for the CVD outcomes in population with no CVD/HF/CKD strata sex and intervals
   predictions_retinopathy_retinopathy_stan_adjusted_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_retinopathy_retinopathy_stan_adjusted_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.retinopathy.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_retinopathy_retinopathy_stan_adjusted_baye <- vector()
-
-
+  
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.retinopathy.dataset[,breakdown_adjust], is.factor)
-
+  
   models_retinopathy_retinopathy_adjusted_male_baye <- vector("list", quantiles)
-
+  
   models_retinopathy_retinopathy_adjusted_female_baye <- vector("list", quantiles)
-
+  
   for (i in mnumber) {
-
+    
     dataset.now <- group.retinopathy.dataset %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.retinopathy.dataset$postdrug_retinopathy_censtime_yrs,
@@ -12978,23 +13014,23 @@ if (class(try(
       drop_na() %>%
       mutate(sex = relevel(sex, ref = "Male"),
              intervals = relevel(intervals, ref = levels(group.retinopathy.dataset$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_retinopathy_retinopathy_adjusted_male_baye[[i]] <- brms::brm(formula = formula(formula_baye),
-                                                      data = dataset.now,
-                                                      family = "cox",
-                                                      chains = 2,
-                                                      iter = 10000)
-
+                                                                        data = dataset.now,
+                                                                        family = "cox",
+                                                                        chains = 2,
+                                                                        iter = 10000)
+    
     predictions_retinopathy_retinopathy_stan_adjusted_baye <- rbind(predictions_retinopathy_retinopathy_stan_adjusted_baye, cbind(mean = fixef(models_retinopathy_retinopathy_adjusted_male_baye[[i]])[2,1],
-                                                                                              lci = fixef(models_retinopathy_retinopathy_adjusted_male_baye[[i]])[2,3],
-                                                                                              uci = fixef(models_retinopathy_retinopathy_adjusted_male_baye[[i]])[2,4],
-                                                                                              sex = "Male",
-                                                                                              intervals = levels(group.retinopathy.dataset$intervals)[i]))
-
+                                                                                                                                  lci = fixef(models_retinopathy_retinopathy_adjusted_male_baye[[i]])[2,3],
+                                                                                                                                  uci = fixef(models_retinopathy_retinopathy_adjusted_male_baye[[i]])[2,4],
+                                                                                                                                  sex = "Male",
+                                                                                                                                  intervals = levels(group.retinopathy.dataset$intervals)[i]))
+    
     dataset.now <- group.retinopathy.dataset %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.retinopathy.dataset$postdrug_retinopathy_censtime_yrs,
@@ -13015,57 +13051,57 @@ if (class(try(
       drop_na() %>%
       mutate(sex = relevel(sex, ref = "Female"),
              intervals = relevel(intervals, ref = levels(group.retinopathy.dataset$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + sex*factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_retinopathy_retinopathy_adjusted_female_baye[[i]] <- brms::brm(formula = formula(formula_baye),
-                                                        data = dataset.now,
-                                                        family = "cox",
-                                                        chains = 2,
-                                                        iter = 10000)
-
+                                                                          data = dataset.now,
+                                                                          family = "cox",
+                                                                          chains = 2,
+                                                                          iter = 10000)
+    
     predictions_retinopathy_retinopathy_stan_adjusted_baye <- rbind(predictions_retinopathy_retinopathy_stan_adjusted_baye, cbind(mean = fixef(models_retinopathy_retinopathy_adjusted_female_baye[[i]])[2,1],
-                                                                                              lci = fixef(models_retinopathy_retinopathy_adjusted_female_baye[[i]])[2,3],
-                                                                                              uci = fixef(models_retinopathy_retinopathy_adjusted_female_baye[[i]])[2,4],
-                                                                                              sex = "Female",
-                                                                                              intervals = levels(group.retinopathy.dataset$intervals)[i]))
-
+                                                                                                                                  lci = fixef(models_retinopathy_retinopathy_adjusted_female_baye[[i]])[2,3],
+                                                                                                                                  uci = fixef(models_retinopathy_retinopathy_adjusted_female_baye[[i]])[2,4],
+                                                                                                                                  sex = "Female",
+                                                                                                                                  intervals = levels(group.retinopathy.dataset$intervals)[i]))
+    
   }
-
+  
   saveRDS(models_retinopathy_retinopathy_adjusted_male_baye, paste0(output_path, "/additional_outcomes/models_retinopathy_retinopathy_adjusted_male_baye.rds"))
-
+  
   saveRDS(models_retinopathy_retinopathy_adjusted_female_baye, paste0(output_path, "/additional_outcomes/models_retinopathy_retinopathy_adjusted_female_baye.rds"))
-
+  
   predictions_retinopathy_retinopathy_stan_adjusted_baye <- predictions_retinopathy_retinopathy_stan_adjusted_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_retinopathy_retinopathy_stan_adjusted_baye, paste0(output_path, "/additional_outcomes/predictions_retinopathy_retinopathy_stan_adjusted_baye.rds"))
-
+  
 }
 
 if (class(try(
-
+  
   # predictions for the CVD outcomes in the population with no CVD/HF/CKD
   predictions_retinopathy_retinopathy_stan_adjusted_overall_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_retinopathy_retinopathy_stan_adjusted_overall_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.retinopathy.dataset[,breakdown_adjust], is.factor)
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.retinopathy.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_retinopathy_retinopathy_stan_adjusted_overall_baye <- vector()
-
+  
   models_retinopathy_retinopathy_adjusted_overall_baye <- vector("list", quantiles)
-
+  
   for (i in mnumber) {
-
+    
     dataset.now <- group.retinopathy.dataset %>%
       select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
       cbind(time = group.retinopathy.dataset$postdrug_retinopathy_censtime_yrs,
@@ -13085,50 +13121,50 @@ if (class(try(
       as.data.frame() %>%
       drop_na() %>%
       mutate(intervals = relevel(intervals, ref = levels(group.retinopathy.dataset$intervals)[i]))
-
+    
     checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-    formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+    
+    formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + intervals + factor(drugclass)*intervals + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+    
     models_retinopathy_retinopathy_adjusted_overall_baye[[i]] <- brms::brm(formula = formula(formula_baye),
-                                                         data = dataset.now,
-                                                         family = "cox",
-                                                         chains = 2,
-                                                         iter = 10000)
-
+                                                                           data = dataset.now,
+                                                                           family = "cox",
+                                                                           chains = 2,
+                                                                           iter = 10000)
+    
     predictions_retinopathy_retinopathy_stan_adjusted_overall_baye <- rbind(predictions_retinopathy_retinopathy_stan_adjusted_overall_baye, cbind(mean = fixef(models_retinopathy_retinopathy_adjusted_overall_baye[[i]])[2,1],
-                                                                                                              lci = fixef(models_retinopathy_retinopathy_adjusted_overall_baye[[i]])[2,3],
-                                                                                                              uci = fixef(models_retinopathy_retinopathy_adjusted_overall_baye[[i]])[2,4],
-                                                                                                              intervals = levels(group.retinopathy.dataset$intervals)[i]))
-
+                                                                                                                                                  lci = fixef(models_retinopathy_retinopathy_adjusted_overall_baye[[i]])[2,3],
+                                                                                                                                                  uci = fixef(models_retinopathy_retinopathy_adjusted_overall_baye[[i]])[2,4],
+                                                                                                                                                  intervals = levels(group.retinopathy.dataset$intervals)[i]))
+    
   }
-
+  
   saveRDS(models_retinopathy_retinopathy_adjusted_overall_baye, paste0(output_path, "/additional_outcomes/models_retinopathy_retinopathy_adjusted_overall_baye.rds"))
-
+  
   predictions_retinopathy_retinopathy_stan_adjusted_overall_baye <- predictions_retinopathy_retinopathy_stan_adjusted_overall_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_retinopathy_retinopathy_stan_adjusted_overall_baye, paste0(output_path, "/additional_outcomes/predictions_retinopathy_retinopathy_stan_adjusted_overall_baye.rds"))
-
+  
 }
 # Full population (interval as a continuous, without subgrouping individuals)
 if (class(try(
-
+  
   # predictions for the CVD outcomes in the population with no CVD/HF/CKD
   predictions_retinopathy_retinopathy_stan_adjusted_full_baye <- readRDS(paste0(output_path, "/additional_outcomes/predictions_retinopathy_retinopathy_stan_adjusted_full_baye.rds"))
-
+  
   , silent = TRUE)) == "try-error") {
-
+  
   breakdown_adjust <- unique(c(variables_mu, variables_tau))
   # categorical variables in breakdown
   factors <- sapply(group.retinopathy.dataset[,breakdown_adjust], is.factor)
-
+  
   # maximum number of deciles being tested
   quantiles <- length(levels(group.retinopathy.dataset[,"intervals"]))
   # create lists with results
   mnumber = c(1:quantiles)
   predictions_retinopathy_retinopathy_stan_adjusted_full_baye <- vector()
-
+  
   dataset.now <- group.retinopathy.dataset %>%
     select(drugclass, intervals, sex, qrisk2_10yr_score, agetx, t2dmduration, prehba1c, preegfr, prealt, drugline, ncurrtx, prepad, preheartfailure, preihd, preneuropathy, preretinopathy) %>%
     cbind(time = group.retinopathy.dataset$postdrug_retinopathy_censtime_yrs,
@@ -13147,28 +13183,28 @@ if (class(try(
           prealt_2 = rcs(group.retinopathy.dataset$prealt, 3)[,2]) %>%
     as.data.frame() %>%
     drop_na()
-
+  
   checker <- which(sapply(dataset.now[,breakdown_adjust[factors]], function(col) length(unique(col))) > 1)
-
-  formula_baye <- paste0("time | cens(censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
-
+  
+  formula_baye <- paste0("time | cens(1 - censored) ~ factor(drugclass) + qrisk2_10yr_score_1 + qrisk2_10yr_score_2 + agetx_1 + agetx_2 + t2dmduration_1 + t2dmduration_2 + prehba1c_1 + prehba1c_2 + preegfr_1 + preegfr_2 + prealt_1 + prealt_2 +", paste(breakdown_adjust[factors][checker], collapse = " + "))
+  
   models_retinopathy_retinopathy_adjusted_full_baye <- brms::brm(formula = formula(formula_baye),
-                                               data = dataset.now,
-                                               family = "cox",
-                                               chains = 2,
-                                               iter = 10000)
-
+                                                                 data = dataset.now,
+                                                                 family = "cox",
+                                                                 chains = 2,
+                                                                 iter = 10000)
+  
   predictions_retinopathy_retinopathy_stan_adjusted_full_baye <- rbind(predictions_retinopathy_retinopathy_stan_adjusted_full_baye, cbind(mean = fixef(models_retinopathy_retinopathy_adjusted_full_baye)[2,1],
-                                                                                                      lci = fixef(models_retinopathy_retinopathy_adjusted_full_baye)[2,3],
-                                                                                                      uci = fixef(models_retinopathy_retinopathy_adjusted_full_baye)[2,4]))
-
+                                                                                                                                          lci = fixef(models_retinopathy_retinopathy_adjusted_full_baye)[2,3],
+                                                                                                                                          uci = fixef(models_retinopathy_retinopathy_adjusted_full_baye)[2,4]))
+  
   saveRDS(models_retinopathy_retinopathy_adjusted_full_baye, paste0(output_path, "/additional_outcomes/models_retinopathy_retinopathy_adjusted_full_baye.rds"))
-
+  
   predictions_retinopathy_retinopathy_stan_adjusted_full_baye <- predictions_retinopathy_retinopathy_stan_adjusted_full_baye %>%
     as.data.frame()
-
+  
   saveRDS(predictions_retinopathy_retinopathy_stan_adjusted_full_baye, paste0(output_path, "/additional_outcomes/predictions_retinopathy_retinopathy_stan_adjusted_full_baye.rds"))
-
+  
 }
 
 

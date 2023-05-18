@@ -11,8 +11,8 @@ library(tidyverse)
 library(tableone)
 
 ### Load functions required
-source("11.02.slade_aurum_set_data.R")
-source("11.01.slade_aurum_functions.R")
+source("02.slade_aurum_set_data.R")
+source("01.slade_aurum_functions.R")
 
 #:--------------------------------------------------------------------------------------
 ## Start of the file
@@ -35,8 +35,8 @@ vars <- c("yrdrugstart","agetx", "t2dmduration", "sex", "ethnicity", "drug_canag
           "premap", "premap_na", "prediabeticnephropathy", "preneuropathy", "preretinopathy",
           "preangina","CV_problems", "microvascular_complications", "ASCVD", "preaf", 
           "prerevasc", "preheartfailure", "prehypertension", "preihd", "premyocardialinfarction",
-          "prepad", "prestroke","pretia", "preckd", "precld", "posthba1cfinal",
-          "posthba1cfinal_na", "hba1cmonth", "hba1cmonth_na")
+          "prepad", "prestroke","pretia", "preckd", "precld", "qrisk2_10yr_score", "qrisk2_10yr_score_na",
+          "posthba1cfinal", "posthba1cfinal_na", "hba1cmonth", "hba1cmonth_na")
 
 #:-----------------------
 ############## Predicted treatment benefits

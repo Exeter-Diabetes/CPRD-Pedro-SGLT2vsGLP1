@@ -8,10 +8,11 @@
 library(tidyverse)
 library(patchwork)
 library(scales)
+library(forestplot)
 
 ## Load functions required
-source("11.01.slade_aurum_functions.R")
-source("11.02.slade_aurum_set_data.R")
+source("01.slade_aurum_functions.R")
+source("02.slade_aurum_set_data.R")
 
 ## make directory for outputs
 dir.create("Plots/Paper")
@@ -115,7 +116,7 @@ plot_a <- as.data.frame(values) %>%
   theme(axis.text.y = element_text(angle = 45, face = "bold"),
         axis.title.y = element_blank())
 
-theme(axis.text = element_text(face="bold"))
+# theme(axis.text = element_text(face="bold"))
 
 
 ### B - Overall cohort histogram split by sex
@@ -154,7 +155,7 @@ plot_b_2 <- hist_plot(hba1c.heterogeneity %>% filter(sex == "Male"), "Males", -1
 ### C - Differential treatment effects
 
 # Full cohort for average values
-full.cohort <- set_up_data_sglt2_glp1(dataset.type="full.cohort") %>%
+full.cohort <- set_up_data_sglt2_glp1(dataset.type="hba1c.train") %>%
   left_join(readRDS("Samples/SGLT2-GLP1/Aurum/response_model_bcf/patient_effects.rds"), by = c("patid", "pated"))
 
 levels(full.cohort$sex) <- c("Females", "Males")
@@ -165,7 +166,8 @@ plot_sex_strata <- full.cohort %>%
   select(sex, effects) %>%
   ggplot(aes(x = sex, y = effects)) +
   geom_hline(aes(yintercept = 0), colour = "red") +
-  geom_boxplot(outlier.shape = NA, width = 0.1) +
+  geom_violin(width = 0.3) +
+  stat_summary(fun = median, fun.min = median, fun.max = median, geom = "crossbar", width = 0.3) +
   ylim(-10, 10) +
   ggtitle("Sex") +
   ylab("Predicted treatment effects (mmol/mol)") +
@@ -179,7 +181,8 @@ plot_ncurrtx_strata <- full.cohort %>%
   select(ncurrtx, effects, sex) %>%
   ggplot(aes(x = ncurrtx, y = effects)) +
   geom_hline(aes(yintercept = 0), colour = "red") +
-  geom_boxplot(outlier.shape = NA) +
+  geom_violin() +
+  stat_summary(fun = median, fun.min = median, fun.max = median, geom = "crossbar") +
   facet_wrap(~sex) +
   ylim(-10, 10) +
   ggtitle("Number of other current\nglucose-lowering drugs") +
@@ -195,7 +198,8 @@ plot_prepad_strata <- full.cohort %>%
   select(prepad, effects, sex) %>%
   ggplot(aes(x = prepad, y = effects)) +
   geom_hline(aes(yintercept = 0), colour = "red") +
-  geom_boxplot(outlier.shape = NA, width = 0.3) +
+  geom_violin(width = 0.5) +
+  stat_summary(fun = median, fun.min = median, fun.max = median, geom = "crossbar", width = 0.5) +
   facet_wrap(~sex) +
   ylim(-10, 10) +
   ggtitle("Peripheral arterial disease") +
@@ -211,7 +215,8 @@ plot_preihd_strata <- full.cohort %>%
   select(preihd, effects, sex) %>%
   ggplot(aes(x = preihd, y = effects)) +
   geom_hline(aes(yintercept = 0), colour = "red") +
-  geom_boxplot(outlier.shape = NA, width = 0.3) +
+  geom_violin(width = 0.5) +
+  stat_summary(fun = median, fun.min = median, fun.max = median, geom = "crossbar", width = 0.5) +
   facet_wrap(~sex) +
   ylim(-10, 10) +
   ggtitle("Ischaemic heart disease") +
@@ -227,7 +232,8 @@ plot_preneuropathy_strata <- full.cohort %>%
   select(preneuropathy, effects, sex) %>%
   ggplot(aes(x = preneuropathy, y = effects)) +
   geom_hline(aes(yintercept = 0), colour = "red") +
-  geom_boxplot(outlier.shape = NA, width = 0.3) +
+  geom_violin(width = 0.5) +
+  stat_summary(fun = median, fun.min = median, fun.max = median, geom = "crossbar", width = 0.5) +
   facet_wrap(~sex) +
   ylim(-10, 10) +
   ggtitle("Neuropathy") +
@@ -243,7 +249,8 @@ plot_preretinopathy_strata <- full.cohort %>%
   select(preretinopathy, effects, sex) %>%
   ggplot(aes(x = preretinopathy, y = effects)) +
   geom_hline(aes(yintercept = 0), colour = "red") +
-  geom_boxplot(outlier.shape = NA, width = 0.3) +
+  geom_violin(width = 0.5) +
+  stat_summary(fun = median, fun.min = median, fun.max = median, geom = "crossbar", width = 0.5) +
   facet_wrap(~sex) +
   ylim(-10, 10) +
   ggtitle("Retinopathy") +
@@ -259,7 +266,8 @@ plot_preheartfailure_strata <- full.cohort %>%
   select(preheartfailure, effects, sex) %>%
   ggplot(aes(x = preheartfailure, y = effects)) +
   geom_hline(aes(yintercept = 0), colour = "red") +
-  geom_boxplot(outlier.shape = NA, width = 0.3) +
+  geom_violin(width = 0.5) +
+  stat_summary(fun = median, fun.min = median, fun.max = median, geom = "crossbar", width = 0.5) +
   facet_wrap(~sex) +
   ylim(-10, 10) +
   ggtitle("Heart failure") +
@@ -284,10 +292,11 @@ plot_prehba1c_strata <- group_values(data = full.cohort,
   ungroup() %>%
   ggplot(aes(x = intervals_labels, y = effects)) +
   geom_hline(aes(yintercept = 0), colour = "red") +
-  geom_boxplot(outlier.shape = NA) +
+  geom_violin() +
+  stat_summary(fun = median, fun.min = median, fun.max = median, geom = "crossbar") +
   facet_wrap(~sex) +
   ylim(-10, 10) +
-  ggtitle("HbA1c") +
+  ggtitle("HbA1c (mmol/mol)") +
   ylab("Predicted treatment effects (mmol/mol)") +
   theme_bw() +
   theme(legend.position = "bottom",
@@ -309,16 +318,18 @@ plot_preegfr_strata <- group_values(data = full.cohort,
   ungroup() %>%
   ggplot(aes(x = intervals_labels, y = effects)) +
   geom_hline(aes(yintercept = 0), colour = "red") +
-  geom_boxplot(outlier.shape = NA) +
+  geom_violin() +
+  stat_summary(fun = median, fun.min = median, fun.max = median, geom = "crossbar") +
   facet_wrap(~sex) +
   ylim(-10, 10) +
-  ggtitle("eGFR") +
+  ggtitle(expression(paste("eGFR (mL/min per 1.3",m^{2},")"))) +
   ylab("Predicted treatment effects (mmol/mol)") +
   theme_bw() +
   theme(legend.position = "bottom",
         axis.title = element_blank(),
         plot.title = element_text(hjust = 0.5),
         strip.background = element_rect(fill="white"))
+
 
 # Age at baseline
 breaks_agetx <- quantile(full.cohort$agetx, probs = seq(0.2, 0.9, 0.2), na.rm = TRUE)
@@ -334,10 +345,11 @@ plot_agetx_strata <- group_values(data = full.cohort,
   ungroup() %>%
   ggplot(aes(x = intervals_labels, y = effects)) +
   geom_hline(aes(yintercept = 0), colour = "red") +
-  geom_boxplot(outlier.shape = NA) +
+  geom_violin() +
+  stat_summary(fun = median, fun.min = median, fun.max = median, geom = "crossbar") +
   facet_wrap(~sex) +
   ylim(-10, 10) +
-  ggtitle("Current age") +
+  ggtitle("Current age (years)") +
   ylab("Predicted treatment effects (mmol/mol)") +
   theme_bw() +
   theme(legend.position = "bottom",
@@ -359,10 +371,11 @@ plot_prebmi_strata <- group_values(data = full.cohort,
   ungroup() %>%
   ggplot(aes(x = intervals_labels, y = effects)) +
   geom_hline(aes(yintercept = 0), colour = "red") +
-  geom_boxplot(outlier.shape = NA) +
+  geom_violin() +
+  stat_summary(fun = median, fun.min = median, fun.max = median, geom = "crossbar") +
   facet_wrap(~sex) +
   ylim(-10, 10) +
-  ggtitle("BMI") +
+  ggtitle(expression(paste("BMI (kg/", m^{2}, ")"))) +
   ylab("Predicted treatment effects (mmol/mol)") +
   theme_bw() +
   theme(legend.position = "bottom",
@@ -537,8 +550,8 @@ plot_a <- rbind(
   cbind(intervals = "Predicted HbA1c benefit on SGLT2i", mean = 50, lci = 50, uci = 50, drugclass = "SGLT2"),
   cbind(intervals = "Predicted HbA1c benefit on SGLT2i", mean = 50, lci = 50, uci = 50, drugclass = "GLP1"),
   predictions_hba1c_stan_adjusted_overall %>% select(intervals, drugclass, mean, lci, uci) %>% slice(1:6),
-  cbind(intervals = "Predicted HbA1c benefit on GLP-1 RA", mean = 50, lci = 50, uci = 50, drugclass = "SGLT2"),
-  cbind(intervals = "Predicted HbA1c benefit on GLP-1 RA", mean = 50, lci = 50, uci = 50, drugclass = "GLP1"),
+  cbind(intervals = "Predicted HbA1c benefit on GLP1-RA", mean = 50, lci = 50, uci = 50, drugclass = "SGLT2"),
+  cbind(intervals = "Predicted HbA1c benefit on GLP1-RA", mean = 50, lci = 50, uci = 50, drugclass = "GLP1"),
   predictions_hba1c_stan_adjusted_overall %>% select(intervals, drugclass, mean, lci, uci) %>% slice(7:12),
   predictions_hba1c_stan_adjusted_full %>% select(drugclass, mean, lci, uci) %>% mutate(intervals = "Average treatment effect")
 ) %>%
@@ -554,7 +567,7 @@ plot_a <- rbind(
                                                         ifelse(intervals == levels(group.hba1c.dataset$intervals)[6], paste0(">5 mmol/mol (n=", format(group.hba1c.dataset%>%filter(intervals == levels(group.hba1c.dataset$intervals)[6])%>%nrow(),big.mark=",",scientific=FALSE), ")"), intervals))))))) %>%
   rename("lower" = "lci", "upper" = "uci", "group" = "drugclass", "labeltext" = "intervals") %>%
   group_by(group) %>%
-  mutate(group = ifelse(group == "SGLT2", "SGLT2i", "GLP-1RA")) %>%
+  mutate(group = ifelse(group == "SGLT2", "SGLT2i", "GLP1-RA")) %>%
   forestplot(ci.vertices = TRUE,
              fn.ci_norm = c(fpDrawNormalCI, fpDrawNormalCI, fpDrawNormalCI, fpDrawNormalCI, fpDrawNormalCI, fpDrawNormalCI, fpDrawNormalCI, fpDrawNormalCI, fpDrawNormalCI, fpDrawDiamondCI),
              ci.vertices.height = 0.1,
@@ -622,6 +635,7 @@ plot_b <- rbind(
          uci = as.numeric(uci)) %>%
   rename("lower" = "lci", "upper" = "uci", "group" = "drugclass", "labeltext" = "intervals") %>%
   group_by(group) %>%
+  mutate(group = ifelse(group == "SGLT2", "SGLT2i", "GLP1-RA")) %>%
   forestplot(ci.vertices = TRUE,
              fn.ci_norm = c(fpDrawNormalCI, fpDrawNormalCI, fpDrawNormalCI, fpDrawNormalCI, fpDrawNormalCI, fpDrawNormalCI, fpDrawNormalCI, fpDrawNormalCI, fpDrawNormalCI, fpDrawDiamondCI),
              ci.vertices.height = 0.1,
@@ -697,6 +711,7 @@ plot_c <- rbind(
          uci = as.numeric(uci)) %>%
   rename("lower" = "lci", "upper" = "uci", "group" = "drugclass", "labeltext" = "intervals") %>%
   group_by(group) %>%
+  mutate(group = ifelse(group == "SGLT2", "SGLT2i", "GLP1-RA")) %>%
   forestplot(ci.vertices = TRUE,
              fn.ci_norm = c(fpDrawNormalCI, fpDrawNormalCI, fpDrawNormalCI, fpDrawNormalCI, fpDrawNormalCI, fpDrawNormalCI, fpDrawNormalCI, fpDrawNormalCI, fpDrawNormalCI, fpDrawDiamondCI),
              ci.vertices.height = 0.1,

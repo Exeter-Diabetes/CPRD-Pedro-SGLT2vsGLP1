@@ -35,8 +35,8 @@ dir.create("Plots")
 
 ## Load functions required
 
-source("11.01.slade_aurum_functions.R")
-source("11.02.slade_aurum_set_data.R")
+source("01.slade_aurum_functions.R")
+source("02.slade_aurum_set_data.R")
 
 ## Load dataset
 ps.model.train <- set_up_data_sglt2_glp1(dataset.type = "ps.model.train")
@@ -286,8 +286,8 @@ saveRDS(patient_prop_scores, paste0(output_path, "/ps_model/patient_prop_scores.
 # 
 # ## Load functions required
 # 
-# source("11.01.slade_aurum_functions.R")
-# source("11.02.slade_aurum_set_data.R")
+# source("01.slade_aurum_functions.R")
+# source("02.slade_aurum_set_data.R")
 # 
 # ## Load dataset
 # ps.model.train <- set_up_data_sglt2_glp1(dataset.type = "ps.model.train")
